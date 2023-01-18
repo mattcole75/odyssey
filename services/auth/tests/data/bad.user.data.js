@@ -5,7 +5,7 @@ const users = [
         desription: 'create user, Rand Althor',
         displayName: 'Rand Althor',
         email: 'rand.altho@system.com',
-        password: 'letmein',
+        password: '1234abcd!',
         role: ['user'],
         localId: '',
         idToken: ''
@@ -32,7 +32,7 @@ const users = [
         desription: 'create user, Rand Althor',
         displayName: 'Rand Althor',
         email: 'rand.althor@system.com',
-        password: 'letmein',
+        password: '1234abcd!',
         role: ['user'],
         localId: '',
         idToken: ''

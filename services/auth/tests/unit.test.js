@@ -450,7 +450,7 @@ describe('Test the user update functionality', () => {
 // auth input validator tests
 describe('Test the user input validators', () => {
 
-    it('should, fail validation for missing @', async done => {
+    it('should, fail validation for missing @', async () => {
         await endPoint.post(application + '/api/' + version + '/user')
             .send({
                 displayName: "Test",
@@ -463,7 +463,7 @@ describe('Test the user input validators', () => {
             .then(res => {
                 expect(res.body.status).toBe(400);
                 expect(res.body.msg).toBe('Bad request - validation failure');
-                done();
+                
             })
     });
 

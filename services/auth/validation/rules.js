@@ -3,7 +3,8 @@ const { ObjectId } = require('mongodb');
 const postUserRules = {
     displayName: value => value.length > 0 && value.length <= 50,
     email: value => /^([a-zA-Z0-9._%-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6})*$/.test(value),
-    password: value => /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$/i.test(value)
+    password: value => value.length === 64
+    // password: value => /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$/i.test(value)
 }
 
 const postLoginRules = {
