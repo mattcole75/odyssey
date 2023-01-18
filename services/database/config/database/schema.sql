@@ -1,7 +1,7 @@
-drop database if exists core;
-create database core;
+drop database if exists odyssey;
+create database odyssey;
 
-use core;
+use odyssey;
 
 -- an asset is a physical space allocated to provide functionality that satisfies some requirement
 create table asset (

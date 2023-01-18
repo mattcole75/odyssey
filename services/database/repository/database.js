@@ -5,7 +5,7 @@ const executeInsert = (req, next) => {
     const { sql } = req.body;
     database.getPool().query(sql, (err, res) => {
         if(err) {
-            console.log(err);
+            // console.log(err);
             next({ status: 500, res: err }, null);
         }
         else {

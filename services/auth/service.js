@@ -2,7 +2,7 @@
 const dotenv = require('dotenv').config();
 const database = require('./configuration/database');
 const config = require('./configuration/config');
-const application = config.get('application');
+const service = config.get('service');
 const express = require('./configuration/express');
 
 if(dotenv.error) {
@@ -20,7 +20,7 @@ database.connectToServer((err) => {
         process.exit();
     } else {
         app.listen(PORT, () => {
-            console.log(application + ` api is running on port: ${PORT}`);
+            console.log(service + ` api is running on port: ${PORT}`);
         });
     }
 });

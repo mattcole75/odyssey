@@ -5,7 +5,7 @@ const config = require('../configuration/config');
 const createLogger = () => {
 
     const logger = bunyan.createLogger({
-        name: config.get('application'),
+        name: config.get('service'),
         streams: [{
             path: process.env.LOG_PATH,
         }]

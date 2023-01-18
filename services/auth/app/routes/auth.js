@@ -1,16 +1,15 @@
 const config = require('../../configuration/config');
-const application = config.get('application');
+const service = config.get('service');
 const version = config.get('version');
 const auth = require('../controller/auth');
 
 module.exports = (app) => {
 
-    app.get('/', (req, res) => {
+    app.get('/' + service + '/api/' + version, (req, res) => {
         res.status(200).send({'msg': 'Server is up!'});
     });
 
-    app.post('/' + application + '/api/' + version + '/user', (req, res) => {
-        
+    app.post('/' + service + '/api/' + version + '/user', (req, res) => {
         auth.postUser(req, (err, user) => {
             res.set('Content-Type', 'application/json');
             if(err)
@@ -20,8 +19,7 @@ module.exports = (app) => {
         });
     });
 
-    app.post('/' + application + '/api/' + version + '/user/login', (req, res) => {
-
+    app.post('/' + service + '/api/' + version + '/user/login', (req, res) => {
         auth.login(req, (err, auth) => {
             res.set('Content-Type', 'application/json');
             if(err)
@@ -31,8 +29,7 @@ module.exports = (app) => {
         });
     });
 
-    app.get('/' + application + '/api/' + version + '/user', (req, res) => {
-
+    app.get('/' + service + '/api/' + version + '/user', (req, res) => {
         res.set('Content-Type', 'application/json');
 
         const rules = {
@@ -54,8 +51,7 @@ module.exports = (app) => {
         });
     });
 
-    app.get('/' + application + '/api/' + version + '/users', (req, res) => {
-
+    app.get('/' + service + '/api/' + version + '/users', (req, res) => {
         res.set('Content-Type', 'application/json');
 
         const rules = {
@@ -76,8 +72,7 @@ module.exports = (app) => {
         });
     });
 
-    app.post('/' + application + '/api/' + version + '/user/logout', (req, res) => {
-
+    app.post('/' + service + '/api/' + version + '/user/logout', (req, res) => {
         res.set('Content-Type', 'application/json');
 
         const rules = {
@@ -99,8 +94,7 @@ module.exports = (app) => {
         });
     });
 
-    app.patch('/' + application + '/api/' + version + '/user/displayname', (req, res) => {
-
+    app.patch('/' + service + '/api/' + version + '/user/displayname', (req, res) => {
         res.set('Content-Type', 'application/json');
 
         const rules = {
@@ -122,8 +116,7 @@ module.exports = (app) => {
         });
     });
 
-    app.patch('/' + application + '/api/' + version + '/user/email', (req, res) => {
-
+    app.patch('/' + service + '/api/' + version + '/user/email', (req, res) => {
         res.set('Content-Type', 'application/json');
 
         const rules = {
@@ -145,8 +138,7 @@ module.exports = (app) => {
         });
     });
 
-    app.patch('/' + application + '/api/' + version + '/user/password', (req, res) => {
-
+    app.patch('/' + service + '/api/' + version + '/user/password', (req, res) => {
         res.set('Content-Type', 'application/json');
 
         const rules = {
@@ -168,8 +160,7 @@ module.exports = (app) => {
         });
     });
 
-    app.patch('/' + application + '/api/' + version + '/user/role', (req, res) => {
-
+    app.patch('/' + service + '/api/' + version + '/user/role', (req, res) => {
         res.set('Content-Type', 'application/json');
 
         const rules = {
@@ -190,11 +181,9 @@ module.exports = (app) => {
         });
     });
 
-    app.post('/' + application + '/api/' + version + '/approvetransaction', (req, res) => {
-
+    app.post('/' + service + '/api/' + version + '/approvetransaction', (req, res) => {
         // will not authenticate user as the function is only checking the token
         // must check the rules of the requesting API endpoint
-        
         auth.approveTransaction(req, (err, token) => {
             res.set('Content-Type', 'application/json');
             if(err)

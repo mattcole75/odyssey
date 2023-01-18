@@ -4,8 +4,7 @@
   "description": "The authentication platform for all systems",
   "main": "index.js",
   "scripts": {
-    "auth": "node service.js",
-    "test": "echo 'db.user.remove({})' | mongosh auth && jest"
+    "auth": "node service.js"
   },
   "keywords": [
     "Authentication"

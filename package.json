@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "assets": "node server.js",
-    "test": "jest",
+    "test": "echo 'db.user.remove({})' | mongosh auth && jest --runInBand",
     "testOld": "echo 'db.asset.remove({})' | mongo assets && jest",
     "populate": "jest -t 'Test the location microservice POST methods'",
     "startRailmon": "node services/auth/service.js"

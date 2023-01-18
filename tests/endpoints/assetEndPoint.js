@@ -1,4 +1,4 @@
-const config = require('../services/asset/config/app/config');
+const config = require('../../services/asset/config/app/config');
 const service = config.get('service');
 const version = config.get('version');
 
