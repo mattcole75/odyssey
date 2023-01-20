@@ -5,9 +5,9 @@ use odyssey;
 
 -- an asset is a physical space allocated to provide functionality that satisfies some requirement
 create table asset (
-    id int not null auto_increment,
+    id int not null auto_increment, -- the primary key
 
-    assetRef int null, -- where in the world is this asset ref to the location service
+    assetRef int null, -- reference to a perent child relationship, null would indicate the asset at the top of the hierarchy
     ownedByRef varchar(64) not null, -- which organisation ownes this asset ref to the organisation service
 
     name varchar(32) not null unique, -- the name describing the asset is unique
@@ -20,8 +20,9 @@ create table asset (
     locationType varchar(32) not null, -- constrain to the following values: Area or Pin
     area polygon null, -- a series of coordinates (lat lng)
     pin point null, -- a single coordinate (lat lng)
-    -- latitude decimal(10, 8) null, -- location latitude
-    -- longitude decimal(11, 8) null, -- location logitude
+    -- an location type defines the asset function - this could be geographical area, geographical point
+        -- geographical area asset type will define a polygon encapsulating a geographical area with other geographical area and/or geographical points.
+        -- geographical pin asset type will reference a physical unit and will be made up of asset equipment
 
     created datetime not null default now(), -- when was this record created
     updated datetime not null default now() on update now(), -- when was the last time this record was updated
@@ -44,9 +45,9 @@ create table equipmentModel (
     mtbfHours int not null, -- what is the mean time (hours) between failures
     mtbrHours int not null, -- what is the mean time (hours) between repairs
 
-    created datetime not null default now(),
-    updated datetime not null default now() on update now(),
-    inUse boolean not null default true,
+    created datetime not null default now(), -- when was this record created
+    updated datetime not null default now() on update now(), -- when was the last time this record was updated
+    inUse boolean not null default true, -- can this record be used / viewed
 
     primary key (id)
 );
@@ -69,9 +70,9 @@ create table equipment (
     uninstalled datetime null, -- the date the equioment was installed
     disposed date null,  -- the date the equipment was disposed of
 
-    created datetime not null default now(),
-    updated datetime not null default now() on update now(),
-    inUse boolean not null default true,
+    created datetime not null default now(), -- when was this record created
+    updated datetime not null default now() on update now(), -- when was the last time this record was updated
+    inUse boolean not null default true, -- can this record be used / viewed
 
     primary key (id),
     constraint fk_equipment_assetRef foreign key (assetRef) references asset (id) on update cascade on delete cascade,
@@ -86,10 +87,145 @@ create table equipmentTanc (
     equipmentRef int not null, -- reference to the equipment
     tancRef varchar(64) not null, -- reference to the tanc Service
 
-    created datetime not null default now(),
-    updated datetime not null default now() on update now(),
-    inUse boolean not null default true,
+    created datetime not null default now(), -- when was this record created
+    updated datetime not null default now() on update now(), -- when was the last time this record was updated
+    inUse boolean not null default true, -- can this record be used / viewed
 
     primary key (id),
     constraint fk_equipmentTanc_equipmentRef foreign key (equipmentRef) references equipment (id) on update cascade on delete cascade
+);
+
+-- VALIDATION --
+-- requirement source table, this could make reference to the Law, Contract, Best Practice, and the Manufacturers O&M
+create table requirementSource (
+    id int not null auto_increment, -- the primary key
+
+    source varchar(32) not null, -- the short description of the requirement source
+    description varchar(256) not null, -- the long description of the requirement source
+    reference varchar(64) not null, -- the documented reference number of the source
+    version varchar(32) not null, -- the version of the source document
+    url varchar(256) null, -- a web reference to the source
+    reviewedDate date not null, -- a date indicating when the source was reviewed
+    reviewPeriodWeeks tinyint not null, -- the period between review dates
+
+    created datetime not null default now(), -- when was this record created
+    updated datetime not null default now() on update now(), -- when was the last time this record was updated
+    inUse boolean not null default true, -- can this record be used / viewed
+
+    primary key (id)
+);
+
+-- what are the requirements that need to be satisfied
+create table requirement (
+    id int not null auto_increment, -- the primary key
+
+    requirementSourceRef int not null, -- the referecne to the requirement source table
+
+    title varchar(32) not null unique, -- the requirements title
+    requirement varchar(512) not null, -- a description of the requirement
+    guidance varchar(512) null, -- ny guidance on how the requirements could be satified
+    
+    reviewedDate date not null, -- a date indicating when the source was reviewed
+    reviewPeriodWeeks tinyint not null, -- the period between review dates
+    expires date null, -- a date in the future when this requirement will no longer be required
+
+    created datetime not null default now(), -- when was this record created
+    updated datetime not null default now() on update now(), -- when was the last time this record was updated
+    inUse boolean not null default true, -- can this record be used / viewed
+
+    primary key (id),
+    constraint fk_requirement_requirementSourceRef foreign key (requirementSourceRef) references requirementSource (id) on update cascade on delete cascade
+);
+
+-- specify how the requirements will be satisfied through a task specification
+create table taskSpecification (
+    id int not null auto_increment, -- the primary key
+
+    requirementRef int not null, -- the reference to the requirement table
+
+    title varchar(32) not null unique, -- the specification title
+    specification varchar(256) not null, -- the specification text - shall, will, must
+
+    reviewedDate date not null, -- a date indicating when the specification was reviewed
+    reviewPeriodWeeks tinyint not null, -- the period between review dates
+    expires date null, -- a date in the future when this specification will no longer be required
+
+    taskScheduleType varchar(32) not null, -- two types cyclical or Week based
+
+    taskCyclicalStartDate date null, -- the date the task must start
+    taskCyclicalFrequencyWeeks tinyInt null, -- the task periodicity in weeks
+    -- or
+    taskIsoDateStartWeek tinyInt not null, -- 52/53 weeks in a year
+    taskIsoDateDay tinyInt not null, -- 7 days in a week - 1 = Monday
+    taskIsoDateRepeatType varchar(32) null, -- task period repeats [weekly, daily] must be divisable by 52, 26, 13 or 1, 4, 12, 24, 48
+    taskIsoDateRepeats tinyInt null, -- frequency at which the task repeats
+
+    taskTolerenceType varchar(32) not null, --  weeks, days
+    tolerance tinyInt not null, -- the value by which the task can be brought forward or taken back
+
+    created datetime not null default now(), -- when was this record created
+    updated datetime not null default now() on update now(), -- when was the last time this record was updated
+    inUse boolean not null default true, -- can this record be used / viewed
+
+    primary key (id),
+    constraint fk_taskSpecification_requirementRef foreign key (requirementRef) references requirement (id) on update cascade on delete cascade,
+    constraint ck_taskSpecification_taskScheduleType check (taskScheduleType in ('cyclical', 'period'))
+);
+
+-- a list of sequencial instruction to satisfy the specification
+create table taskRequirement (
+    id int not null auto_increment, -- the primary key
+
+    taskSpecificationRef int not null, -- the reference to the task specification table
+
+    title varchar(32) not null, -- the instructions task
+    description varchar(256) not null, -- the instructions description
+    durationHours tinyInt not null, -- how long the task will take
+    resource tinyInt not null, -- how many people are required to complete task
+    sequence smallInt not null, -- the 
+
+    -- future link to competency
+    -- future link to tools
+    -- future link to plant
+    -- future link to parts/consumables
+
+    created datetime not null default now(), -- when was this record created
+    updated datetime not null default now() on update now(), -- when was the last time this record was updated
+    inUse boolean not null default true, -- can this record be used / viewed
+
+    primary key (id),
+    constraint fk_taskInstruction_taskSpecificationRef foreign key (taskSpecificationRef) references taskSpecification (id) on update cascade on delete cascade
+
+);
+
+create table taskInstruction (
+    id int not null auto_increment, -- the primary key
+
+    taskRequirementRef int not null, -- a reference to the task requirement table
+
+    sequence smallInt not null, -- the key to ordering this list for presentation
+    instruction varchar(512) not null, -- detail to complete the step
+
+    created datetime not null default now(), -- when was this record created
+    updated datetime not null default now() on update now(), -- when was the last time this record was updated
+    inUse boolean not null default true, -- can this record be used / viewed
+
+    primary key (id),
+    constraint fk_taskInstruction_taskRequirementRef foreign key (taskRequirementRef) references taskRequirement (id) on update cascade on delete cascade
+);
+
+create table taskRecordRequirement (
+    id int not null auto_increment, -- the primary key
+
+    taskInstructionRef int not null, -- the reference to the task instruction table
+
+    item varchar(32) not null, -- the name of the item to be recorded
+    dataType varchar(32) not null, -- what kind of data needs to be recorded - numerical, boolean, signature, photo, text, pdf document
+
+    created datetime not null default now(), -- when was this record created
+    updated datetime not null default now() on update now(), -- when was the last time this record was updated
+    inUse boolean not null default true, -- can this record be used / viewed
+
+    primary key (id),
+    constraint fk_taskRecord_taskInstructionRef foreign key (taskInstructionRef) references taskInstruction (id) on update cascade on delete cascade
 );
