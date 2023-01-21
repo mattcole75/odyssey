@@ -44,10 +44,10 @@ Requires JSON Header:
     }
 
 Requires JSON Body:
-    {
+    [{
         id: 'sensor registered id',
         value: 20 this must be a numerical value for the aggregate GET request to work correctly
-    }
+    }]
 
 Returns:
     - 201 Created, returns the uid and transaction status
