@@ -13,7 +13,7 @@ const Navigation = (props) => {
 
                 <div  className='dropdown text-end'>
 					<a href='/' className='nav-link text-white dropdown-toggle' id='dropdownUser1' data-bs-toggle='dropdown' aria-expanded='false'>
-						{/* <i className='bi-person fs-3 d-block text-sm-center'></i> */}
+						<i className='bi-person fs-3 d-block text-sm-center'></i>
 						Profile
 					</a>
 					<ul className='dropdown-menu text-small' aria-labelledby='dropdownUser1'>
@@ -24,9 +24,7 @@ const Navigation = (props) => {
 						{ isAuthenticated
 							?	<li><hr className='dropdown-divider'/></li>
 							:	null
-						}
-						{/* <DropdownNavigationItem link='/users' icon='bi-people'> Users</DropdownNavigationItem> */}
-						
+						}						
                         { !isAuthenticated
 							?	<NavigationMenuItem link='/login' icon='bi-person-check'> Login</NavigationMenuItem>
 							:	null
@@ -38,8 +36,7 @@ const Navigation = (props) => {
                         { !isAuthenticated
                             ?   <NavigationMenuItem link='/signup' icon='bi-person-plus'> Sign-up</NavigationMenuItem>
                             :   null
-                        }
-						
+                        }						
 					</ul>
 				</div>
             </ul>

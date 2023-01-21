@@ -645,7 +645,7 @@ describe('Bug replication and fixes', () => {
 
     // monitoring the logs on the live server and clocked this request... someone trying to hack the system? 
     it('should return 404 Not Found', async () => {
-        await authEndPoint.get('.env')
+        await authEndPoint.get('/.env')
         .expect(404)
         .then(res => {
             expect(res.res.statusMessage).toBe('Not Found');
@@ -653,7 +653,7 @@ describe('Bug replication and fixes', () => {
     });
 
     it('should return 404 Not Found', async () => {
-        await authEndPoint.get('index.html')
+        await authEndPoint.get('/index.html')
         .expect(404)
         .then(res => {
             expect(res.res.statusMessage).toBe('Not Found');
@@ -812,7 +812,7 @@ describe('Bug replication and fixes', () => {
 
     // monitoring the logs on the live server and clocked this request... someone trying to hack the system? 
     it('should return 404 Not Found', async () => {
-        await assetEndPoint.get('.env')
+        await assetEndPoint.get('/.env')
         .expect(404)
         .then(res => {
             expect(res.res.statusMessage).toBe('Not Found');
@@ -820,7 +820,7 @@ describe('Bug replication and fixes', () => {
     });
 
     it('should return 404 Not Found', async () => {
-        await assetEndPoint.get('index.html')
+        await assetEndPoint.get('/index.html')
         .expect(404)
         .then(res => {
             expect(res.res.statusMessage).toBe('Not Found');
