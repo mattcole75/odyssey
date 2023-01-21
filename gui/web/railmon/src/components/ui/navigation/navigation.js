@@ -11,6 +11,12 @@ const Navigation = (props) => {
             <ul className='nav col-12 col-lg-auto me-lg-auto mb-2 justify-content-center mb-md-0'>
                 <NavigationItem link='/' icon='bi-house-door'>Home</NavigationItem>
 
+				{ isAuthenticated
+					?	<NavigationItem link='/assets' icon='bi-share'>Assets</NavigationItem>
+					:	null
+				}
+				
+
                 <div  className='dropdown text-end'>
 					<a href='/' className='nav-link text-white dropdown-toggle' id='dropdownUser1' data-bs-toggle='dropdown' aria-expanded='false'>
 						<i className='bi-person fs-3 d-block text-sm-center'></i>

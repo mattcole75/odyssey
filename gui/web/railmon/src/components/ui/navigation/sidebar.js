@@ -19,7 +19,14 @@ const Sidebar = (props) => {
                         <li className='nav-item'>
                             <NavLink to='/' className='nav-link text-white' onClick={ toggleShowSidebar }><i className='bi-house-door' />  Home</NavLink>
                         </li>
-
+                        
+                        { isAuthenticated
+                            ?   <li className='nav-item'>
+                                    <NavLink to='/assets' className='nav-link text-white' onClick={ toggleShowSidebar }><i className='bi-share' />  Assets</NavLink>
+                                </li>
+                            : null
+                        }
+                        
                         <div className='mx-2'>
                             <hr className='px-3 py-2' />
                         </div>
