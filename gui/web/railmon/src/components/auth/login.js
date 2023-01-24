@@ -56,7 +56,7 @@ const Login = () => {
                     <label htmlFor='email'>Email Address</label>
                 </div>
                 <div className='form-floating mb-3'>
-                    <input type='password' className='form-control form-auth-ele-bot form-auth-password' id='password' placeholder='Password' autoComplete='off' required
+                    <input type='password' className='form-control form-auth-ele-bot' id='password' placeholder='Password' autoComplete="new-password" required
                     { ...register('password', { required: true, minLength: 6, maxLength: 32 }) }
                     />
                     <label htmlFor='password'>Password</label>
