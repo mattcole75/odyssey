@@ -1,14 +1,13 @@
 import axios from '../../axios/auth';
 import * as actionType from './actionTypes';
-import {whatIsTheErrorMessage} from '../../shared/errorMessages';
+import { whatIsTheErrorMessage } from '../../shared/errorMessages';
 
 // reducer interface functions
-
 const start = () => {
     return {
         type: actionType.AUTH_START
     };
-};
+}
 
 const success = (idToken, localId, email, displayName, roles, avatarUrl, identifier) => {
     return {
@@ -21,26 +20,26 @@ const success = (idToken, localId, email, displayName, roles, avatarUrl, identif
         avatarUrl: avatarUrl,
         identifier: identifier
     };
-};
+}
 
 const finish = () => {
     return {
         type: actionType.AUTH_FINISH
     };
-};
+}
 
 const fail = (error) => {
     return {
         type: actionType.AUTH_FAIL,
         error: error
     };
-};
+}
 
 const reset = () => {
     return {
         type: actionType.AUTH_RESET
     };
-};
+}
 
 const avatarUrlUpdate = (idToken, avatarUrl, identifier) => {
     return {
@@ -49,7 +48,7 @@ const avatarUrlUpdate = (idToken, avatarUrl, identifier) => {
         idToken: idToken,
         identifier: identifier
     };
-};
+}
 
 const avatarUrlDelete = (idToken, avatarUrl, identifier) => {
     return {
@@ -58,7 +57,7 @@ const avatarUrlDelete = (idToken, avatarUrl, identifier) => {
         idToken: idToken,
         identifier: identifier
     };
-};
+}
 
 const displayNameUpdate = (displayName, identifier) => {
     return {
@@ -66,7 +65,7 @@ const displayNameUpdate = (displayName, identifier) => {
         displayName: displayName,
         identifier: identifier
     };
-};
+}
 
 const emailUpdate = (email, identifier) => {
     return {
@@ -74,7 +73,7 @@ const emailUpdate = (email, identifier) => {
         email: email,
         identifier: identifier
     };
-};
+}
 
 const passwordUpdate = (identifier) => {
     return {
@@ -93,7 +92,7 @@ const deleteLocalStorage = () => {
     localStorage.removeItem('email');
     localStorage.removeItem('roles');
     localStorage.removeItem('avatarUrl');
-};
+}
 
 const setLocalStorage = (authData) => {
 
@@ -105,10 +104,9 @@ const setLocalStorage = (authData) => {
     localStorage.setItem('displayName', authData.displayName);
     localStorage.setItem('roles', JSON.stringify(authData.roles));
     localStorage.setItem('avatarUrl', authData.avatarUrl);
-};
+}
 
 // exported functions
-
 export const logout = () => {
 
     const idToken = localStorage.getItem('idToken');
@@ -139,7 +137,7 @@ export const logout = () => {
             });
         }
     };
-};
+}
 
 export const checkAuthTimeout = (expirationTime) => {
     return dispatch => {
@@ -147,7 +145,7 @@ export const checkAuthTimeout = (expirationTime) => {
             dispatch(logout({}));
         }, expirationTime * 1000);
     };
-};
+}
 
 export const login = (authData, identifier) => {
     return dispatch => {
@@ -176,7 +174,7 @@ export const login = (authData, identifier) => {
                 dispatch(fail(whatIsTheErrorMessage(err))); 
             });
     };
-};
+}
 
 export const signup = (authData, identifier) => {
     return dispatch => {
@@ -206,7 +204,7 @@ export const signup = (authData, identifier) => {
                 dispatch(fail(whatIsTheErrorMessage(err))); 
             });
     };
-};
+}
 
 export const passwordRequest = (authData, identifier) => {
     return dispatch => {
@@ -233,7 +231,7 @@ export const passwordRequest = (authData, identifier) => {
                 dispatch(fail(whatIsTheErrorMessage(error)));
             });
     };
-};
+}
 
 export const updateDisplayName = (data, idToken, localId, identifier) => {
     return dispatch => {
@@ -260,7 +258,7 @@ export const updateDisplayName = (data, idToken, localId, identifier) => {
                 dispatch(fail(whatIsTheErrorMessage(err))); 
             });
     };
-};
+}
 
 export const updateEmail = (data, idToken, localId, identifier) => {
     return dispatch => {
@@ -287,7 +285,7 @@ export const updateEmail = (data, idToken, localId, identifier) => {
                 dispatch(fail(whatIsTheErrorMessage(err))); 
             });
     };
-};
+}
 
 export const updatePassword = (password, idToken, localId, identifier) => {
     return dispatch => {
@@ -313,7 +311,7 @@ export const updatePassword = (password, idToken, localId, identifier) => {
                 dispatch(fail(whatIsTheErrorMessage(err))); 
             });
     };
-};
+}
 
 export const updateAccount = (authData, idToken, localId, identifier) => {
     return dispatch => {
@@ -472,4 +470,4 @@ export const authCheckState = () => {
             } 
         }
     };
-};
+}

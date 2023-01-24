@@ -7,3 +7,9 @@ export {
     updatePassword,
     authCheckState
 } from './auth';
+
+export {
+    adminReset,
+    adminGetUsers,
+    adminUpdateUser
+} from './admin';

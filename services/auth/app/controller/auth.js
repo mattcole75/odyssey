@@ -4,7 +4,7 @@ const crypto = require('crypto');
 const config = require('../../configuration/config');
 const version = config.get('version');
 const validate = require('../../validation/validate');
-const { postUserRules, postLoginRules, getUserRules, postLogoutRules, getTokenRules, patchUserDisplayNameRules, patchUserEmailRules, patchUserPasswordRules, patchUserRoleRules, testTokenRules } = require('../../validation/rules');
+const { postUserRules, postLoginRules, getUserRules, postLogoutRules, getTokenRules, patchUserDisplayNameRules, patchUserEmailRules, patchUserPasswordRules, patchUserRoleRules, testTokenRules, patchAdminUserRules } = require('../../validation/rules');
 const moment = require('moment');
 const { genHash, genToken } = require('../../utility/auth');
 const { ObjectId } = require('mongodb');
@@ -151,7 +151,7 @@ const getUser = (req, next) => {
 
 const getUsers = (req, next) => {
 
-    const { localid, idtoken } = req.headers;
+    const { localid, idtoken, query } = req.headers;
 
     let errors = [];
 
@@ -166,7 +166,7 @@ const getUsers = (req, next) => {
         log.error(`POST v${version} - validation failure - getUser - status: 400, msg: ${errors}`);
         next({status: 400, msg: 'Bad request - validation failure'}, null);
     } else {
-        auth.getUsers(req.headers, (err, res) => {
+        auth.getUsers(query, (err, res) => {
             if(err) {
                 log.error(`POST v${version} - failed - getUser - status: ${err.status} msg: ${err.msg}`);
                 next(err, null);
@@ -249,7 +249,7 @@ const isAuthenticated = (req, rules, next) => {
         idtoken && idtoken != null && idtoken !== null && idtoken !== '' && idtoken !== 'null') {
         errors = validate(req.headers, getTokenRules);
     } else {
-        log.error(`POST v${version} - validation failure - isAuthenticated - status: 400, msg: request header parameters missing`);
+        log.error(`POST v${version} - validation failure - isAuthenticated - status: 401, msg: request header parameters missing`);
         return next({ status: 401, msg: 'Unauthorised' }, null);
     }
 
@@ -346,18 +346,21 @@ const patchUserPassword = (req, next) => {
     }
 }
 
-const patchUserRole = (req, next) => {
+const patchAdminUser = (req, next) => {
 
-    const { localId, idToken, roles } = req.body;
+    const { uid, roles, inuse } = req.body;
+    console.log('uid', uid);
+    console.log('roles', roles);
+    console.log('inuse', inuse);
 
-    const errors = validate(req.body, patchUserRoleRules);
+    const errors = validate(req.body, patchAdminUserRules);
 
     if(errors.length > 0) {
-        log.error(`POST v${version} - validation failure - patch user roles - status: 400, msg: ${errors}`);
+        log.error(`POST v${version} - validation failure - patch user status - status: 400, msg: ${errors}`);
         next({status: 400, msg: 'Bad request - validation failure'}, null);
     } else {
-        const params = { localId: localId, idToken: idToken, data: { roles: roles, updated: moment().format() } };
-        auth.patchUserRole(params, (err, res) => {
+        const params = { uid: uid, data: { roles: roles, inuse: inuse, updated: moment().format() } };
+        auth.patchAdminUser(params, (err, res) => {
             if(err) {
                 log.error(`POST v${version} - failed - patchUser - status: ${err.status} msg: ${err.msg}`);
                 next(err, null);
@@ -367,6 +370,28 @@ const patchUserRole = (req, next) => {
         });
     }
 }
+
+// const patchUserRole = (req, next) => {
+
+//     const { localId, idToken, roles } = req.body;
+
+//     const errors = validate(req.body, patchUserRoleRules);
+
+//     if(errors.length > 0) {
+//         log.error(`POST v${version} - validation failure - patch user roles - status: 400, msg: ${errors}`);
+//         next({status: 400, msg: 'Bad request - validation failure'}, null);
+//     } else {
+//         const params = { localId: localId, idToken: idToken, data: { roles: roles, updated: moment().format() } };
+//         auth.patchUserRole(params, (err, res) => {
+//             if(err) {
+//                 log.error(`POST v${version} - failed - patchUser - status: ${err.status} msg: ${err.msg}`);
+//                 next(err, null);
+//             } else {
+//                 next(null, res);
+//             }
+//         });
+//     }
+// }
 
 const approveTransaction = (req, next) => {
 
@@ -411,6 +436,7 @@ module.exports = {
     patchUserDisplayName: patchUserDisplayName,
     patchUserEmail: patchUserEmail,
     patchUserPassword: patchUserPassword,
-    patchUserRole: patchUserRole,
+    patchAdminUser: patchAdminUser,
+    // patchUserRole: patchUserRole,
     approveTransaction: approveTransaction
 }

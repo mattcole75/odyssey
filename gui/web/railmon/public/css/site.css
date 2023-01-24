@@ -66,6 +66,12 @@ p::before {
   content: "⚠ ";
 } */
 
+.form-admin {
+  width: 100%;
+  padding: 15px;
+  margin: auto;
+}
+
 
 
 .loader {

@@ -55,7 +55,7 @@ module.exports = (app) => {
         res.set('Content-Type', 'application/json');
 
         const rules = {
-            roles: ['user', 'administrator']
+            roles: ['administrator']
         }
 
         auth.isAuthenticated(req, rules, (err) => {
@@ -160,18 +160,18 @@ module.exports = (app) => {
         });
     });
 
-    app.patch('/' + service + '/api/' + version + '/user/role', (req, res) => {
+    app.patch('/' + service + '/api/' + version + '/admin/user', (req, res) => {
         res.set('Content-Type', 'application/json');
 
         const rules = {
-            roles: ['user', 'administrator']
+            roles: ['administrator']
         }
 
         auth.isAuthenticated(req, rules, (err) => {
             if(err)
                 res.status(err.status).send(err);
             else {
-                auth.patchUserRole(req, (err, user) => {
+                auth.patchAdminUser(req, (err, user) => {
                     if(err)
                         res.status(err.status).send(err);
                     else
@@ -180,6 +180,27 @@ module.exports = (app) => {
             }
         });
     });
+
+    // app.patch('/' + service + '/api/' + version + '/user/role', (req, res) => {
+    //     res.set('Content-Type', 'application/json');
+
+    //     const rules = {
+    //         roles: ['administrator']
+    //     }
+
+    //     auth.isAuthenticated(req, rules, (err) => {
+    //         if(err)
+    //             res.status(err.status).send(err);
+    //         else {
+    //             auth.patchUserRole(req, (err, user) => {
+    //                 if(err)
+    //                     res.status(err.status).send(err);
+    //                 else
+    //                     res.status(user.status).send(user);
+    //             });
+    //         }
+    //     });
+    // });
 
     app.post('/' + service + '/api/' + version + '/approvetransaction', (req, res) => {
         // will not authenticate user as the function is only checking the token

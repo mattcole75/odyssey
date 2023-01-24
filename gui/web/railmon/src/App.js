@@ -10,6 +10,8 @@ const App = () => {
 	const dispatch = useDispatch();
 	const onTryAutoLogin = useCallback(() => dispatch(authCheckState()), [dispatch]);
 	const isAuthenticated = useSelector(state => state.auth.idToken !== null);
+	const roles = useSelector(state => state.auth.roles);
+    const isAdministrator = roles.includes('administrator', 0);
 
 	useEffect(() => {
 		onTryAutoLogin();
@@ -35,6 +37,9 @@ const App = () => {
 	const Account = React.lazy(() => {
 		return import('./components/auth/account/account');
 	});
+	const Users = React.lazy(() => {
+		return import('./components/admin/users/users');
+	});
 
 	const routes = (
 		<Routes>
@@ -43,12 +48,13 @@ const App = () => {
 			<Route path='/signup' element={ <Signup /> } />
 			<Route path='/logout' element={ <Logout /> } />
 			{ isAuthenticated && <Route path='/account' element={ <Account /> } /> }
+			{ isAuthenticated && isAdministrator && <Route path='admin/users' element={ <Users /> } /> }
 		</Routes>
 	);
 
 	return (
 		<div>
-			<Layout>
+			<Layout isAuthenticated={ isAuthenticated } isAdministrator={ isAdministrator }>
 				<Suspense fallback={<p>Loading...</p>}>{ routes }</Suspense>
 			</Layout>
 		</div>

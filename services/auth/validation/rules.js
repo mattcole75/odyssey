@@ -39,6 +39,12 @@ const patchUserPasswordRules = {
     password: value => value.length === 64
 }
 
+const patchAdminUserRules = {
+    uid: value => ObjectId.isValid(value),
+    roles: value => value.constructor === Array,
+    inuse: value => value.constructor === Boolean
+}
+
 const patchUserRoleRules = {
     localId: value => ObjectId.isValid(value),
     idToken: value => value.length === 256,
@@ -58,6 +64,7 @@ module.exports = {
     patchUserDisplayNameRules: patchUserDisplayNameRules,
     patchUserEmailRules: patchUserEmailRules,
     patchUserPasswordRules: patchUserPasswordRules,
+    patchAdminUserRules: patchAdminUserRules,
     patchUserRoleRules: patchUserRoleRules,
     testTokenRules: testTokenRules
 }

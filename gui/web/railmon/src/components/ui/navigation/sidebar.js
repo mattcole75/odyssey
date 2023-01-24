@@ -3,7 +3,7 @@ import { NavLink } from 'react-router-dom';
 
 const Sidebar = (props) => {
 
-    const { isAuthenticated, showSidebar, toggleShowSidebar } = props;
+    const { isAuthenticated, isAdministrator, showSidebar, toggleShowSidebar } = props;
 
     const navStyle = ['col-md-3', 'col-lg-2', 'sidebar', 'bg-dark', 'bg-opacity-75']
 
@@ -27,9 +27,12 @@ const Sidebar = (props) => {
                             : null
                         }
                         
-                        <div className='mx-2'>
-                            <hr className='px-3 py-2' />
-                        </div>
+                        { isAuthenticated
+                            ?   <div className='mx-2'>
+                                    <hr />
+                                </div>
+                            : null
+                        }
 
                         { isAuthenticated
                             ?   <li className='nav-item'>
@@ -54,6 +57,20 @@ const Sidebar = (props) => {
                                     <NavLink to='/signup' className='nav-link text-white' onClick={ toggleShowSidebar }><i className='bi-person-plus' />  Sign Up</NavLink>
                                 </li>
                             :   null
+                        }
+
+                        {/* admin */}
+                        { isAuthenticated && isAdministrator
+                            ?   <div className='mx-2'>
+                                    <hr />
+                                </div>
+                            : null
+                        }
+                        { isAuthenticated && isAdministrator
+                            ?   <li className='nav-item'>
+                                    <NavLink to='/admin/users' className='nav-link text-white' onClick={ toggleShowSidebar }><i className='bi-people' />  Users</NavLink>
+                                </li>
+                            : null
                         }
                     </ul>
                 </div>

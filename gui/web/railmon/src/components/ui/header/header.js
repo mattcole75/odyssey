@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 
 const Header = (props) => {
 
-    const { isAuthenticated, showSidebar, toggleShowSidebar } = props;   
+    const { isAuthenticated, isAdministrator,  showSidebar, toggleShowSidebar } = props;   
 
     return (
         <div className='container'>
@@ -27,7 +27,7 @@ const Header = (props) => {
                         <p className='h1 mb-0'>RailMon</p>
                     </Link>
                     <div className='headerNavigation'>
-                        <Navigation isAuthenticated={ isAuthenticated }/>
+                        <Navigation isAuthenticated={ isAuthenticated } isAdministrator={ isAdministrator }/>
                     </div>
                 </div>
             </header>

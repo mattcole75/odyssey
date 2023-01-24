@@ -5,13 +5,13 @@
   "main": "index.js",
   "scripts": {
     "assets": "node server.js",
-    "test": "echo 'db.user.remove({})' | mongosh auth && jest --runInBand",
-    "testOld": "echo 'db.asset.remove({})' | mongo assets && jest",
+    "authTest": "echo 'db.user.remove({})' | mongosh auth && jest ./tests/a.auth.unit.test.js --runInBand",
+    "assetTest": "jest ./tests/b.asset.unit.test.js --runInBand",
     "populate": "jest -t 'Test the location microservice POST methods'",
     "startRailmon": "node services/auth/service.js",
     "sparkDbInit1": "echo \"db.createCollection('sensorData', { 'timeseries': {timeField: 'timestamp', metaField: 'id', granularity: 'minutes'}, expireAfterSeconds: 31536000})\" | mongosh spark",
     "sparkDbInit2": "echo \"db.createCollection('pointData', { 'timeseries': {timeField: 'timestamp', metaField: 'id', granularity: 'minutes'}, expireAfterSeconds: 31536000})\" | mongosh spark",
-    "sparkTest": "echo 'db.sensorData.deleteMany({}) ' | mongosh spark && jest -t 'Spark Test' "
+    "sparkTest": "echo 'db.sensorData.deleteMany({}) ' | mongosh spark && jest ./tests/c.spark.unit.test.js --runInBand"
   },
   "keywords": [
     "asset register"

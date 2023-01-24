@@ -85,31 +85,26 @@ const getUser = (req, next) => {
         }));
 }
 
-const getUsers = (req, next) => {
+const getUsers = (query, next) => {
 
-    // const { id } = req.headers;
-    // const { name } = req.body;
+    let filter = null;
 
+    if(query !== '')
+        filter = { $text: { $search: query, $caseSensitive: false }}
+        
     const dbConnect = database.getDb();
-
-    // let query;
-    
-    // if (id)
-    //     query = { parentRef: id }
-    // else if (name)
-    //     query = {$text: { $search: name, $caseSensitive: false }}
-    // else
-    //     query = { parentRef: { $exists: false }};
 
     dbConnect
         .collection('user')
-        .find()
+        .find(filter)
         // .limit(200)
         .toArray(function (err, res) {
-        if (err) 
+        if (err) {
+            console.log('error', err);
             next({ status: 400, msg: err }, null);
+        }
         else 
-            next(null, { status: 200, data: res });
+            next(null, { status: 200, res: res });
         });
 }
 
@@ -181,18 +176,18 @@ const patchUser = (req, next) => {
         }));
 }
 
-const patchUserRole = (req, next) => {
+const patchAdminUser = (req, next) => {
 
-    const { localId } = req;
+    const { uid, data } = req;
 
     const dbConnect = database.getDb();
-    const id = new ObjectId(localId);
+    const id = new ObjectId(uid);
 
     dbConnect
         .collection('user')
         .updateOne(
             { _id: id }, 
-            { $set: req.data },
+            { $set: data },
             { upsert: true }, ((err, res) => {
                 const { acknowledged, modifiedCount, upsertedId, upsertedCount } = res;
                 if (err)
@@ -203,6 +198,29 @@ const patchUserRole = (req, next) => {
                     next({ status: 400, msg: "Invalid request" }, null);
             }));
 }
+
+// const patchUserRole = (req, next) => {
+
+//     const { localId } = req;
+
+//     const dbConnect = database.getDb();
+//     const id = new ObjectId(localId);
+
+//     dbConnect
+//         .collection('user')
+//         .updateOne(
+//             { _id: id }, 
+//             { $set: req.data },
+//             { upsert: true }, ((err, res) => {
+//                 const { acknowledged, modifiedCount, upsertedId, upsertedCount } = res;
+//                 if (err)
+//                 next({ status: 500, msg: err }, null);
+//                 else if (acknowledged === true && modifiedCount === 1 && upsertedId === null && upsertedCount === 0)
+//                     next(null, { status: 200, msg: 'OK' });
+//                 else
+//                     next({ status: 400, msg: "Invalid request" }, null);
+//             }));
+// }
 
 const approveTransaction = (idToken, next) => {
 
@@ -231,6 +249,7 @@ module.exports = {
     removeToken: removeToken,
     isAuthenticated: isAuthenticated,
     patchUser: patchUser,
-    patchUserRole: patchUserRole,
+    patchAdminUser: patchAdminUser,
+    // patchUserRole: patchUserRole,
     approveTransaction: approveTransaction
 }
