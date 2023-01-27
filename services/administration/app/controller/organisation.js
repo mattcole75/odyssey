@@ -1,5 +1,6 @@
 const repository = require('../repository/organisation');
 const axios = require('../../config/axios');
+const moment = require('moment');
 
 const post = (req, next) => {
 
@@ -37,7 +38,7 @@ const post = (req, next) => {
 
 const patch = (req, next) => {
     const { idtoken } = req.headers;
-    const { uid, name, assetRole } = req.body;
+    const { uid, name, assetRole, inuse } = req.body;
 
     console.log('headers', req.headers);
     console.log('body', req.body);
@@ -60,7 +61,7 @@ const patch = (req, next) => {
         .then(authRes => {
             if(authRes.data.status === 200) {
 
-                const data = { uid: uid, data: { name: name, assetRole: assetRole } }
+                const data = { uid: uid, data: { name: name, assetRole: assetRole, inuse: inuse, updated: moment().format() } }
                 repository.patch(data, (err, res) => {
                     if(err)
                         next(err, null);
