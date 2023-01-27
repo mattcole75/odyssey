@@ -13,7 +13,7 @@ module.exports = (app) => {
         
         res.set('Content-Type', 'application/json');
         
-        controller.createAsset(req, (err, response) => {
+        controller.postAsset(req, (err, response) => {
             if(err)
                 res.status(err.status).send(err);
             else

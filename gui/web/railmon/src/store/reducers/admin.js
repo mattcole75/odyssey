@@ -4,6 +4,7 @@ const initialState = {
     loading: false,
     error: null,
     users: [],
+    organisations: [],
     identifier: null,
     redirectPath: '/admin/users'
 }
@@ -23,13 +24,28 @@ const getUsersSuccess = (state, action) => {
 }
 
 const updateUserSuccess = (state, action) => {
-    let index = null;
     let updatedUsers = [ ...state.users];
-    index = updatedUsers.findIndex(ele => ele._id === action.user.uid);
+    const index = updatedUsers.findIndex(ele => ele._id === action.user.uid);
     updatedUsers[index] = { ...updatedUsers[index], roles: action.user.roles, inuse: action.user.inuse };
 
     return { ...state,
         users: updatedUsers
+    };
+}
+
+const getOrganisationsSuccess = (state, action) => {
+    return { ...state,
+        organisations: action.organisations,
+        identifier: action.identifier
+    };
+}
+
+const updateOrganisationSuccess = (state, action) => {
+    let updatedOrganisations = [ ...state.organisations ];
+    const index = updatedOrganisations.findIndex(ele => ele._id === action.organisation.uid);
+    updatedOrganisations[index] = { ...updatedOrganisations[index], name: action.organisation.name, assetRole: action.organisation.assetRole, inuse: action.organisation.inuse };
+    return { ...state, 
+        organisations: updatedOrganisations
     };
 }
 
@@ -56,6 +72,8 @@ const reducer = (state = initialState, action) => {
         case actionType.ADMIN_START: return start(state);
         case actionType.ADMIN_GET_USERS_SUCCESS: return getUsersSuccess(state, action);
         case actionType.ADMIN_UPDATE_USER_SUCCESS: return updateUserSuccess(state, action);
+        case actionType.ADMIN_GET_ORGANISATIONS_SUCCESS: return getOrganisationsSuccess(state, action);
+        case actionType.ADMIN_UPDATE_ORGANISATION_SUCCESS: return updateOrganisationSuccess(state, action);
         case actionType.ADMIN_FINISH: return finish(state);
         case actionType.ADMIN_FAIL: return fail(state, action);
         case actionType.ADMIN_RESET: return reset();

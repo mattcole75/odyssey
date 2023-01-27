@@ -19,12 +19,13 @@ const Navigation = (props) => {
 				{/* Admin */}
 				{ isAuthenticated && isAdministrator
 					?	<div className='dropdown text-end'>
-							<a href='/' className='nav-link text-white dropdown-toggle' id='dropdownUser1' data-bs-toggle='dropdown' aria-expanded='false'>
+							<a href='/' className='nav-link text-white dropdown-toggle' id='dropdownAdmin1' data-bs-toggle='dropdown' aria-expanded='false'>
 								<i className='bi-gear-wide fs-3 d-block text-sm-center'></i>
 								Admin
 							</a>
-							<ul className='dropdown-menu text-small' aria-labelledby='dropdownUser1'>
+							<ul className='dropdown-menu text-small' aria-labelledby='dropdownAdmin1'>
 								<NavigationMenuItem link='/admin/users' icon='bi-people'> Users</NavigationMenuItem>
+								<NavigationMenuItem link='/admin/organisations' icon='bi-building'> Organisations</NavigationMenuItem>
 							</ul>
 						</div>
 					:	null
@@ -32,11 +33,11 @@ const Navigation = (props) => {
 				
 				{/* auth */}
                 <div  className='dropdown text-end'>
-					<a href='/' className='nav-link text-white dropdown-toggle' id='dropdownUser1' data-bs-toggle='dropdown' aria-expanded='false'>
+					<a href='/' className='nav-link text-white dropdown-toggle' id='dropdownProfile1' data-bs-toggle='dropdown' aria-expanded='false'>
 						<i className='bi-person fs-3 d-block text-sm-center'></i>
 						Profile
 					</a>
-					<ul className='dropdown-menu text-small' aria-labelledby='dropdownUser1'>
+					<ul className='dropdown-menu text-small' aria-labelledby='dropdownProfile1'>
 						{ isAuthenticated
 							?	<NavigationMenuItem link='/account' icon='bi-person'> Account</NavigationMenuItem>
 							:	null

@@ -1,13 +1,6 @@
-# Auth
-Node Express MongoDB api for managing user authentication.
+# Administration
+Node Express MongoDB api for managing lists.
 
-## Installation
-
-Use the package manager [npm](https://github.com/mattcole75/auth) to install Auth once you have cloned the repository.
-
-```bash
-npm install
-```
 ## Configuration
  - Create a .env file in the root directory
     - Add the following configuration:
@@ -16,29 +9,30 @@ npm install
         - LOG_PATH={the path to your log file} e.g. ./logs/auth.log
 - Create your logs Directory as above
 - Take a look at the config file in the configuration directory as this information is used in the URL's
-- Create a -1 unique index on the email field in the user collection
-- Create a text index on the email field in the user collection
+- Create a -1 unique index on the name fields in the user collection
+- Create a text index on the name fields in the user collection
 
 ## Data requirements
 ```
-    - displayName: string: 1 - 50
-    - email: /^([a-zA-Z0-9._%-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6})*$/
-    - password: a SHA256 hashed string
     - localId: MongoDb Object
-    - idToken: 128 random bytes hex
+    - query: 'search text'
 
 ```
 ## Usage
-### POST Create new user:
+### POST new organisation:
 
 ```
-POST http://localhost:1337/auth/api/0.1/user
+POST http://localhost:1337/admin/api/0.1/organisation
 
+Requires JSON Header:
+    {
+        idToken: 'the given IdToken',
+        query: 'organisation name to search'
+    }
 Requires JSON Body:
     {
-        displayName: 'new display name',
-        email: 'a valid email address',
-        password: 'a hashed 256 character password'
+        name: 'the organisations name',
+        assetRole: (owner, maintainer, or supplier)
     }
 
 Returns:
@@ -47,6 +41,25 @@ Returns:
     - 400 Bad request - validation failure
     - 500 Internal error message
 ```
+
+### GET Organisations
+```
+GET http://localhost:1337/admin/api/0.1/organisations
+
+Requires JSON Header:
+    {
+        idToken: 'the given IdToken'
+    }
+Returns:
+    - 200 OK [an array of organisations]
+    - 200 OK
+    - 400 Bad request - validation failure
+    - 400 Invalid request
+    - 401 Unauthorised
+    - 500 Internal error message
+
+```
+
 ### POST Login:
 ```
 POST http://localhost:1337/auth/api/0.1/user/login

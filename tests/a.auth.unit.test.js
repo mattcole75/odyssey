@@ -9,7 +9,6 @@ const badUsers = require('./data/bad.user.data');
 // let idToken2 = null;
 let wrongToken = '7c58e9e7cd20ae44f354d59f7a73ebb7e346d5e5a61517e33e0e97c4c79d25a826debfc57ca2e99c66108f80801059a9d2d94d14886fc98539e4ab324a5da2e125aa7e7d26af000e103fcbc75b0ed9caa75895ba26efa248fc0c2154a581786679c6a2a9120fadc9e68fef80bc30d6a8644cd19362e035a85e130d675e2e30a9';
 
-
 describe('Create system users:', () => {
 
     goodUsers.forEach(user => {
@@ -88,16 +87,16 @@ describe('Log each user in, get their data and logout:', () => {
             let roles = user.roles;
 
             it('should, elevate specified users to the administrator role', async () => {
-                await authEndPoint.patch('/user/role')
+                await authEndPoint.patch('/admin/user')
                     .set({
                         idToken: goodUsers[9].idToken,
                         localId: goodUsers[9].localId
                     })
                     .set('Accept', 'application/json')
                     .send({
-                        idToken: user.idToken,
-                        localId: user.localId,
-                        roles: roles
+                        uid: user.localId,
+                        roles: roles,
+                        inuse: true
                     })
                     .expect('Content-Type', /json/)
                     .then(res => {
@@ -113,7 +112,8 @@ describe('Log each user in, get their data and logout:', () => {
             await authEndPoint.get('/users')
                 .set({
                     idToken: user.idToken,
-                    localId: user.localId
+                    localId: user.localId,
+                    query: ''
                 })
                 .set('Accept', 'application/json')
                 .expect('Content-Type', /json/)

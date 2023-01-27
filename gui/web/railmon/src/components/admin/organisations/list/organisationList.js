@@ -1,8 +1,8 @@
 import React from 'react';
 
-const Users = (props) => {
+const Organisations = (props) => {
 
-    const { users, toggle } = props;
+    const { organisations, toggle } = props;
 
     const selectUserItem = (item) => {
         toggle(item);
@@ -15,18 +15,18 @@ const Users = (props) => {
                 <table className='table table-striped table-hover cursor-pointer'>
                     <thead>
                         <tr>
-                            <th scope="col">Display Name</th>
-                            <th scope="col">Email</th>
+                            <th scope="col">Name</th>
+                            <th scope="col">Role</th>
                             <th scope="col">Status</th>
                         </tr>
                     </thead>
                     <tbody>
-                        {users && users.map((item) => (
+                        {organisations && organisations.map((item) => (
                             <tr key={item._id} onClick={() => selectUserItem(item)}>
-                                <td>{item.displayName}</td>
-                                <td>{item.email}</td>
+                                <td>{item.name}</td>
+                                <td>{item.assetRole}</td>
                                 <td>{item.inuse 
-                                        ? <span className='badge text-nowrap bg-success'>Active</span>
+                                        ? <span className='badge text-nowrap bg-success'>Enabled</span>
                                         : <span className='badge text-nowrap bg-danger'>Disabled</span>
                                     }
                                 </td>
@@ -40,4 +40,4 @@ const Users = (props) => {
     );
 }
 
-export default Users;
+export default Organisations;

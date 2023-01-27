@@ -33,7 +33,7 @@ const postUser = (req, next) => {
                 roles: ['user'],
                 updated: moment().format(),
                 created: moment().format()
-            }, 
+            },
             (err, user) => {
             if(err) {
                 log.error(`POST v${version} - failed - postUser - status: ${err.status} msg: ${err.msg}`);
@@ -152,23 +152,24 @@ const getUser = (req, next) => {
 const getUsers = (req, next) => {
 
     const { localid, idtoken, query } = req.headers;
+    console.log('query', query);
 
     let errors = [];
 
     if(localid && localid != null && idtoken && idtoken != null) {
         errors = validate(req.headers, getUserRules);
     } else {
-        log.error(`POST v${version} - validation failure - getUser - status: 400, msg: request header parameters missing`);
+        log.error(`POST v${version} - validation failure - getUsers - status: 400, msg: request header parameters missing`);
         return next({status: 400, msg: 'Bad request - validation failure'}, null);
     }
     
     if(errors.length > 0) {
-        log.error(`POST v${version} - validation failure - getUser - status: 400, msg: ${errors}`);
+        log.error(`POST v${version} - validation failure - getUsers - status: 400, msg: ${errors}`);
         next({status: 400, msg: 'Bad request - validation failure'}, null);
     } else {
         auth.getUsers(query, (err, res) => {
             if(err) {
-                log.error(`POST v${version} - failed - getUser - status: ${err.status} msg: ${err.msg}`);
+                log.error(`POST v${version} - failed - getUsers - status: ${err.status} msg: ${err.msg}`);
                 next(err, null);
             } else {
                 // console.log(res);
@@ -228,6 +229,20 @@ const authorise = (req, authenticated, rules, next) => {
         // console.log('role compliance', roles, role);
         return next(null, { status: 200, message: 'OK'});
     }
+
+     // if(role.every(r => roles.includes(r))) {
+    // console.log('rules', rules);
+    // console.log('roles', roles);
+
+    // if(roles.some(el => rules.roles.includes(el)))
+    // if(rules.roles.some(el => roles.includes(el)))
+    //     return next(null, { status: 200, message: 'OK'});
+
+    // if(rules.roles.some(r=> roles.indexOf(r) >= 0)) {
+    //     // if(rules.roles.every(r => roles.includes(r))) {
+    //         // console.log('role compliance', roles, role);
+    //         return next(null, { status: 200, message: 'OK'});
+    //     }
 
     // console.log('NO MATCH');
     // console.log('role', role);
@@ -349,9 +364,6 @@ const patchUserPassword = (req, next) => {
 const patchAdminUser = (req, next) => {
 
     const { uid, roles, inuse } = req.body;
-    console.log('uid', uid);
-    console.log('roles', roles);
-    console.log('inuse', inuse);
 
     const errors = validate(req.body, patchAdminUserRules);
 
@@ -370,28 +382,6 @@ const patchAdminUser = (req, next) => {
         });
     }
 }
-
-// const patchUserRole = (req, next) => {
-
-//     const { localId, idToken, roles } = req.body;
-
-//     const errors = validate(req.body, patchUserRoleRules);
-
-//     if(errors.length > 0) {
-//         log.error(`POST v${version} - validation failure - patch user roles - status: 400, msg: ${errors}`);
-//         next({status: 400, msg: 'Bad request - validation failure'}, null);
-//     } else {
-//         const params = { localId: localId, idToken: idToken, data: { roles: roles, updated: moment().format() } };
-//         auth.patchUserRole(params, (err, res) => {
-//             if(err) {
-//                 log.error(`POST v${version} - failed - patchUser - status: ${err.status} msg: ${err.msg}`);
-//                 next(err, null);
-//             } else {
-//                 next(null, res);
-//             }
-//         });
-//     }
-// }
 
 const approveTransaction = (req, next) => {
 

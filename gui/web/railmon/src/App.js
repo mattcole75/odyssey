@@ -40,6 +40,9 @@ const App = () => {
 	const Users = React.lazy(() => {
 		return import('./components/admin/users/users');
 	});
+	const Organisations = React.lazy(() => {
+		return import('./components/admin/organisations/organisations');
+	});
 
 	const routes = (
 		<Routes>
@@ -49,6 +52,7 @@ const App = () => {
 			<Route path='/logout' element={ <Logout /> } />
 			{ isAuthenticated && <Route path='/account' element={ <Account /> } /> }
 			{ isAuthenticated && isAdministrator && <Route path='admin/users' element={ <Users /> } /> }
+			{ isAuthenticated && isAdministrator && <Route path='admin/organisations' element={ <Organisations /> } /> }
 		</Routes>
 	);
 

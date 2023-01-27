@@ -1,6 +1,6 @@
 const repository = require('../repository/asset');
 
-const createAsset = (req, next) => {
+const postAsset = (req, next) => {
 
     // add code to check request for validity -- future
 
@@ -13,7 +13,7 @@ const createAsset = (req, next) => {
         }
     }
 
-    repository.createAsset(request, (err, res) => {
+    repository.postAsset(request, (err, res) => {
         if(err)
             next(err, null);
         else
@@ -22,5 +22,5 @@ const createAsset = (req, next) => {
 };
 
 module.exports = {
-    createAsset: createAsset
+    postAsset: postAsset
 }

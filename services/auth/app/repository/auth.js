@@ -99,10 +99,8 @@ const getUsers = (query, next) => {
         .find(filter)
         // .limit(200)
         .toArray(function (err, res) {
-        if (err) {
-            console.log('error', err);
+        if (err)
             next({ status: 400, msg: err }, null);
-        }
         else 
             next(null, { status: 200, res: res });
         });
@@ -223,7 +221,7 @@ const patchAdminUser = (req, next) => {
 // }
 
 const approveTransaction = (idToken, next) => {
-
+    
     const dbConnect = database.getDb();
 
     dbConnect

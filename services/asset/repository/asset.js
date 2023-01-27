@@ -1,6 +1,6 @@
 const axios = require('../config/axios/axios');
 
-const createAsset = (req, next) => {
+const postAsset = (req, next) => {
     // declare the SQL String
     const sql = "insert into asset (assetRef, ownedByRef, name, description, operational, operationalStarDate, operationalEndDate, locationType, area, pin) values (" +
         (req.body.values[0] == null ? null + ", " : req.body.values[0] + ", ") + // assetRef
@@ -28,6 +28,6 @@ const createAsset = (req, next) => {
 };
 
 module.exports = {
-    createAsset: createAsset
+    postAsset: postAsset
 }
 

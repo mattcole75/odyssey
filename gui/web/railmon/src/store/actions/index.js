@@ -11,5 +11,7 @@ export {
 export {
     adminReset,
     adminGetUsers,
-    adminUpdateUser
+    adminUpdateUser,
+    adminGetOrganisations,
+    adminUpdateOganisation
 } from './admin';

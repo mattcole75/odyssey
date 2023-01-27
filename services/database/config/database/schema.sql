@@ -8,7 +8,8 @@ create table asset (
     id int not null auto_increment, -- the primary key
 
     assetRef int null, -- reference to a perent child relationship, null would indicate the asset at the top of the hierarchy
-    ownedByRef varchar(64) not null, -- which organisation ownes this asset ref to the organisation service
+    ownedByRef varchar(64) not null, -- the organisation who ownes this asset ref - organisation service
+    maintainedByRef varchar(64) not null, -- the organisation who maintains this asset - organisation service
 
     name varchar(32) not null unique, -- the name describing the asset is unique
     description varchar(256) not null, -- a short functional description or contract requirement

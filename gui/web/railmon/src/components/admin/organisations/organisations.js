@@ -1,37 +1,37 @@
 import React, { useCallback, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { adminUpdateUser } from '../../../store/actions/index';
+import { adminUpdateOganisation } from '../../../store/actions/index';
 import Search from './search/search';
-import Users from './list/userList';
+import Organisations from './list/organisationList';
 import Backdrop from '../../ui/backdrop/backdrop';
 import Modal from '../../ui/modal/modal';
 import Spinner from '../../ui/spinner/spinner';
-import UserForm from './userForm/userForm';
+import OrgForm from './orgForm/orgForm';
 
-const user = React.memo(() => {
+const organisations = React.memo(() => {
 
     const dispatch = useDispatch();
 
-    const [ user, setUser ] = useState(null);
+    const [ organisation, setOrganisation ] = useState(null);
 
-    const { idToken, localId } = useSelector(state => state.auth);
-    const { loading, error, users } = useSelector(state => state.admin);
+    const { idToken } = useSelector(state => state.auth);
+    const { loading, error, organisations } = useSelector(state => state.admin);
 
-    const [editingUser, setEditingUser] = useState(false);
+    const [editingOrg, setEditingOrg] = useState(false);
 
     // editing toggles
-    const toggleUserEditing = (user) => {
-        setUser(user);
-        setEditingUser(prevState => !prevState);
+    const toggleOrgEditing = (org) => {
+        setOrganisation(org);
+        setEditingOrg(prevState => !prevState);
     };
 
-    const onSave = useCallback((idToken, localId, data, identifier) => {
-        dispatch(adminUpdateUser(idToken, localId, data, identifier))
+    const onSave = useCallback((idToken, data, identifier) => {
+        dispatch(adminUpdateOganisation(idToken, data, identifier))
     }, [dispatch]);
 
     const saveHandler = useCallback((data) => {
-        onSave(idToken, localId, data, 'ADMIN_UPDATE');
-    }, [idToken, localId, onSave]);
+        onSave(idToken, data, 'ADMIN_UPDATE');
+    }, [idToken, onSave]);
 
     let spinner = null;
     if(loading)
@@ -39,15 +39,15 @@ const user = React.memo(() => {
 
     // modal edit user
     let modal = null;
-    if(editingUser) {
+    if(editingOrg) {
         modal = <Modal
-            show={editingUser}
-            modalClosed={toggleUserEditing}
+            show={editingOrg}
+            modalClosed={toggleOrgEditing}
             content={
-                <UserForm
-                    toggle={toggleUserEditing}
+                <OrgForm
+                    toggle={toggleOrgEditing}
                     save={saveHandler}
-                    user={user}
+                    organisation={organisation}
                 />
             } />;
     }
@@ -68,7 +68,7 @@ const user = React.memo(() => {
             </div>
 
             <div>
-                <Users users={users} toggle={toggleUserEditing} />
+                <Organisations organisations={organisations} toggle={toggleOrgEditing} />
             </div>
 
         </section>
@@ -76,4 +76,4 @@ const user = React.memo(() => {
 
 });
 
-export default user;
+export default organisations;

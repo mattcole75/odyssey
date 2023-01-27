@@ -1,4 +1,5 @@
-import axios from '../../axios/auth';
+import auth from '../../axios/auth';
+import admin from '../../axios/admin';
 import * as actionType from './actionTypes';
 import { whatIsTheErrorMessage } from '../../shared/errorMessages';
 
@@ -21,6 +22,22 @@ const updateUserSuccess = (user, identifier) => {
     return {
         type: actionType.ADMIN_UPDATE_USER_SUCCESS,
         user: user,
+        identifier: identifier
+    };
+}
+
+const getOrganisationsSuccess = (organisations, identifier) => {
+    return {
+        type: actionType.ADMIN_GET_ORGANISATIONS_SUCCESS,
+        organisations: organisations,
+        identifier: identifier
+    };
+}
+
+const updateOrganisationSuccess = (organisation, identifier) => {
+    return {
+        type: actionType.ADMIN_UPDATE_ORGANISATION_SUCCESS,
+        organisation: organisation,
         identifier: identifier
     };
 }
@@ -64,7 +81,7 @@ export const adminGetUsers = (idToken, localId, query, identifier) => {
             }
         };
         
-        axios.get('/users', config)
+        auth.get('/users', config)
             .then(res => {
                 dispatch(getUsersSuccess(res.data.res, identifier));
             })
@@ -89,9 +106,59 @@ export const adminUpdateUser = (idToken, localId, data, identifier) => {
             }
         };
 
-        axios.patch('/admin/user', data, config)
+        auth.patch('/admin/user', data, config)
         .then(() => {
             dispatch(updateUserSuccess(data, identifier));
+        })
+        .then(() => {
+            dispatch(finish());
+        })
+        .catch(err => {
+            dispatch(fail(whatIsTheErrorMessage(err))); 
+        });
+    };
+}
+
+export const adminGetOrganisations = (idToken, query, identifier) => {
+    return dispatch => {
+        dispatch(start());
+
+        const config = {
+            headers: {
+                'content-type': 'application/json',
+                idToken: idToken,
+                query: query
+            }
+        };
+        
+        admin.get('/organisations', config)
+            .then(res => {
+                dispatch(getOrganisationsSuccess(res.data.res, identifier));
+            })
+            .then(() => {
+                dispatch(finish());
+            })
+            .catch(err => {
+                dispatch(fail(whatIsTheErrorMessage(err)));
+            })
+    };
+}
+
+export const adminUpdateOganisation = (idToken, data, identifier) => {
+
+    return dispatch => {
+        dispatch(start());
+
+        const config = {
+            headers: {
+                'content-type': 'application/json',
+                idToken: idToken
+            }
+        };
+
+        admin.patch('/organisation', data, config)
+        .then(() => {
+            dispatch(updateOrganisationSuccess(data, identifier));
         })
         .then(() => {
             dispatch(finish());
