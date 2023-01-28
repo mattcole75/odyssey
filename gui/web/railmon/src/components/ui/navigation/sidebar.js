@@ -5,7 +5,7 @@ const Sidebar = (props) => {
 
     const { isAuthenticated, isAdministrator, showSidebar, toggleShowSidebar } = props;
 
-    const navStyle = ['col-md-3', 'col-lg-2', 'sidebar', 'bg-dark', 'bg-opacity-75']
+    const navStyle = ['col-md-3', 'col-lg-2', 'sidebar', 'bg-dark', 'bg-opacity-95']
 
     if(!showSidebar) {
         navStyle.push('collapse')
