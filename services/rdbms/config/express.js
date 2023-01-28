@@ -3,12 +3,12 @@ const morgan = require('morgan');
 
 const allowCrossOriginRequests = (req, res, next) => {
     res.header('Access-Control-Allow-Origin', '*');
-    res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, X-Authorization, idToken, localId');
+    res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, X-Authorization, idToken, param, query');
     res.header('Access-Control-Allow-Methods', 'GET, POST, PATCH, DELETE');
     next();
 };
 
-module.exports = (routes) => {
+module.exports = () => {
 
     const app = express();
     
@@ -17,8 +17,7 @@ module.exports = (routes) => {
 
     app.use(morgan('[:date[clf]] :method :url :status :response-time ms - :res[content-length]'));
 
-    routes(app);
-    // require('../routes/asset')(app);
+    require('../app/routes/rdbms')(app);
 
     app.use((err, req, res, next) => {
         console.error(err.stack);
@@ -26,4 +25,4 @@ module.exports = (routes) => {
     });
 
     return app;
-}
+};

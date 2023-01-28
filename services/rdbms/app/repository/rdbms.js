@@ -1,4 +1,4 @@
-const database = require('../../../configuration/database');
+const database = require('../../config/database');
 
 const executeInsert = (req, next) => {
     // extract the sql from the request body

@@ -1,5 +1,5 @@
 const controller = require('../controller/asset');
-const config = require('../config/app/config');
+const config = require('../../config/config');
 const service = config.get('service');
 const version = config.get('version');
 

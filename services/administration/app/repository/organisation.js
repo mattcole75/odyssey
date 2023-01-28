@@ -21,7 +21,6 @@ const post = (req, next) => {
 }
 
 const patch = (req, next) => {
-    console.log('data',req);
     const { uid, data } = req;
     const dbConnect = database.getDb();
     const id = new ObjectId(uid);

@@ -1,12 +1,14 @@
 const bunyan = require('bunyan');
-const config = require('../configuration/config');
+const config = require('../config/config');
+const service = config.get('service');
+const logPath = config.get('logPath');
 
 const createLogger = () => {
 
     const logger = bunyan.createLogger({
-        name: config.get('service'),
+        name: service,
         streams: [{
-            path: process.env.LOG_PATH,
+            path: logPath,
         }]
     });
 

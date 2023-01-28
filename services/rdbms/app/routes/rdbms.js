@@ -1,5 +1,5 @@
-const controller = require('../controller/database');
-const config = require('../config/app/config');
+const controller = require('../controller/rdbms');
+const config = require('../../config/config');
 const service = config.get('service');
 const version = config.get('version');
 

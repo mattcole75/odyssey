@@ -62,6 +62,7 @@ describe('Asset Service Tests', () => {
             .send({
                 assetRef: null,
                 ownedByRef: 'TfGM',
+                maintainedByRef: 'KAM',
                 name: 'Delta Area',
                 description: 'The delta area',
                 operational: true,
@@ -93,10 +94,11 @@ describe('Asset Service Tests', () => {
             .send({
                 assetRef: parentAssetRef,
                 ownedByRef: 'TfGM',
+                maintainedByRef: 'KAM',
                 name: 'MKT08M',
                 description: 'Market Street motorised point machine',
                 operational: true,
-                operationalStarDate: moment().format(),
+                operationalStartDate: moment().format(),
                 operationalEndDate: null,
                 locationType: 'Pin',
                 area: null,
@@ -123,6 +125,7 @@ describe('Asset Service Tests', () => {
             .send({
                 assetRef: null,
                 ownedByRef: 'TfGM',
+                maintainedByRef: 'KAM',
                 name: 'Delta Area',
                 description: 'The delta area',
                 operational: true,

@@ -1,5 +1,5 @@
 const axios = require('axios');
-const config = require('../../../../configuration/config');
+const config = require('../../../config/config');
 
 const uri = config.get('dbService.uri');
 
