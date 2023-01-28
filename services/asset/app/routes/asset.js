@@ -10,10 +10,18 @@ module.exports = (app) => {
     });
 
     app.post('/' + service + '/api/' + version + '/asset', (req, res) => {
-        
         res.set('Content-Type', 'application/json');
-        
         controller.postAsset(req, (err, response) => {
+            if(err)
+                res.status(err.status).send(err);
+            else
+                res.status(response.status).send(response);
+        });
+    });
+
+    app.get('/' + service + '/api/' + version + '/assets', (req, res) => {
+        res.set('Content-Type', 'application/json');
+        controller.getAssets(req, (err, response) => {
             if(err)
                 res.status(err.status).send(err);
             else

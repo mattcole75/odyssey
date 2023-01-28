@@ -147,6 +147,20 @@ describe('Asset Service Tests', () => {
             });
     });
 
+    it('should, return a list of assets', async () => {
+        await assetEndPoint.get('/assets')
+            .set({
+                idToken: idToken,
+                query: ''
+            })
+            .set('Accept', 'application/json')
+            .expect('Content-Type', /json/)
+            .expect(200)
+            .then(res => {
+                console.log(res.body);
+            })
+    });
+
 });
 
 // auth bug fixes

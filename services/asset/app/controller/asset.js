@@ -21,12 +21,37 @@ const postAsset = (req, next) => {
             log.error(`status: ${ err.status } POST asset v${ version } result: ${ JSON.stringify(err) }`);
             next(err, null);
         } else {
-            log.info(`status: ${res.status} POST asset v${version}`);
+            log.info(`status: ${ res.status } POST asset v${ version }`);
+            next(null, res);
+        }
+    });
+};
+
+const getAssets = (req, next) => {
+
+    // add code to check request for validity -- future
+
+    // define the request object
+    const request = {
+        headers: req.headers,
+        body: {
+            rules: { rules: { roles: ['user'] } },
+            filter: []
+        }
+    }
+
+    repository.getAssets(request, (err, res) => {
+        if(err) {
+            log.error(`status: ${ err.status } GET assets v${ version } result: ${ JSON.stringify(err) }`);
+            next(err, null);
+        } else {
+            log.info(`status: ${ res.status } GET assets v${ version }`);
             next(null, res);
         }
     });
 };
 
 module.exports = {
-    postAsset: postAsset
+    postAsset: postAsset,
+    getAssets: getAssets
 }

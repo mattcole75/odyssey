@@ -17,4 +17,14 @@ module.exports = (app) => {
                 res.status(result.status).send(result);
         });
     });
+
+    app.get('/' + service + '/api/' + version + '/get', (req, res) => {
+        controller.get(req, (err, result) => {
+            res.set('Content-Type', 'application/json');
+            if(err)
+                res.status(err.status).send(err);
+            else
+                res.status(result.status).send(result);
+        });
+    });
 };

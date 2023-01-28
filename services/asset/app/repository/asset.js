@@ -1,6 +1,8 @@
 const axios = require('../../config/axios');
 
 const postAsset = (req, next) => {
+    
+    const { rules } = req.body;
     // declare the SQL String
     const sql = "insert into asset (assetRef, ownedByRef, maintainedByRef, name, description, operational, operationalStarDate, operationalEndDate, locationType, area, pin) values (" +
         (req.body.values[0] == null ? null + ", " : req.body.values[0] + ", ") + // assetRef
@@ -18,7 +20,7 @@ const postAsset = (req, next) => {
         // (req.body.values[10] == null ? null + ", " : "'" + req.body.values[10] + "')"); // what3words
 
     axios.post('/post',
-        { rules: req.body.rules, sql: sql },
+        { rules: rules, sql: sql },
         { headers: {'Content-Type': 'application/json', idToken: req.headers.idtoken } })
         .then(res => {
             next(null, res.data);
@@ -28,7 +30,24 @@ const postAsset = (req, next) => {
         });
 };
 
+const getAssets = (req, next) => {
+    const { idtoken } = req.headers;
+    const { rules } = req.body;
+    //declare the sql string
+    const sql = "select id, assetRef, ownedByRef, maintainedByRef, name, operational from asset";
+
+    axios.get('/get',
+        { headers: {'Content-Type': 'application/json', idToken: req.headers.idtoken, rules: rules, sql: sql } })
+        .then(res => {
+            next(null, res.data);
+        })
+        .catch(err => {
+            next(err.response.data, null);
+        });
+};
+
 module.exports = {
-    postAsset: postAsset
+    postAsset: postAsset,
+    getAssets: getAssets
 }
 
