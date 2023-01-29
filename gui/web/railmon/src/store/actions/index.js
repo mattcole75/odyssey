@@ -15,3 +15,8 @@ export {
     adminGetOrganisations,
     adminUpdateOganisation
 } from './admin';
+
+export {
+    assetGetAssets,
+    assetReset
+} from './asset';

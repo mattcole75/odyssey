@@ -7,12 +7,14 @@ import { configureStore } from '@reduxjs/toolkit';
 import App from './App';
 import auth from './store/reducers/auth';
 import admin from './store/reducers/admin';
+import asset from './store/reducers/asset';
 // import reportWebVitals from './reportWebVitals';
 
 const store = configureStore({
 	reducer: {
 		auth: auth,
-		admin: admin
+		admin: admin,
+		asset: asset
 	}
 });
 

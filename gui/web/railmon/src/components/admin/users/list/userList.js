@@ -11,7 +11,7 @@ const Users = (props) => {
     return (
         <div className='container'>
             <hr className='mb-3' />
-            <div className='row mb-2'>
+            <div className='mb-2'>
                 <table className='table table-striped table-hover cursor-pointer'>
                     <thead>
                         <tr>
