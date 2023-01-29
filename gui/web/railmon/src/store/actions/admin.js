@@ -42,6 +42,15 @@ const updateOrganisationSuccess = (organisation, identifier) => {
     };
 }
 
+const createOrganisationSuccess = (uid, organisation, identifier) => {
+    return {
+        type: actionType.ADMIN_CREATE_ORGANISATION_SUCCESS,
+        uid: uid,
+        organisation: organisation,
+        identifier: identifier
+    };
+}
+
 const finish = () => {
     return {
         type: actionType.ADMIN_FINISH
@@ -159,6 +168,32 @@ export const adminUpdateOganisation = (idToken, data, identifier) => {
         admin.patch('/organisation', data, config)
         .then(() => {
             dispatch(updateOrganisationSuccess(data, identifier));
+        })
+        .then(() => {
+            dispatch(finish());
+        })
+        .catch(err => {
+            dispatch(fail(whatIsTheErrorMessage(err))); 
+        });
+    };
+}
+
+export const adminCreateOganisation = (idToken, data, identifier) => {
+
+    return dispatch => {
+        dispatch(start());
+
+        const config = {
+            headers: {
+                'content-type': 'application/json',
+                idToken: idToken
+            }
+        };
+
+        admin.post('/organisation', data, config)
+        .then(res => {
+            const { insertedId } = res.data.res;
+            dispatch(createOrganisationSuccess(insertedId, data, identifier));
         })
         .then(() => {
             dispatch(finish());

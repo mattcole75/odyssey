@@ -16,6 +16,7 @@ const Organisations = (props) => {
                     <thead>
                         <tr>
                             <th scope="col">Name</th>
+                            <th scope="col">Abbr</th>
                             <th scope="col">Role</th>
                             <th scope="col">Status</th>
                         </tr>
@@ -24,6 +25,7 @@ const Organisations = (props) => {
                         {organisations && organisations.map((item) => (
                             <tr key={item._id} onClick={() => selectUserItem(item)}>
                                 <td>{item.name}</td>
+                                <td>{item.abbreviation}</td>
                                 <td>{item.assetRole}</td>
                                 <td>{item.inuse 
                                         ? <span className='badge text-nowrap bg-success'>Enabled</span>

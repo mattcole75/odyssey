@@ -13,7 +13,8 @@ export {
     adminGetUsers,
     adminUpdateUser,
     adminGetOrganisations,
-    adminUpdateOganisation
+    adminUpdateOganisation,
+    adminCreateOganisation
 } from './admin';
 
 export {

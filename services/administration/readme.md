@@ -9,8 +9,9 @@ Node Express MongoDB api for managing lists.
         - LOG_PATH={the path to your log file} e.g. ./logs/auth.log
 - Create your logs Directory as above
 - Take a look at the config file in the configuration directory as this information is used in the URL's
-- Create a -1 unique index on the name fields in the user collection
-- Create a text index on the name fields in the user collection
+- Create a -1 unique index on the name field in the user collection
+- Create a text index on the name field in the user collection
+- Create a -1 unique index on the abbrieviation field in the user collection
 
 ## Data requirements
 ```

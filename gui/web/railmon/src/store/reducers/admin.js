@@ -1,4 +1,5 @@
 import * as actionType from '../actions/actionTypes';
+import moment from 'moment';
 
 const initialState = {
     loading: false,
@@ -43,8 +44,25 @@ const getOrganisationsSuccess = (state, action) => {
 const updateOrganisationSuccess = (state, action) => {
     let updatedOrganisations = [ ...state.organisations ];
     const index = updatedOrganisations.findIndex(ele => ele._id === action.organisation.uid);
-    updatedOrganisations[index] = { ...updatedOrganisations[index], name: action.organisation.name, assetRole: action.organisation.assetRole, inuse: action.organisation.inuse };
+    updatedOrganisations[index] = { ...updatedOrganisations[index],
+        name: action.organisation.name,
+        abbreviation: action.organisation.abbreviation,
+        assetRole: action.organisation.assetRole,
+        inuse: action.organisation.inuse };
     return { ...state, 
+        organisations: updatedOrganisations
+    };
+}
+
+const createOrganisationSuccess = (state, action) => {
+    let updatedOrganisations = [ ...state.organisations ];
+    const newOrganisation = { ...action.organisation,
+        _id: action.uid,
+        created: moment().format(),
+        updated: moment().format()
+    }
+    updatedOrganisations.push(newOrganisation);
+    return { ...state,
         organisations: updatedOrganisations
     };
 }
@@ -74,6 +92,7 @@ const reducer = (state = initialState, action) => {
         case actionType.ADMIN_UPDATE_USER_SUCCESS: return updateUserSuccess(state, action);
         case actionType.ADMIN_GET_ORGANISATIONS_SUCCESS: return getOrganisationsSuccess(state, action);
         case actionType.ADMIN_UPDATE_ORGANISATION_SUCCESS: return updateOrganisationSuccess(state, action);
+        case actionType.ADMIN_CREATE_ORGANISATION_SUCCESS: return createOrganisationSuccess(state, action);
         case actionType.ADMIN_FINISH: return finish(state);
         case actionType.ADMIN_FAIL: return fail(state, action);
         case actionType.ADMIN_RESET: return reset();

@@ -4,8 +4,9 @@ import { useDispatch, useSelector } from "react-redux";
 import { adminGetOrganisations } from '../../../../store/actions/index'
 
 
-const Search = React.memo(() => {
+const Search = React.memo((props) => {
 
+    const { newOrganisationHandler } = props;
     const [enteredFilter, setEnteredFilter] = useState('');
     const inputRef = useRef();
 
@@ -40,8 +41,12 @@ const Search = React.memo(() => {
                     <span className='heading-primary_main'>Organisations</span>
                 </h1>
             </div>
+
+            <div className='d-flex align-items-center col-lg-auto mb-3 mb-lg-0 ms-3 me-3'>
+                <button className='btn btn-outline-primary' onClick={ newOrganisationHandler }>Add</button>
+            </div>
             
-            <form className='col-12 col-lg-auto mb-3 mb-lg-0'>
+            <form className='d-flex col-12 align-items-center col-lg-auto mb-3 mb-lg-0'>
                 <input
                     type="search"
                     className='form-control'

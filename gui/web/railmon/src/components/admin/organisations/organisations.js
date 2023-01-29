@@ -1,6 +1,6 @@
 import React, { useCallback, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { adminUpdateOganisation } from '../../../store/actions/index';
+import { adminUpdateOganisation, adminCreateOganisation } from '../../../store/actions/index';
 import Search from './search/search';
 import Organisations from './list/organisationList';
 import Backdrop from '../../ui/backdrop/backdrop';
@@ -25,13 +25,23 @@ const organisations = React.memo(() => {
         setEditingOrg(prevState => !prevState);
     };
 
-    const onSave = useCallback((idToken, data, identifier) => {
+    const newOrganisationHandler = () => {
+        toggleOrgEditing(null);
+    }
+
+    const onUpdate = useCallback((idToken, data, identifier) => {
         dispatch(adminUpdateOganisation(idToken, data, identifier))
+    }, [dispatch]);
+    const onCreate = useCallback((idToken, data, identifier) => {
+        dispatch(adminCreateOganisation(idToken, data, identifier))
     }, [dispatch]);
 
     const saveHandler = useCallback((data) => {
-        onSave(idToken, data, 'ADMIN_UPDATE');
-    }, [idToken, onSave]);
+        if(data.uid != null)
+            onUpdate(idToken, data, 'ORG_UPDATE');
+        else
+            onCreate(idToken, data, "ORG_CREATE")
+    }, [idToken, onUpdate, onCreate]);
 
     let spinner = null;
     if(loading)
@@ -64,7 +74,7 @@ const organisations = React.memo(() => {
             }
             {modal}
             <div className='u-margin-bottom-small'>
-                <Search />
+                <Search newOrganisationHandler={ newOrganisationHandler } />
             </div>
 
             <div>

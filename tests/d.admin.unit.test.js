@@ -53,6 +53,7 @@ describe('Organisation Service Tests', () => {
             })
             .send({
                 name: 'Transport for Greater Manchester (TfGM)',
+                abbreviation: 'TfGM',
                 assetRole: 'Owner',
             })
             .set('Accept', 'application/json')
@@ -88,7 +89,8 @@ describe('Organisation Service Tests', () => {
                 idToken: idToken
             })
             .send({
-                name: 'Transport for Greater Manchester (TfGM)',
+                name: 'Transport for Greater Manchester',
+                abbreviation: 'TfGM',
                 assetRole: 'Owner'
             })
             .set('Accept', 'application/json')
@@ -107,7 +109,8 @@ describe('Organisation Service Tests', () => {
                 idToken: idToken
             })
             .send({
-                name: 'KeolisAmey Metrolink (KAM)',
+                name: 'KeolisAmey Metrolink',
+                abbreviation: 'KAM',
                 assetRole: 'Maintainer'
             })
             .set('Accept', 'application/json')
@@ -127,6 +130,7 @@ describe('Organisation Service Tests', () => {
             })
             .send({
                 name: 'Podtrak',
+                abbreviation: 'POD',
                 assetRole: 'Supplier'
             })
             .set('Accept', 'application/json')
@@ -148,6 +152,27 @@ describe('Organisation Service Tests', () => {
             })
             .send({
                 name: 'Podtrak',
+                abbreviation: 'POD',
+                assetRole: 'Supplier'
+            })
+            .set('Accept', 'application/json')
+            .expect('Content-Type', /json/)
+            .expect(400)
+            .then(res => {
+                expect(res.body.status).toBe(400);
+                expect(res.body.res).toBe('Duplicate entry');
+            });
+    });
+
+    it('should, fail to insert an organisation with the same abbreviation', async () => {
+
+        await adminEndPoint.post('/organisation')
+            .set({
+                idToken: idToken
+            })
+            .send({
+                name: 'Podtrak ltd',
+                abbreviation: 'POD',
                 assetRole: 'Supplier'
             })
             .set('Accept', 'application/json')

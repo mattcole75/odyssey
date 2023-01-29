@@ -47,7 +47,7 @@ const post = (req, next) => {
 
 const patch = (req, next) => {
     const { idtoken } = req.headers;
-    const { uid, name, assetRole, inuse } = req.body;
+    const { uid, name, abbreviation, assetRole, inuse } = req.body;
 
     // configure header
     let header = null;
@@ -67,7 +67,7 @@ const patch = (req, next) => {
         .then(authRes => {
             if(authRes.data.status === 200) {
 
-                const data = { uid: uid, data: { name: name, assetRole: assetRole, inuse: inuse, updated: moment().format() } }
+                const data = { uid: uid, data: { name: name, abbreviation: abbreviation, assetRole: assetRole, inuse: inuse, updated: moment().format() } }
                 repository.patch(data, (err, res) => {
                     if(err) {
                         log.error(`status: ${ err.status } PATCH organisation v${ version } result: ${ JSON.stringify(err) }`);
