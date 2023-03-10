@@ -1,27 +1,22 @@
+const { get } = require('../../../../config/config');
 const axios = require('../../config/axios');
 
 const postAsset = (req, next) => {
     
-    const { rules } = req.body;
-    // declare the SQL String
-    const sql = "insert into asset (assetRef, ownedByRef, maintainedByRef, name, description, operational, operationalStarDate, operationalEndDate, locationType, area, pin) values (" +
-        (req.body.values[0] == null ? null + ", " : req.body.values[0] + ", ") + // assetRef
-        (req.body.values[1] == null ? null + ", " : "'" + req.body.values[1] + "', ") + // ownedByRef
-        (req.body.values[2] == null ? null + ", " : "'" + req.body.values[2] + "', ") + // maintainedByRef
-        (req.body.values[3] == null ? null + ", " : "'" + req.body.values[3] + "', ") + // name
-        (req.body.values[4] == null ? null + ", " : "'" + req.body.values[4] + "', ") + // description
-        (req.body.values[5] == null ? null + ", " : req.body.values[5] + ", ") + // operational
-        (req.body.values[6] == null ? null + ", " : "'" + req.body.values[6] + "', ") + // operationalStarDate
-        (req.body.values[7] == null ? null + ", " : "'" + req.body.values[7] + "', ") + // operationalEndDate
-        (req.body.values[8] == null ? null + ", " : "'" + req.body.values[8] + "', ") + // locationType
-        (req.body.values[9] == null ? null + ", " : "ST_PolygonFromText('" + req.body.values[9] + "'),") + // area
-        (req.body.values[10] == null ? null + ") " : req.body.values[10] + ")"); // pin
-
-        // (req.body.values[10] == null ? null + ", " : "'" + req.body.values[10] + "')"); // what3words
+    const { idtoken } = req.headers;
+    const { rules, values } = req.body;
+    
+    const sproc = "call sp_insertAsset(" +
+        (values.assetRef == null ? null + ", " : values.assetRef + ", ") + // assetRef
+        (values.ownedByRef == null ? null + ", " : "'" + values.ownedByRef + "', ") + // ownedByRef
+        (values.maintainedByRef == null ? null + ", " : "'" + values.maintainedByRef + "', ") + // maintainedByRef
+        (values.name == null ? null + ", " : "'" + values.name + "', ") + // name
+        (values.description == null ? null + ", " : "'" + values.description + "', ") + // description
+        "@insertId)"; 
 
     axios.post('/post',
-        { rules: rules, sql: sql },
-        { headers: {'Content-Type': 'application/json', idToken: req.headers.idtoken } })
+        { rules: rules, sproc: sproc },
+        { headers: {'Content-Type': 'application/json', idToken: idtoken } })
         .then(res => {
             next(null, res.data);
         })
@@ -31,14 +26,61 @@ const postAsset = (req, next) => {
 };
 
 const getAssets = (req, next) => {
-    const { idtoken } = req.headers;
+    const { idtoken, query } = req.headers;
     const { rules } = req.body;
     //declare the sql string
-    const sql = "select id, assetRef, ownedByRef, maintainedByRef, name, operational from asset";
+    const sproc = `call sp_selectAssets('${query}')`;
 
     axios.get('/get',
-        { headers: {'Content-Type': 'application/json', idToken: req.headers.idtoken, rules: rules, sql: sql } })
+        { headers: {'Content-Type': 'application/json', idToken: idtoken, rules: rules, sproc: sproc } })
         .then(res => {
+            next(null, res.data);
+        })
+        .catch(err => {
+            next(err.response.data, null);
+        });
+};
+
+const getAsset = (req, next) => {
+
+    const { idtoken, query } = req.headers;
+    const { rules } = req.body;
+    const sproc = `call sp_selectAsset(${query})`;
+
+    axios.get('/get',
+        { headers: {'Content-Type': 'application/json', idToken: idtoken, rules: rules, sproc: sproc } })
+        .then(res => {
+            next(null, { status: res.data.status, res: res.data.res[0] });
+        })
+        .catch(err => {
+            next(err.response.data, null);
+        });
+};
+
+const patchAsset = (req, next) => {
+
+    const { idtoken } = req.headers;
+    const { rules, values } = req.body;
+    const sproc = "call sp_updateAsset(" +
+        (values.id == null ? null + ", " : values.id + ", ") +
+        (values.ownedByRef == null ? null + ", " : "'" + values.ownedByRef + "', ") +
+        (values.maintainedByRef == null ? null + ", " : "'" + values.maintainedByRef + "', ") +
+        (values.name == null ? null + ", " : "'" + values.name + "', ") +
+        (values.description == null ? null + ", " : "'" + values.description + "', ") +
+        (values.status == null ? null + ", " : "'" + values.status + "', ") +
+        (values.installedDate == null ? null + ", " : "'" + values.installedDate + "', ") +
+        (values.commissionedDate == null ? null + ", " : "'" + values.commissionedDate + "', ") +
+        (values.decommissionedDate == null ? null + ", " : "'" + values. decommissionedDate + "', ") +
+        (values.disposedDate == null ? null + ", " : "'" + values. disposedDate + "', ") +
+        (values.inuse == null ? null + ") " : values.inuse + ")");
+
+    console.log(sproc);
+
+    axios.patch('/patch',
+        { rules: rules, sproc: sproc },
+        { headers: {'Content-Type': 'application/json', idToken: idtoken } })
+        .then(res => {
+            console.log('asset result following patch', res.data);
             next(null, res.data);
         })
         .catch(err => {
@@ -48,6 +90,8 @@ const getAssets = (req, next) => {
 
 module.exports = {
     postAsset: postAsset,
-    getAssets: getAssets
+    getAssets: getAssets,
+    getAsset: getAsset,
+    patchAsset: patchAsset
 }
 

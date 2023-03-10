@@ -12,7 +12,8 @@ const postAsset = (req, next) => {
         headers: req.headers,
         body: {
             rules: { rules: { roles: ['superuser', 'administrator'] } },
-            values: [ req.body.assetRef, req.body.ownedByRef, req.body.maintainedByRef, req.body.name, req.body.description, req.body.operational, req.body.operationalStarDate, req.body.operationalEndDate, req.body.locationType, req.body.area, req.body.pin ]
+            values: req.body
+            // values: [ req.body.assetRef, req.body.ownedByRef, req.body.maintainedByRef, req.body.name, req.body.description, req.body.operational, req.body.operationalStarDate, req.body.operationalEndDate, req.body.locationType, req.body.area, req.body.pin ]
         }
     }
 
@@ -35,8 +36,7 @@ const getAssets = (req, next) => {
     const request = {
         headers: req.headers,
         body: {
-            rules: { rules: { roles: ['user'] } },
-            filter: []
+            rules: { rules: { roles: ['user'] } }
         }
     }
 
@@ -51,7 +51,57 @@ const getAssets = (req, next) => {
     });
 };
 
+const getAsset = (req, next) => {
+
+    // add code to check request for validity -- future
+
+    // define the request object
+    const request = {
+        headers: req.headers,
+        body: {
+            rules: { rules: { roles: ['user'] } }
+        }
+    }
+
+    repository.getAsset(request, (err, res) => {
+        if(err) {
+            log.error(`status: ${ err.status } GET asset v${ version } result: ${ JSON.stringify(err) }`);
+            next(err, null);
+        } else {
+            log.info(`status: ${ res.status } GET asset v${ version }`);
+            next(null, res);
+        }
+    });
+};
+
+const patchAsset = (req, next) => {
+
+    // add code to check request for validity -- future
+
+    // define the request object
+    const request = {
+        headers: req.headers,
+        body: {
+            rules: { rules: { roles: ['superuser', 'administrator'] } },
+            values: req.body
+            // values: [ req.body.assetRef, req.body.ownedByRef, req.body.maintainedByRef, req.body.name, req.body.description, req.body.operational, req.body.operationalStarDate, req.body.operationalEndDate, req.body.locationType, req.body.area, req.body.pin ]
+        }
+    }
+
+    repository.patchAsset(request, (err, res) => {
+        if(err) {
+            log.error(`status: ${ err.status } PATCH asset v${ version } result: ${ JSON.stringify(err) }`);
+            next(err, null);
+        } else {
+            log.info(`status: ${ res.status } PATCH asset v${ version }`);
+            next(null, res);
+        }
+    });
+};
+
 module.exports = {
     postAsset: postAsset,
-    getAssets: getAssets
+    getAssets: getAssets,
+    getAsset: getAsset,
+    patchAsset: patchAsset
 }

@@ -46,6 +46,9 @@ const App = () => {
 	const Assets = React.lazy(() => {
 		return import('./components/assets/assets')
 	});
+	const Asset = React.lazy(() => {
+		return import('./components/assets/assetForm/assetForm');
+	});
 
 	const routes = (
 		<Routes>
@@ -55,6 +58,7 @@ const App = () => {
 			<Route path='/logout' element={ <Logout /> } />
 			{ isAuthenticated && <Route path='/account' element={ <Account /> } /> }
 			{ isAuthenticated && <Route path='/assets' element={ <Assets /> } /> }
+			{ isAuthenticated && <Route path='/asset/:id' element={ <Asset /> } /> }
 			{ isAuthenticated && isAdministrator && <Route path='admin/users' element={ <Users /> } /> }
 			{ isAuthenticated && isAdministrator && <Route path='admin/organisations' element={ <Organisations /> } /> }
 		</Routes>

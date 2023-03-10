@@ -79,6 +79,7 @@ export const adminReset = () => {
 
 export const adminGetUsers = (idToken, localId, query, identifier) => {
     return dispatch => {
+
         dispatch(start());
 
         const config = {
@@ -130,6 +131,7 @@ export const adminUpdateUser = (idToken, localId, data, identifier) => {
 
 export const adminGetOrganisations = (idToken, query, identifier) => {
     return dispatch => {
+
         dispatch(start());
 
         const config = {
@@ -141,6 +143,31 @@ export const adminGetOrganisations = (idToken, query, identifier) => {
         };
         
         admin.get('/organisations', config)
+            .then(res => {
+                dispatch(getOrganisationsSuccess(res.data.res, identifier));
+            })
+            .then(() => {
+                dispatch(finish());
+            })
+            .catch(err => {
+                dispatch(fail(whatIsTheErrorMessage(err)));
+            })
+    };
+}
+
+export const adminGetOrganisationList = (idToken, identifier) => {
+    return dispatch => {
+
+        dispatch(start());
+
+        const config = {
+            headers: {
+                'content-type': 'application/json',
+                idToken: idToken
+            }
+        };
+        
+        admin.get('/organisationlist', config)
             .then(res => {
                 dispatch(getOrganisationsSuccess(res.data.res, identifier));
             })

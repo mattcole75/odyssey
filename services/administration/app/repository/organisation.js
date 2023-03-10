@@ -51,11 +51,25 @@ const get = (query, next) => {
 
     dbConnect
         .collection('organisations')
-        .find(filter)
+        .find(filter).sort({ name: 1 })
         // .limit(200)
         .toArray(function (err, res) {
         if (err) {
-            console.log('error', err);
+            next({ status: 400, msg: err }, null);
+        }
+        else 
+            next(null, { status: 200, res: res });
+        });
+}
+
+const getOrganisationList = (req, next) => {
+    const dbConnect = database.getDb();
+
+    dbConnect
+        .collection('organisations')
+        .find({ inuse: true }).sort({ name: 1 })
+        .toArray(function (err, res) {
+        if (err) {
             next({ status: 400, msg: err }, null);
         }
         else 
@@ -66,5 +80,6 @@ const get = (query, next) => {
 module.exports = {
     post: post,
     patch: patch,
-    get: get
+    get: get,
+    getOrganisationList: getOrganisationList
 }

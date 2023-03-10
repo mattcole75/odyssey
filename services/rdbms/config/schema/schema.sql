@@ -14,24 +14,20 @@ create table asset (
     name varchar(32) not null unique, -- the name describing the asset is unique
     description varchar(256) not null, -- a short functional description or contract requirement
 
-    operational boolean not null default false, -- is the asset operational
-    operationalStarDate datetime null, -- when did the asset begin it's operational life
-    operationalEndDate datetime null, -- when did the asset end it's operational life
+    status varchar(64) not null default 'design', -- valid options are Design, procure, Install, Commission, Operational
+    installedDate date null, -- the date the asset was installed
+    commissionedDate date null, -- the date the asset was commissioned
+    decommissionedDate date null, -- the date the asset was decommissioned
+    disposedDate date null, -- the date the assert was disposed
 
-    locationType varchar(32) not null, -- constrain to the following values: Area or Pin
-    area polygon null, -- a series of coordinates (lat lng)
-    pin point null, -- a single coordinate (lat lng)
-    -- an location type defines the asset function - this could be geographical area, geographical point
-        -- geographical area asset type will define a polygon encapsulating a geographical area with other geographical area and/or geographical points.
-        -- geographical pin asset type will reference a physical unit and will be made up of asset equipment
-
-    created datetime not null default now(), -- when was this record created
-    updated datetime not null default now() on update now(), -- when was the last time this record was updated
-    inUse boolean not null default true, -- can this record be used / viewed
+    created timestamp not null default now(), -- when was this record created
+    updated timestamp not null default now() on update now(), -- when was the last time this record was updated
+    inuse boolean not null default true, -- can this record be used / viewed
     
     primary key (id),
+    fulltext key (name, description, status),
     constraint fk_asset_assetRef foreign key (assetRef) references asset (id) on update cascade on delete cascade,
-    constraint ck_asset_locationType check (locationType in ('Area', 'Pin'))
+    constraint ck_asset_status check (status in ('design', 'procure', 'installed', 'commissioned', 'decommissioned', 'disposed'))
 );
 
 -- the specific equioment model details
@@ -48,7 +44,7 @@ create table equipmentModel (
 
     created datetime not null default now(), -- when was this record created
     updated datetime not null default now() on update now(), -- when was the last time this record was updated
-    inUse boolean not null default true, -- can this record be used / viewed
+    inuse boolean not null default true, -- can this record be used / viewed
 
     primary key (id)
 );
@@ -73,7 +69,7 @@ create table equipment (
 
     created datetime not null default now(), -- when was this record created
     updated datetime not null default now() on update now(), -- when was the last time this record was updated
-    inUse boolean not null default true, -- can this record be used / viewed
+    inuse boolean not null default true, -- can this record be used / viewed
 
     primary key (id),
     constraint fk_equipment_assetRef foreign key (assetRef) references asset (id) on update cascade on delete cascade,
@@ -90,7 +86,7 @@ create table equipmentTanc (
 
     created datetime not null default now(), -- when was this record created
     updated datetime not null default now() on update now(), -- when was the last time this record was updated
-    inUse boolean not null default true, -- can this record be used / viewed
+    inuse boolean not null default true, -- can this record be used / viewed
 
     primary key (id),
     constraint fk_equipmentTanc_equipmentRef foreign key (equipmentRef) references equipment (id) on update cascade on delete cascade
@@ -111,7 +107,7 @@ create table requirementSource (
 
     created datetime not null default now(), -- when was this record created
     updated datetime not null default now() on update now(), -- when was the last time this record was updated
-    inUse boolean not null default true, -- can this record be used / viewed
+    inuse boolean not null default true, -- can this record be used / viewed
 
     primary key (id)
 );
@@ -132,7 +128,7 @@ create table requirement (
 
     created datetime not null default now(), -- when was this record created
     updated datetime not null default now() on update now(), -- when was the last time this record was updated
-    inUse boolean not null default true, -- can this record be used / viewed
+    inuse boolean not null default true, -- can this record be used / viewed
 
     primary key (id),
     constraint fk_requirement_requirementSourceRef foreign key (requirementSourceRef) references requirementSource (id) on update cascade on delete cascade
@@ -166,7 +162,7 @@ create table taskSpecification (
 
     created datetime not null default now(), -- when was this record created
     updated datetime not null default now() on update now(), -- when was the last time this record was updated
-    inUse boolean not null default true, -- can this record be used / viewed
+    inuse boolean not null default true, -- can this record be used / viewed
 
     primary key (id),
     constraint fk_taskSpecification_requirementRef foreign key (requirementRef) references requirement (id) on update cascade on delete cascade,
@@ -192,7 +188,7 @@ create table taskRequirement (
 
     created datetime not null default now(), -- when was this record created
     updated datetime not null default now() on update now(), -- when was the last time this record was updated
-    inUse boolean not null default true, -- can this record be used / viewed
+    inuse boolean not null default true, -- can this record be used / viewed
 
     primary key (id),
     constraint fk_taskInstruction_taskSpecificationRef foreign key (taskSpecificationRef) references taskSpecification (id) on update cascade on delete cascade
@@ -209,7 +205,7 @@ create table taskInstruction (
 
     created datetime not null default now(), -- when was this record created
     updated datetime not null default now() on update now(), -- when was the last time this record was updated
-    inUse boolean not null default true, -- can this record be used / viewed
+    inuse boolean not null default true, -- can this record be used / viewed
 
     primary key (id),
     constraint fk_taskInstruction_taskRequirementRef foreign key (taskRequirementRef) references taskRequirement (id) on update cascade on delete cascade
@@ -225,8 +221,68 @@ create table taskRecordRequirement (
 
     created datetime not null default now(), -- when was this record created
     updated datetime not null default now() on update now(), -- when was the last time this record was updated
-    inUse boolean not null default true, -- can this record be used / viewed
+    inuse boolean not null default true, -- can this record be used / viewed
 
     primary key (id),
     constraint fk_taskRecord_taskInstructionRef foreign key (taskInstructionRef) references taskInstruction (id) on update cascade on delete cascade
 );
+
+-- *********************
+-- Stored Procedures
+-- *********************
+
+-- drop procedure if exists sp_getAssets;
+
+delimiter //
+
+create procedure sp_selectAssets (in searchText varchar(64))
+    begin
+        if(searchText <> '') then
+            select id, assetRef, ownedByRef, maintainedByRef, name, status from asset
+            where match(name, description) against(searchText in boolean mode) order by name;
+        else
+            select id, assetRef, ownedByRef, maintainedByRef, name, status from asset;
+        end if;
+    end//
+
+create procedure sp_insertAsset (in assetRef int, ownedByRef varchar(64), maintainedByRef varchar(64), name varchar(32), description varchar(256),
+                                out insertId int)
+    begin
+        insert into asset (assetRef, ownedByRef, maintainedByRef, name, description)
+        values (assetRef, ownedByRef, maintainedByRef, name, description);
+
+        set insertId := last_insert_id();
+        select insertId;
+    end//
+
+create procedure sp_selectAsset (in uid int)
+    begin
+        select 
+        id, ownedByRef, maintainedByRef, name, description, status, 
+        date_format(installedDate, '%Y-%m-%d') as installedDate,
+        date_format(commissionedDate, '%Y-%m-%d') as commissionedDate,
+        date_format(decommissionedDate, '%Y-%m-%d') as decommissionedDate,
+        date_format(disposedDate, '%Y-%m-%d') as disposedDate,
+        created, updated, inuse from asset where id = uid;
+    end//
+
+create procedure sp_updateAsset (in uid int, ownedByRef varchar(64), maintainedByRef varchar(64), name varchar(32), description varchar(256), status varchar(64), installedDate date, commissionedDate date, decommissionedDate date, disposedDate date, inuse boolean)
+    begin
+        update asset
+        set ownedByRef = ownedByRef,
+            maintainedByRef = maintainedByRef,
+            name = name,
+            description = description,
+            status = status,
+            installedDate = installedDate,
+            commissionedDate = commissionedDate,
+            decommissionedDate = decommissionedDate,
+            disposedDate = disposedDate,
+            inuse = inuse
+        where id = uid;
+
+        call sp_selectAsset(uid);
+
+    end//
+
+delimiter ;

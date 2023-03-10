@@ -83,14 +83,14 @@ describe('Organisation Service Tests', () => {
 
     
 
-    it('should, insert an organisation TfGM', async () => {
+    it('should, insert an organisation Company A', async () => {
         await adminEndPoint.post('/organisation')
             .set({
                 idToken: idToken
             })
             .send({
-                name: 'Transport for Greater Manchester',
-                abbreviation: 'TfGM',
+                name: 'Company A',
+                abbreviation: 'COA',
                 assetRole: 'Owner'
             })
             .set('Accept', 'application/json')
@@ -103,14 +103,14 @@ describe('Organisation Service Tests', () => {
             });
     });
 
-    it('should, insert an organisation KAM', async () => {
+    it('should, insert an organisation Company B', async () => {
         await adminEndPoint.post('/organisation')
             .set({
                 idToken: idToken
             })
             .send({
-                name: 'KeolisAmey Metrolink',
-                abbreviation: 'KAM',
+                name: 'Company B',
+                abbreviation: 'COB',
                 assetRole: 'Maintainer'
             })
             .set('Accept', 'application/json')
@@ -123,14 +123,14 @@ describe('Organisation Service Tests', () => {
             });
     });
 
-    it('should, insert an organisation Podtrak', async () => {
+    it('should, insert an organisation Company C', async () => {
         await adminEndPoint.post('/organisation')
             .set({
                 idToken: idToken
             })
             .send({
-                name: 'Podtrak',
-                abbreviation: 'POD',
+                name: 'Company C',
+                abbreviation: 'COC',
                 assetRole: 'Supplier'
             })
             .set('Accept', 'application/json')
@@ -151,8 +151,8 @@ describe('Organisation Service Tests', () => {
                 idToken: idToken
             })
             .send({
-                name: 'Podtrak',
-                abbreviation: 'POD',
+                name: 'Company C',
+                abbreviation: 'COC',
                 assetRole: 'Supplier'
             })
             .set('Accept', 'application/json')
@@ -171,8 +171,8 @@ describe('Organisation Service Tests', () => {
                 idToken: idToken
             })
             .send({
-                name: 'Podtrak ltd',
-                abbreviation: 'POD',
+                name: 'Company C',
+                abbreviation: 'COC',
                 assetRole: 'Supplier'
             })
             .set('Accept', 'application/json')
@@ -202,7 +202,7 @@ describe('Organisation Service Tests', () => {
         await adminEndPoint.get('/organisations')
             .set({
                 idToken: idToken,
-                query: 'Podtrak'
+                query: 'C'
             })
             .set('Accept', 'application/json')
             .expect('Content-Type', /json/)
@@ -219,8 +219,10 @@ describe('Organisation Service Tests', () => {
             })
             .send({
                 uid: uid,
-                name: 'Podtrak Ltd',
-                assetRole: 'Supplier'
+                name: 'Company C Ltd',
+                abbreviation: 'COC',
+                assetRole: 'Supplier',
+                inuse: true
             })
             .set('Accept', 'application/json')
             .expect('Content-Type', /json/)
@@ -232,6 +234,21 @@ describe('Organisation Service Tests', () => {
                 // expect(insertedId).toBeDefined();
             })
     });
+
+    it('should, return a list of organisations by role filter', async () => {
+        await adminEndPoint.get('/organisationlist')
+            .set({
+                idToken: idToken
+            })
+            .set('Accept', 'application/json')
+            .expect('Content-Type', /json/)
+            .expect(200)
+            .then(res => {
+                console.log(res.body.res);
+                // expect(res.body.res).toHaveLength(1);
+            })
+    });
+    
 
 });
 

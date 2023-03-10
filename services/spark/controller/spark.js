@@ -9,7 +9,7 @@ const postSensorData = (req, next) => {
     const data = [];
 
     req.body.forEach(event => {
-        data.push({ ...event, timestamp: new Date(req.body.eventTimestamp)})
+        data.push({ ...event, timestamp: new Date(event.eventTimestamp)})
     });
 
     repository.postSensorData(data, (err, data) => {

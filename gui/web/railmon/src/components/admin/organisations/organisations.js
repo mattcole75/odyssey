@@ -51,13 +51,13 @@ const organisations = React.memo(() => {
     let modal = null;
     if(editingOrg) {
         modal = <Modal
-            show={editingOrg}
-            modalClosed={toggleOrgEditing}
+            show={ editingOrg }
+            modalClosed={ toggleOrgEditing }
             content={
                 <OrgForm
-                    toggle={toggleOrgEditing}
-                    save={saveHandler}
-                    organisation={organisation}
+                    toggle={ toggleOrgEditing }
+                    save={ saveHandler }
+                    organisation={ organisation }
                 />
             } />;
     }
@@ -78,7 +78,7 @@ const organisations = React.memo(() => {
             </div>
 
             <div>
-                <Organisations organisations={organisations} toggle={toggleOrgEditing} />
+                <Organisations organisations={ organisations } toggle={ toggleOrgEditing } />
             </div>
 
         </section>

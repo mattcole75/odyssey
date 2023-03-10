@@ -38,4 +38,14 @@ module.exports = (app) => {
                 res.status(response.status).send(response);
         });
     });
+
+    app.get('/' + service + '/api/' + version + '/organisationlist', (req, res) => {
+        res.set('Content-Type', 'application/json');
+        controller.getOrganisationList(req, (err, response) => {
+            if(err)
+                res.status(err.status).send(err);
+            else
+                res.status(response.status).send(response);
+        });
+    });
 }

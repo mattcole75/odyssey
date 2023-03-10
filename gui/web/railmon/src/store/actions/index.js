@@ -13,11 +13,14 @@ export {
     adminGetUsers,
     adminUpdateUser,
     adminGetOrganisations,
+    adminGetOrganisationList,
     adminUpdateOganisation,
     adminCreateOganisation
 } from './admin';
 
 export {
     assetGetAssets,
+    assetGetAsset,
+    assetPatchAsset,
     assetReset
 } from './asset';

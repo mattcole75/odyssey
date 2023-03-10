@@ -16,6 +16,22 @@ const getAssetsSuccess = (assets, identifier) => {
     };
 }
 
+const getAssetSuccess = (asset, identifier) => {
+    return {
+        type: actionType.ASSET_GET_ASSET_SUCCESS,
+        asset: asset,
+        identifier: identifier
+    };
+}
+
+const patchAssetSuccess = (asset, identifier) => {
+    return {
+        type: actionType.ASSET_PATCH_ASSET_SUCCESS,
+        asset: asset,
+        identifier: identifier
+    }
+}
+
 const finish = () => {
     return {
         type: actionType.ASSET_FINISH
@@ -44,6 +60,7 @@ export const assetReset = () => {
 
 export const assetGetAssets = (idToken, query, identifier) => {
     return dispatch => {
+
         dispatch(start());
 
         const config = {
@@ -64,5 +81,52 @@ export const assetGetAssets = (idToken, query, identifier) => {
             .catch(err => {
                 dispatch(fail(whatIsTheErrorMessage(err)));
             });
+    };
+}
+
+export const assetGetAsset = (idToken, query, identifier) => {
+    return dispatch => {
+
+        dispatch(start());
+
+        const config = {
+            headers: {
+                'content-type': 'application/json',
+                idToken: idToken,
+                query: query
+            }
+        };
+
+        asset.get('/asset', config)
+            .then(res => {
+                dispatch(getAssetSuccess(res.data.res, identifier));
+            })
+            .then(() => {
+                dispatch(finish());
+            })
+            .catch(err => {
+                dispatch(fail(whatIsTheErrorMessage(err)));
+            });
+    };
+}
+
+export const assetPatchAsset = (idToken, data, identifier) => {
+    return dispatch => {
+        dispatch(start());
+
+        asset.patch('/asset', data, {
+            headers: {
+                idToken: idToken,
+            }
+        })
+        .then(res => {
+            dispatch(patchAssetSuccess(res.data.res, identifier));
+        })
+        .then(() => {
+            dispatch(finish());
+        })
+        .catch(err => {
+            dispatch(fail(whatIsTheErrorMessage(err))); 
+        });
     };
 }

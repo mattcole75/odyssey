@@ -1,8 +1,11 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
+import { capitalizeFirstLetter } from '../../../shared/utility';
 
 const Assets = (props) => {
 
     const { assets } = props;
+    const navigate = useNavigate();
     
     return (
         <div className='container'>
@@ -14,19 +17,16 @@ const Assets = (props) => {
                             <th scope="col">Name</th>
                             <th scope="col">Owner</th>
                             <th scope="col">Maintainer</th>
-                            <th scope="col">Operational</th>
+                            <th scope="col">Status</th>
                         </tr>
                     </thead>
                     <tbody>
                         {assets && assets.map((item) => (
-                            <tr key={item.id} onClick={() => {}}>
+                            <tr key={item.id} onClick={ () => { navigate(`/asset/${ item.id }`) } }>
                                 <td>{item.name}</td>
                                 <td>{item.ownedByRef}</td>
                                 <td>{item.maintainedByRef}</td>
-                                <td>{item.operational
-                                        ? <span className='badge text-nowrap bg-success'>Operational</span>
-                                        : <span className='badge text-nowrap bg-danger'>Decommissioned</span>
-                                    }
+                                <td>{capitalizeFirstLetter(item.status)}
                                 </td>
                             </tr>
                         ))}

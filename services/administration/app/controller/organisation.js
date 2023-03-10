@@ -127,8 +127,48 @@ const get = (req, next) => {
         });
 }
 
+const getOrganisationList = (req, next) => {
+    const { idtoken } = req.headers;
+    // configure header
+    let header = null;
+    if(idtoken) {
+        header = {
+            'Content-Type': 'application/json',
+            idToken: idtoken
+        }
+    } else {
+        log.error(`status: ${ err.status } GET organisation list v${ version } result: no idToken`);
+        return next({ status: 400, res: 'Bad Request' }, null);
+    }
+    // set the api authorisation rules
+    const rules = { roles: ['user'] };
+    //authenticate user with the auth microservice
+    axios.post('/approvetransaction', { rules: rules }, { headers: header })
+        .then(authRes => {
+            if(authRes.data.status === 200) {
+                repository.getOrganisationList(null, (err, res) => {
+                    if(err){
+                        log.error(`status: ${ err.status } GET organisation list v${ version } result: ${ JSON.stringify(err) }`);
+                        next(err, null);
+                    } else {
+                        log.info(`status: ${res.status} GET organisation list v${version}`);
+                        next(null, res);
+                    }
+                });
+            } else {
+                log.error(`status: ${ authRes.status } GET organisation list v${ version } result: ${ JSON.stringify(authRes.statusText) }`);
+                return(next(authRes.data, null));
+            }
+        })
+        .catch(authErr => {
+            log.error(`status: ${ authErr.status } GET organisation list v${ version } result: ${ JSON.stringify(authErr.statusText) }`);
+            return(next(authErr.response.data, null));
+        });
+}
+
 module.exports = {
     post: post,
     get: get,
-    patch: patch
+    patch: patch,
+    getOrganisationList: getOrganisationList
 }

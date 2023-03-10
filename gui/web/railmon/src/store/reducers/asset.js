@@ -4,6 +4,7 @@ const initialState = {
     loading: false,
     error: null,
     assets: [],
+    asset: null,
     identifier: null,
     redirectPath: '/assets'
 }
@@ -18,6 +19,21 @@ const start = (state) => {
 const getAssetsSuccess = (state, action) => {
     return { ...state,
         assets: action.assets,
+        asset: null,
+        identifier: action.identifier
+    };
+}
+
+const getAssetSuccess = (state, action) => {
+    return { ...state,
+        asset: action.asset,
+        identifier: action.identifier
+    };
+}
+
+const patchAssetSuccess = (state, action) => {
+    return { ...state,
+        asset: action.asset,
         identifier: action.identifier
     };
 }
@@ -44,6 +60,8 @@ const reducer = (state = initialState, action) => {
     switch(action.type) {
         case actionType.ASSET_START: return start(state);
         case actionType.ASSET_GET_ASSETS_SUCCESS: return getAssetsSuccess(state, action);
+        case actionType.ASSET_GET_ASSET_SUCCESS: return getAssetSuccess(state, action);
+        case actionType.ASSET_PATCH_ASSET_SUCCESS: return patchAssetSuccess(state, action);
         case actionType.ASSET_FINISH: return finish(state);
         case actionType.ASSET_FAIL: return fail(state, action);
         case actionType.ASSET_RESET: return reset();

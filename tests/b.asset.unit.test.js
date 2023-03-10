@@ -64,24 +64,15 @@ describe('Asset Service Tests', () => {
                 ownedByRef: 'TfGM',
                 maintainedByRef: 'KAM',
                 name: 'Delta Area',
-                description: 'The delta area',
-                operational: true,
-                operationalStarDate: moment().format(),
-                operationalEndDate: null,
-                locationType: 'Area',
-                area: 'POLYGON ((-2.237313 53.4803628, -2.2371628 53.480465, -2.2376617 53.4807427, -2.2379138 53.4810205, -2.2376402 53.4813812, -2.2375759 53.4815504, -2.2376402 53.4816462, -2.2377207 53.4817004, -2.2378226 53.4817451, -2.2382142 53.4818249, -2.2383162 53.4816781, -2.2382196 53.4815855, -2.2382625 53.4814833, -2.2390565 53.4809151, -2.2389492 53.4808481, -2.2388043 53.4809279, -2.2386917 53.4809566, -2.2386166 53.480963, -2.2385468 53.4809662, -2.2384717 53.4809343, -2.237313 53.4803628))',
-                pin: null
+                description: 'The delta area'
             })
             .set('Accept', 'application/json')
             .expect('Content-Type', /json/)
             .expect(201)
             .then(res => {
-                const { affectedRows, insertId, serverStatus, warningCount, changedRows } = res.body.res;
-                expect(affectedRows).toBe(1);
+                const { insertId } = res.body.res;
                 expect(insertId).toBeDefined();
-                expect(changedRows).toBe(0);
-                expect(serverStatus).toBe(2);
-                expect(warningCount).toBe(0);
+                expect(insertId).toBe(1);
                 parentAssetRef = insertId;
             });
     });
@@ -96,24 +87,15 @@ describe('Asset Service Tests', () => {
                 ownedByRef: 'TfGM',
                 maintainedByRef: 'KAM',
                 name: 'MKT08M',
-                description: 'Market Street motorised point machine',
-                operational: true,
-                operationalStartDate: moment().format(),
-                operationalEndDate: null,
-                locationType: 'Pin',
-                area: null,
-                pin: 'POINT(53.481312, -2.238397)'
+                description: 'Market Street motorised point machine'
             })
             .set('Accept', 'application/json')
             .expect('Content-Type', /json/)
             .expect(201)
             .then(res => {
                 const { affectedRows, insertId, serverStatus, warningCount, changedRows } = res.body.res;
-                expect(affectedRows).toBe(1);
                 expect(insertId).toBeDefined();
-                expect(changedRows).toBe(0);
-                expect(serverStatus).toBe(2);
-                expect(warningCount).toBe(0);
+                expect(insertId).toBe(2);
             });
     });
 
@@ -127,13 +109,7 @@ describe('Asset Service Tests', () => {
                 ownedByRef: 'TfGM',
                 maintainedByRef: 'KAM',
                 name: 'Delta Area',
-                description: 'The delta area',
-                operational: true,
-                operationalStarDate: moment().format(),
-                operationalEndDate: null,
-                locationType: 'Area',
-                area: 'POLYGON ((-2.237313 53.4803628, -2.2371628 53.480465, -2.2376617 53.4807427, -2.2379138 53.4810205, -2.2376402 53.4813812, -2.2375759 53.4815504, -2.2376402 53.4816462, -2.2377207 53.4817004, -2.2378226 53.4817451, -2.2382142 53.4818249, -2.2383162 53.4816781, -2.2382196 53.4815855, -2.2382625 53.4814833, -2.2390565 53.4809151, -2.2389492 53.4808481, -2.2388043 53.4809279, -2.2386917 53.4809566, -2.2386166 53.480963, -2.2385468 53.4809662, -2.2384717 53.4809343, -2.237313 53.4803628))',
-                pin: null
+                description: 'The delta area'
             })
             .set('Accept', 'application/json')
             .expect('Content-Type', /json/)
@@ -157,8 +133,113 @@ describe('Asset Service Tests', () => {
             .expect('Content-Type', /json/)
             .expect(200)
             .then(res => {
-                console.log(res.body);
+                expect(res.body.res).toHaveLength(2)
+                // console.log(res.body);
             })
+    });
+
+    it('should, return the asset with the given id', async () => {
+        await assetEndPoint.get('/asset')
+            .set({
+                idToken: idToken,
+                query: parentAssetRef
+            })
+            .set('Accept', 'application/json')
+            .expect('Content-Type', /json/)
+            .expect(200)
+    });
+
+    it('should, update an asset record with an installation date', async () => {
+        await assetEndPoint.patch('/asset')
+        .set({
+            idToken: idToken
+        })
+        .send({
+            id: parentAssetRef,
+            ownedByRef: 'TfGM',
+            maintainedByRef: 'KAM',
+            name: 'Delta Area',
+            description: 'The delta area',
+            status: 'commissioned',
+            installedDate: moment().format('YYYY-MM-DD'),
+            commissionedDate: null,
+            decommissionedDate: null,
+            disposedDate: null,
+            inuse: true
+
+        })
+        .set('Accept', 'application/json')
+        .expect('Content-Type', /json/)
+        .expect(200)
+    });
+
+    it('should, update an asset record with a commissioned date', async () => {
+        await assetEndPoint.patch('/asset')
+        .set({
+            idToken: idToken
+        })
+        .send({
+            id: parentAssetRef,
+            ownedByRef: 'TfGM',
+            maintainedByRef: 'KAM',
+            name: 'Delta Area',
+            description: 'The delta area',
+            status: 'commissioned',
+            installedDate: moment().format('YYYY-MM-DD'),
+            commissionedDate: moment().format('YYYY-MM-DD'),
+            decommissionedDate: null,
+            disposedDate: null,
+            inuse: true
+        })
+        .set('Accept', 'application/json')
+        .expect('Content-Type', /json/)
+        .expect(200)
+    });
+
+    it('should, update an asset record with a decommissioned date', async () => {
+        await assetEndPoint.patch('/asset')
+        .set({
+            idToken: idToken
+        })
+        .send({
+            id: parentAssetRef,
+            ownedByRef: 'TfGM',
+            maintainedByRef: 'KAM',
+            name: 'Delta Area',
+            description: 'The delta area',
+            status: 'commissioned',
+            installedDate: moment().format('YYYY-MM-DD'),
+            commissionedDate: moment().format('YYYY-MM-DD'),
+            decommissionedDate: moment().format('YYYY-MM-DD'),
+            disposedDate: null,
+            inuse: true
+        })
+        .set('Accept', 'application/json')
+        .expect('Content-Type', /json/)
+        .expect(200)
+    });
+
+    it('should, update an asset record with a disposal date', async () => {
+        await assetEndPoint.patch('/asset')
+        .set({
+            idToken: idToken
+        })
+        .send({
+            id: parentAssetRef,
+            ownedByRef: 'TfGM',
+            maintainedByRef: 'KAM',
+            name: 'Delta Area',
+            description: 'The delta area',
+            status: 'commissioned',
+            installedDate: moment().format('YYYY-MM-DD'),
+            commissionedDate: moment().format('YYYY-MM-DD'),
+            decommissionedDate: moment().format('YYYY-MM-DD'),
+            disposedDate: moment().format('YYYY-MM-DD'),
+            inuse: true
+        })
+        .set('Accept', 'application/json')
+        .expect('Content-Type', /json/)
+        .expect(200)
     });
 
 });

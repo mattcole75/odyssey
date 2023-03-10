@@ -146,14 +146,14 @@ const OrgForm = (props) => {
                     <button
                         className='w-100 btn btn-primary'
                         type='button'
-                        onClick={handleSubmit(onSave)}>Save</button>
+                        onClick={ handleSubmit(onSave) }>Save</button>
                 </div>
 
                 <div className='form-floating mb-3'>
                     <button
                         className='w-100 btn btn-secondary'
                         type='button'
-                        onClick={toggle}>Close</button>
+                        onClick={ toggle }>Close</button>
                 </div>
 
             </form>

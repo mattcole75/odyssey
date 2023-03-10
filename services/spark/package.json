@@ -4,7 +4,10 @@
   "description": "A data repository to get ideas of the ground",
   "main": "index.js",
   "scripts": {
-    "spark": "node service.js"
+    "spark": "node service.js",
+    "dbInit1": "echo \"db.createCollection('sensorData', { 'timeseries': {timeField: 'timestamp', metaField: 'id', granularity: 'minutes'}, expireAfterSeconds: 31536000})\" | mongosh spark",
+    "dbInit2": "echo \"db.createCollection('pointData', { 'timeseries': {timeField: 'timestamp', metaField: 'id', granularity: 'minutes'}, expireAfterSeconds: 31536000})\" | mongosh spark",
+    "test": "echo 'db.sensorData.deleteMany({}) ' | mongosh spark && jest"
   },
   "keywords": [
     "spark",
