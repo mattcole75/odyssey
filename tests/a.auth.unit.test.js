@@ -222,10 +222,10 @@ describe('Deny access tests:', () => {
             })
             .set('Accept', 'application/json')
             .expect('Content-Type', /json/)
-            .expect(404)
+            .expect(403)
             .then(res => {
                 expect(res.body).toBeDefined();
-                expect(res.body.status).toBe(404);
+                expect(res.body.status).toBe(403);
                 expect(res.body.msg).toBe('Unauthorised');
             })
     });

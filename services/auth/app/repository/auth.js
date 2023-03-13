@@ -230,7 +230,7 @@ const approveTransaction = (idToken, next) => {
             if(err)
                 next({ status: 500, msg: err }, null);
             else if(!res)
-                next({ status: 404, msg: "Not found" }, null);
+                next({ status: 403, msg: "Not found" }, null);
             else if(res.inuse === false)
                 next({ status: 403, msg: "Account disabled, contact your system administrator" }, null);
             else

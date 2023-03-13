@@ -31,7 +31,7 @@ describe('Asset Service Tests', () => {
             })
             .set('Accept', 'application/json')
             .expect('Content-Type', /json/)
-            .expect(404)
+            .expect(403)
     });
 
     it('should, login and return the user details and token', async () => {

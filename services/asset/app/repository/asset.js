@@ -80,7 +80,6 @@ const patchAsset = (req, next) => {
         { rules: rules, sproc: sproc },
         { headers: {'Content-Type': 'application/json', idToken: idtoken } })
         .then(res => {
-            console.log('asset result following patch', res.data);
             next(null, res.data);
         })
         .catch(err => {

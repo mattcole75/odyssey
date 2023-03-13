@@ -389,7 +389,7 @@ const approveTransaction = (req, next) => {
     const { rules } = req.body;
 
     let errors = [];
-    if(idtoken && idtoken != null) {
+    if(idtoken != null) {
         errors = validate(req.headers, testTokenRules);
     } else {
         log.error(`POST v${version} - validation failure - testToken - status: 400, msg: request header parameters missing`);

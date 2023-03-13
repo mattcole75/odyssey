@@ -1,0 +1,25 @@
+{
+  "name": "organisation",
+  "version": "1.0.0",
+  "description": "The organisation micro service. provides organisational details for a system.",
+  "main": "service.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "organisation",
+    "api"
+  ],
+  "author": "Matt Cole",
+  "license": "GPL-3.0",
+  "dependencies": {
+    "axios": "^1.2.4",
+    "bunyan": "^1.8.15",
+    "convict": "^6.2.4",
+    "dotenv": "^16.0.3",
+    "express": "^4.18.2",
+    "moment": "^2.29.4",
+    "mongodb": "^4.13.0",
+    "morgan": "^1.10.0"
+  }
+}

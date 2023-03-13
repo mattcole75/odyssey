@@ -7,6 +7,7 @@
     "assets": "node server.js",
     "authTest": "echo 'db.user.remove({})' | mongosh auth && jest ./tests/a.auth.unit.test.js --runInBand",
     "assetTest": "jest ./tests/b.asset.unit.test.js --runInBand",
+    "locationTest": "echo 'db.locations.deleteMany({}) ' | mongosh location && jest ./tests/e.location.unit.test.js --runInBand",
     "populate": "jest -t 'Test the location microservice POST methods'",
     "startRailmon": "node services/auth/service.js",
     "sparkDbInit1": "echo \"db.createCollection('sensorData', { 'timeseries': {timeField: 'timestamp', metaField: 'id', granularity: 'minutes'}, expireAfterSeconds: 31536000})\" | mongosh spark",
