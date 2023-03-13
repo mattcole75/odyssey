@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
+
 import { assetGetAsset, assetPatchAsset, adminGetOrganisationList } from '../../../store/actions/index';
 
 import { useForm } from 'react-hook-form';
@@ -16,6 +17,7 @@ const AssetForm = () => {
 
     const { id } = useParams();
     const dispatch = useDispatch();
+    const navigate = useNavigate();
 
     const { loading, error, asset } = useSelector(state => state.asset);
     const { idToken } = useSelector(state => state.auth);
@@ -107,131 +109,90 @@ const AssetForm = () => {
             
             <form>
                 {/* asset details */}
-                <div className='form-floating'>
-                    <input type='text' className='form-control form-auth-ele-top' id='name' placeholder='Asset name' autoComplete='off' required minLength={3} maxLength={50}
-                    { ...register('name', {
-                        required: 'You must specify an Asset Name',
-                        minLength: {
-                            value: 3,
-                            message: 'Asset Name must have at least 3 characters'
-                        },
-                        maxLength: {
-                            value: 50,
-                            message: 'Asset Name must have less than 50 characters'
-                        }
-                    }) }
-                    />
-                    <label htmlFor='name'>Asset Name</label>
-                </div>
+                <div className='row g-2 mb-2'>
+                    <div className='col-sm-6'>
+                        <div className='form-floating'>
+                            <input type='text' className='form-control form-auth-ele-top' id='name' placeholder='Asset name' autoComplete='off' required minLength={3} maxLength={50}
+                            { ...register('name', {
+                                required: 'You must specify an Asset Name',
+                                minLength: {
+                                    value: 3,
+                                    message: 'Asset Name must have at least 3 characters'
+                                },
+                                maxLength: {
+                                    value: 50,
+                                    message: 'Asset Name must have less than 50 characters'
+                                }
+                            }) }
+                            />
+                            <label htmlFor='name'>Asset Name</label>
+                        </div>
+                        <div className='form-floating'>
+                            <input type='text' className='form-control form-auth-ele-bot' id='assetRef' placeholder='Asset Reference' autoComplete='off' readOnly value={ asset && asset.assetRef ? asset.assetRef : 'Top Level Asset' } />
+                            <label htmlFor='assetRef'>Parent Asset</label>
+                        </div>
+                    </div>
+                    <div className='col-sm-6'>
+                        <div className='form-floating'>
+                            <select className='form-select form-auth-ele-top' id='ownedByRef' aria-label='Asset status'
+                                { ...register('ownedByRef', { required: 'You must select an owner organisation' }) }
+                            >
+                                <option value=''>Select...</option>
+                                {
+                                    organisations && organisations.map(item => {
+                                        if(item.assetRole === 'Owner')
+                                            return (<option key={item._id} value={item._id}>{item.name}</option>)
+                                        else
+                                            return null;
+                                    })
+                                }
+                                
+                            </select>
+                            <label htmlFor='ownedByRef'>Asset Owner</label>
+                        </div>
+                        <div className='form-floating'>
+                            <select className='form-select form-auth-ele-bot' id='maintainedByRef' aria-label='Asset status'
+                                { ...register('maintainedByRef', { required: 'You must select a maintainer organisation' }) }
+                            >
+                                <option value=''>Select...</option>
+                                {
+                                    organisations && organisations.map(item => {
+                                        if(item.assetRole === 'Maintainer')
+                                            return (<option key={item._id} value={item._id}>{item.name}</option>)
+                                        else
+                                            return null;
+                                    })
+                                }
+                                
+                            </select>
+                            <label htmlFor='maintainedByRef'>Asset Maintainer</label>
+                        </div>
+                    </div>
 
-                <div className='form-floating'>
-                    <select className='form-select form-auth-ele-mid' id='ownedByRef' aria-label='Asset status'
-                         { ...register('ownedByRef', { required: 'You must select an owner organisation' }) }
-                    >
-                        <option value=''>Select...</option>
-                        {
-                            organisations && organisations.map(item => {
-                                if(item.assetRole === 'Owner')
-                                    return (<option key={item._id} value={item._id}>{item.name}</option>)
-                                else
-                                    return null;
-                            })
-                        }
-                        
-                    </select>
-                    <label htmlFor='ownedByRef'>Asset Owner</label>
-                </div>
-
-                <div className='form-floating'>
-                    <select className='form-select form-auth-ele-mid' id='maintainedByRef' aria-label='Asset status'
-                         { ...register('maintainedByRef', { required: 'You must select a maintainer organisation' }) }
-                    >
-                        <option value=''>Select...</option>
-                        {
-                            organisations && organisations.map(item => {
-                                if(item.assetRole === 'Maintainer')
-                                    return (<option key={item._id} value={item._id}>{item.name}</option>)
-                                else
-                                    return null;
-                            })
-                        }
-                        
-                    </select>
-                    <label htmlFor='maintainedByRef'>Asset Maintainer</label>
-                </div>
-
-                <div className='form-floating'>
-                    <input type='text' className='form-control form-auth-ele-bot' id='description' placeholder='Asset Description' autoComplete='off' required minLength={3} maxLength={256}
-                    { ...register('description', {
-                        required: 'You must provide an asset description',
-                        minLength: {
-                            value: 3,
-                            message: 'Asset description must have at least 3 characters'
-                        },
-                        maxLength: {
-                            value: 256,
-                            message: 'Asset description cannot have more than 256 characters'
-                        }
-                    }) }
-                    />
-                    <label htmlFor='description'>Asset Description</label>
-                </div>
-
-
-                {/* Asset Status */}
-                <div className='text-start'>
-                    <h1 className='h3 mb-3 fw-normal text-start'>Asset Status</h1>
-                </div>
-
-                <div className='form-floating'>
-                    <select className='form-select form-auth-ele-top' id='status' aria-label='Asset status'
-                         { ...register('status', { required: 'You must select a status' }) }
-                    >
-                        <option value=''>Select...</option>
-                        <option value='design'>Design</option>
-                        <option value='procure'>Procure</option>
-                        <option value='installed'>Installed</option>
-                        <option value='commissioned'>Commissioned</option>
-                        <option value='decommissioned'>Decommissioned</option>
-                        <option value='disposed'>Disposed</option>
-                    </select>
-                    <label htmlFor='status'>Asset Status</label>
-                </div>
-
-                <div className='form-floating'>
-                    <input type='date' className='form-control form-auth-ele-mid' id='installedDate' placeholder='Installed Date'
-                    { ...register('installedDate') }
-                    />
-                    <label htmlFor='installedDate'>Installed Date</label>
-                </div>
-
-                <div className='form-floating'>
-                    <input type='date' className='form-control form-auth-ele-mid' id='commissionedDate' placeholder='Commissioned Date'
-                    { ...register('commissionedDate') }
-                    />
-                    <label htmlFor='commissionedDate'>Commissioned Date</label>
-                </div>
-
-                <div className='form-floating'>
-                    <input type='date' className='form-control form-auth-ele-mid' id='decommissionedDate' placeholder='decommissioned Date'
-                    { ...register('decommissionedDate') }
-                    />
-                    <label htmlFor='decommissionedDate'>Decommissioned Date</label>
-                </div>
-
-                <div className='form-floating'>
-                    <input type='date' className='form-control form-auth-ele-bot' id='disposedDate' placeholder='Disposed Date'
-                    { ...register('disposedDate') }
-                    />
-                    <label htmlFor='disposedDate'>Disposed Date</label>
+                    <div className='form-floating'>
+                        <textarea className='form-control' id='description' placeholder='Asset Description' rows='5' required minLength={3} maxLength={256}  style={{height:'auto'}}
+                            { ...register('description', {
+                                required: 'You must provide an asset description',
+                                minLength: {
+                                    value: 3,
+                                    message: 'Asset description must have at least 3 characters'
+                                },
+                                maxLength: {
+                                    value: 256,
+                                    message: 'Asset description cannot have more than 256 characters'
+                                }
+                            }) }
+                        />
+                        <label htmlFor='description'>Asset Description</label>
+                    </div>
                 </div>
                 { errors.name && <p className='form-auth-error mt-1'>{errors.name.message}</p> }
-                { errors.abbreviation && <p className='form-auth-error mt-1'>{errors.abbreviation.message}</p> }
-                { errors.assetRole && <p className='form-auth-error mt-1'>{errors.assetRole.message}</p> }
+                { errors.description && <p className='form-auth-error mt-1'>{errors.description.message}</p> }
 
+                {/* Asset Status */}
                 <div className='d-flex gap-2 w-100 justify-content-between mt-3'>
                     <div className='text-start'>
-                        <h1 className='h3 mb-3 fw-normal text-start'>Record Status</h1>
+                        <h1 className='h3 mb-3 fw-normal text-start'>Asset Status</h1>
                     </div>
                     { asset
                         ?   <small className='opacity-75 text-nowrap'>
@@ -243,40 +204,94 @@ const AssetForm = () => {
                         :   null 
                     }
                 </div>
+                
 
-                <div>
-                    <ul className='list-group mb-3'>
-                        <li className='list-group-item d-flex justify-content-between lh-sm'>
-                            <div className='form-check form-switch primary text-start'>
-                                <input 
-                                    className='form-check-input'
-                                    type='checkbox'
-                                    role='switch'
-                                    id='inuse'
-                                    { ...register('inuse', { onChange: toggleInuseStatus, required: false })}
-                                />
-                                <label className='form-check-label' htmlFor='inuse'>{inuseStatus ? 'Asset is enabled' : 'Asset is disabled'}</label>
-                            </div>
-                        </li>
+                <div className='row g-2 mb-2'>
+                    <div className='col-sm-6'>
+                        <div className='form-floating'>
+                            <select className='form-select form-auth-ele-top' id='status' aria-label='Asset status'
+                                { ...register('status', { required: 'You must select a status' }) }
+                            >
+                                <option value=''>Select...</option>
+                                <option value='design'>Design</option>
+                                <option value='procure'>Procure</option>
+                                <option value='installed'>Installed</option>
+                                <option value='commissioned'>Commissioned</option>
+                                <option value='decommissioned'>Decommissioned</option>
+                                <option value='disposed'>Disposed</option>
+                            </select>
+                            <label htmlFor='status'>Asset Status</label>
+                        </div>
+                        <div className='form-floating'>
+                            <input type='date' className='form-control form-auth-ele-mid' id='installedDate' placeholder='Installed Date'
+                            { ...register('installedDate') }
+                            />
+                            <label htmlFor='installedDate'>Installed Date</label>
+                        </div>
+
+                        <div className='form-floating'>
+                            <input type='date' className='form-control form-auth-ele-bot' id='commissionedDate' placeholder='Commissioned Date'
+                            { ...register('commissionedDate') }
+                            />
+                            <label htmlFor='commissionedDate'>Commissioned Date</label>
+                        </div>
+                    </div>
+                    <div className='col-sm-6'>
+                        <div className='form-floating'>
+                            <select className='form-select form-auth-ele-top' id='inuse' aria-label='Asset status' required
+                                { ...register('inuse', { onChange: toggleInuseStatus, required: true })}
+                            >
+                                <option value=''>Select...</option>
+                                <option value={1}>Enabled</option>
+                                <option value={0}>Disabled</option>
+                            </select>
+                            <label htmlFor='inuse'>Asset Enabled Status</label>
+                        </div>
+
+                        <div className='form-floating'>
+                            <input type='date' className='form-control form-auth-ele-mid' id='decommissionedDate' placeholder='decommissioned Date'
+                            { ...register('decommissionedDate') }
+                            />
+                            <label htmlFor='decommissionedDate'>Decommissioned Date</label>
+                        </div>
+
+                        <div className='form-floating'>
+                            <input type='date' className='form-control form-auth-ele-bot' id='disposedDate' placeholder='Disposed Date'
+                            { ...register('disposedDate') }
+                            />
+                            <label htmlFor='disposedDate'>Disposed Date</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div className='text-start'>
+                    <h1 className='h3 mb-3 fw-normal text-start'>Record Details</h1>
+                </div>
+
+                <div className='row g-2 mb-4'>
+                    <div className='col-sm-6'>
                         { asset
-                            ?   <li className='list-group-item d-flex justify-content-between lh-sm'>
-                                    <div className='text-start'>
+                            ?   <div className=''>
+                                    <div className='form-control'>
                                         <h6 className='my-0'>Date Created</h6>
                                         <small className='text-muted'>{moment(asset.created).format('MMMM Do YYYY, h:mm:ss a')}</small>
                                     </div>
-                                </li>
+                                </div>
                             :   null
                         }
+
+                    </div>
+                    <div className='col-sm-6'>
                         { asset
-                            ?   <li className='list-group-item d-flex justify-content-between lh-sm'>
-                                    <div className='text-start'>
+                            ?   <div className=''>
+                                    <div className='form-control'>
                                         <h6 className='my-0'>Date Last Updated</h6>
                                         <small className='text-muted'>{moment(asset.updated).format('MMMM Do YYYY, h:mm:ss a')}</small>
                                     </div>
-                                </li>
+                                </div>
                             :   null
                         }
-                    </ul>
+                    </div>
                 </div>
 
 
@@ -291,7 +306,7 @@ const AssetForm = () => {
                     <button
                         className='w-100 btn btn-secondary'
                         type='button'
-                        onClick={ () => {} }>Close</button>
+                        onClick={ () => { navigate('/assets') } }>Close</button>
                 </div>
 
             </form>

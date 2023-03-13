@@ -14,7 +14,7 @@ create table asset (
     name varchar(32) not null unique, -- the name describing the asset is unique
     description varchar(256) not null, -- a short functional description or contract requirement
 
-    status varchar(64) not null default 'design', -- valid options are Design, procure, Install, Commission, Operational
+    status varchar(64) not null default 'design', -- valid options are Design, procure, Install, commissioned, decommissioned, disposed
     installedDate date null, -- the date the asset was installed
     commissionedDate date null, -- the date the asset was commissioned
     decommissionedDate date null, -- the date the asset was decommissioned
@@ -258,7 +258,7 @@ create procedure sp_insertAsset (in assetRef int, ownedByRef varchar(64), mainta
 create procedure sp_selectAsset (in uid int)
     begin
         select 
-        id, ownedByRef, maintainedByRef, name, description, status, 
+        id, assetRef, ownedByRef, maintainedByRef, name, description, status,
         date_format(installedDate, '%Y-%m-%d') as installedDate,
         date_format(commissionedDate, '%Y-%m-%d') as commissionedDate,
         date_format(decommissionedDate, '%Y-%m-%d') as decommissionedDate,
