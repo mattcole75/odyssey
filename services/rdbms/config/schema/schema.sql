@@ -14,6 +14,8 @@ create table asset (
     name varchar(32) not null unique, -- the name describing the asset is unique
     description varchar(256) not null, -- a short functional description or contract requirement
 
+    location json null, -- the location json value for the map interface
+
     status varchar(64) not null default 'design', -- valid options are Design, procure, Install, commissioned, decommissioned, disposed
     installedDate date null, -- the date the asset was installed
     commissionedDate date null, -- the date the asset was commissioned
@@ -25,7 +27,7 @@ create table asset (
     inuse boolean not null default true, -- can this record be used / viewed
     
     primary key (id),
-    fulltext key (name, description, status),
+    fulltext key text (name, description, status),
     constraint fk_asset_assetRef foreign key (assetRef) references asset (id) on update cascade on delete cascade,
     constraint ck_asset_status check (status in ('design', 'procure', 'installed', 'commissioned', 'decommissioned', 'disposed'))
 );
@@ -239,17 +241,27 @@ create procedure sp_selectAssets (in searchText varchar(64))
     begin
         if(searchText <> '') then
             select id, assetRef, ownedByRef, maintainedByRef, name, status from asset
-            where match(name, description) against(searchText in boolean mode) order by name;
+            where match(name, description, status) against(searchText in boolean mode)
+            order by name;
         else
-            select id, assetRef, ownedByRef, maintainedByRef, name, status from asset;
+            select id, assetRef, ownedByRef, maintainedByRef, name, status from asset 
+            where assetRef is null
+            order by name;
         end if;
     end//
 
-create procedure sp_insertAsset (in assetRef int, ownedByRef varchar(64), maintainedByRef varchar(64), name varchar(32), description varchar(256),
+create procedure sp_selectChildAssets (in uid int)
+    begin
+        select id, assetRef, ownedByRef, maintainedByRef, name, status from asset 
+            where assetRef = uid
+            order by name;
+    end//
+
+create procedure sp_insertAsset (in assetRef int, ownedByRef varchar(64), maintainedByRef varchar(64), name varchar(32), description varchar(256), location json,
                                 out insertId int)
     begin
-        insert into asset (assetRef, ownedByRef, maintainedByRef, name, description)
-        values (assetRef, ownedByRef, maintainedByRef, name, description);
+        insert into asset (assetRef, ownedByRef, maintainedByRef, name, description, location)
+        values (assetRef, ownedByRef, maintainedByRef, name, description, location);
 
         set insertId := last_insert_id();
         select insertId;
@@ -258,7 +270,7 @@ create procedure sp_insertAsset (in assetRef int, ownedByRef varchar(64), mainta
 create procedure sp_selectAsset (in uid int)
     begin
         select 
-        id, assetRef, ownedByRef, maintainedByRef, name, description, status,
+        id, assetRef, ownedByRef, maintainedByRef, name, description, location, status,
         date_format(installedDate, '%Y-%m-%d') as installedDate,
         date_format(commissionedDate, '%Y-%m-%d') as commissionedDate,
         date_format(decommissionedDate, '%Y-%m-%d') as decommissionedDate,
@@ -266,13 +278,14 @@ create procedure sp_selectAsset (in uid int)
         created, updated, inuse from asset where id = uid;
     end//
 
-create procedure sp_updateAsset (in uid int, ownedByRef varchar(64), maintainedByRef varchar(64), name varchar(32), description varchar(256), status varchar(64), installedDate date, commissionedDate date, decommissionedDate date, disposedDate date, inuse boolean)
+create procedure sp_updateAsset (in uid int, ownedByRef varchar(64), maintainedByRef varchar(64), name varchar(32), description varchar(256), location json, status varchar(64), installedDate date, commissionedDate date, decommissionedDate date, disposedDate date, inuse boolean)
     begin
         update asset
         set ownedByRef = ownedByRef,
             maintainedByRef = maintainedByRef,
             name = name,
             description = description,
+            location = location,
             status = status,
             installedDate = installedDate,
             commissionedDate = commissionedDate,

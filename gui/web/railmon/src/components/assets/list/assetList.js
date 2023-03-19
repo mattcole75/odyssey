@@ -26,8 +26,7 @@ const Assets = (props) => {
                                 <td>{item.name}</td>
                                 <td>{item.ownedByRef}</td>
                                 <td>{item.maintainedByRef}</td>
-                                <td>{capitalizeFirstLetter(item.status)}
-                                </td>
+                                <td>{capitalizeFirstLetter(item.status)}</td>
                             </tr>
                         ))}
                     </tbody>

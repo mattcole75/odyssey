@@ -12,7 +12,8 @@ const postAsset = (req, next) => {
         (values.maintainedByRef == null ? null + ", " : "'" + values.maintainedByRef + "', ") + // maintainedByRef
         (values.name == null ? null + ", " : "'" + values.name + "', ") + // name
         (values.description == null ? null + ", " : "'" + values.description + "', ") + // description
-        "@insertId)"; 
+        (values.location == null ? null + ", " : "'" + values.location + "', ") + // location
+        "@insertId)";
 
     axios.post('/post',
         { rules: rules, sproc: sproc },
@@ -43,14 +44,30 @@ const getAssets = (req, next) => {
 
 const getAsset = (req, next) => {
 
-    const { idtoken, query } = req.headers;
+    const { idtoken, param } = req.headers;
     const { rules } = req.body;
-    const sproc = `call sp_selectAsset(${query})`;
+    const sproc = `call sp_selectAsset(${param})`;
 
     axios.get('/get',
         { headers: {'Content-Type': 'application/json', idToken: idtoken, rules: rules, sproc: sproc } })
         .then(res => {
             next(null, { status: res.data.status, res: res.data.res[0] });
+        })
+        .catch(err => {
+            next(err.response.data, null);
+        });
+};
+
+const getChildAssets = (req, next) => {
+    const { idtoken, param } = req.headers;
+    const { rules } = req.body;
+    //declare the sql string
+    const sproc = `call sp_selectChildAssets('${param}')`;
+
+    axios.get('/get',
+        { headers: {'Content-Type': 'application/json', idToken: idtoken, rules: rules, sproc: sproc } })
+        .then(res => {
+            next(null, res.data);
         })
         .catch(err => {
             next(err.response.data, null);
@@ -67,6 +84,7 @@ const patchAsset = (req, next) => {
         (values.maintainedByRef == null ? null + ", " : "'" + values.maintainedByRef + "', ") +
         (values.name == null ? null + ", " : "'" + values.name + "', ") +
         (values.description == null ? null + ", " : "'" + values.description + "', ") +
+        (values.location == null ? null + ", " : "'" + values.location + "', ") +
         (values.status == null ? null + ", " : "'" + values.status + "', ") +
         (values.installedDate == null ? null + ", " : "'" + values.installedDate + "', ") +
         (values.commissionedDate == null ? null + ", " : "'" + values.commissionedDate + "', ") +
@@ -90,6 +108,7 @@ const patchAsset = (req, next) => {
 module.exports = {
     postAsset: postAsset,
     getAssets: getAssets,
+    getChildAssets: getChildAssets,
     getAsset: getAsset,
     patchAsset: patchAsset
 }

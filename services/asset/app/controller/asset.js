@@ -51,6 +51,29 @@ const getAssets = (req, next) => {
     });
 };
 
+const getChildAssets = (req, next) => {
+
+    // add code to check request for validity -- future
+
+    // define the request object
+    const request = {
+        headers: req.headers,
+        body: {
+            rules: { rules: { roles: ['user'] } }
+        }
+    }
+
+    repository.getChildAssets(request, (err, res) => {
+        if(err) {
+            log.error(`status: ${ err.status } GET child assets v${ version } result: ${ JSON.stringify(err) }`);
+            next(err, null);
+        } else {
+            log.info(`status: ${ res.status } GET child assets v${ version }`);
+            next(null, res);
+        }
+    });
+};
+
 const getAsset = (req, next) => {
 
     // add code to check request for validity -- future
@@ -102,6 +125,7 @@ const patchAsset = (req, next) => {
 module.exports = {
     postAsset: postAsset,
     getAssets: getAssets,
+    getChildAssets: getChildAssets,
     getAsset: getAsset,
     patchAsset: patchAsset
 }

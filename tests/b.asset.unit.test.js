@@ -4,7 +4,6 @@ const crypto = require('crypto');
 const moment = require('moment');
 
 let idToken = null;
-let localId = null;
 let parentAssetRef;
 
 let wrongToken = '7c58e9e7cd20ae44f354d59f7a73ebb7e346d5e5a61517e33e0e97c4c79d25a826debfc57ca2e99c66108f80801059a9d2d94d14886fc98539e4ab324a5da2e125aa7e7d26af000e103fcbc75b0ed9caa75895ba26efa248fc0c2154a581786679c6a2a9120fadc9e68fef80bc30d6a8644cd19362e035a85e130d675e2e30a9';
@@ -64,7 +63,8 @@ describe('Asset Service Tests', () => {
                 ownedByRef: 'TfGM',
                 maintainedByRef: 'KAM',
                 name: 'Delta Area',
-                description: 'The delta area'
+                description: 'The delta area',
+                location: '{ "type": "Polygon", "coordinates": [[[-2.2382104, 53.4817944],[-2.2383079, 53.4816753],[-2.2382717, 53.4816561],[-2.2382449, 53.4815611],[-2.2391314, 53.4809362],[-2.2392293, 53.4808357],[-2.2394894, 53.4806665],[-2.2393218, 53.4805811],[-2.2389664, 53.4808293],[-2.238784, 53.4809458],[-2.2386365, 53.480969],[-2.2385131, 53.4809642],[-2.2384152, 53.4809402],[-2.2382395, 53.4808548],[-2.2380343, 53.4807471],[-2.237864, 53.480633],[-2.2376199, 53.4804789],[-2.237404, 53.4806314],[-2.2377125, 53.4807998],[-2.2378466, 53.4808876],[-2.2379163, 53.480933],[-2.2379565, 53.4809945],[-2.23797, 53.481056],[-2.2379552, 53.481103],[-2.2376843, 53.4813864],[-2.2376424, 53.4814481],[-2.237619, 53.4814992],[-2.2376136, 53.4815606],[-2.2376384, 53.4816193],[-2.2376887, 53.4816783],[-2.2377706, 53.4817397],[-2.2381642, 53.4818478],[-2.2382104, 53.4817944]]]}'
             })
             .set('Accept', 'application/json')
             .expect('Content-Type', /json/)
@@ -87,7 +87,8 @@ describe('Asset Service Tests', () => {
                 ownedByRef: 'TfGM',
                 maintainedByRef: 'KAM',
                 name: 'MKT08M',
-                description: 'Market Street motorised point machine'
+                description: 'Market Street motorised point machine',
+                location: '{ "type": "Point", "coordinates": [ 53.48178, -2.23821 ]}'
             })
             .set('Accept', 'application/json')
             .expect('Content-Type', /json/)
@@ -99,7 +100,7 @@ describe('Asset Service Tests', () => {
             });
     });
 
-    it('should, fail to insert a asset with the same name', async () => {
+    it('should, fail to insert an asset with the same name', async () => {
         await assetEndPoint.post('/asset')
             .set({
                 idToken: idToken
@@ -133,16 +134,48 @@ describe('Asset Service Tests', () => {
             .expect('Content-Type', /json/)
             .expect(200)
             .then(res => {
-                expect(res.body.res).toHaveLength(2)
-                // console.log(res.body);
+                console.log(res.body.res);
+                expect(res.body.res).toHaveLength(1)
             })
     });
+
+    it('should, return a list of assets given a search parameter', async () => {
+        await assetEndPoint.get('/assets')
+            .set({
+                idToken: idToken,
+                query: 'market'
+            })
+            .set('Accept', 'application/json')
+            .expect('Content-Type', /json/)
+            .expect(200)
+            .then(res => {
+                // console.log(res.body.res);
+                expect(res.body.res).toHaveLength(1)
+            })
+    });
+
+    it('should, return a list of assets associated with a parent id', async () => {
+        await assetEndPoint.get('/childassets')
+            .set({
+                idToken: idToken,
+                param: parentAssetRef
+            })
+            .set('Accept', 'application/json')
+            .expect('Content-Type', /json/)
+            .expect(200)
+            .then(res => {
+                // console.log(res.body.res);
+                expect(res.body.res).toHaveLength(1)
+            })
+    });
+    
+
 
     it('should, return the asset with the given id', async () => {
         await assetEndPoint.get('/asset')
             .set({
                 idToken: idToken,
-                query: parentAssetRef
+                param: parentAssetRef
             })
             .set('Accept', 'application/json')
             .expect('Content-Type', /json/)
@@ -160,6 +193,7 @@ describe('Asset Service Tests', () => {
             maintainedByRef: 'KAM',
             name: 'Delta Area',
             description: 'The delta area',
+            location: '{ "type": "Polygon", "coordinates": [[[-2.2382104, 53.4817944],[-2.2383079, 53.4816753],[-2.2382717, 53.4816561],[-2.2382449, 53.4815611],[-2.2391314, 53.4809362],[-2.2392293, 53.4808357],[-2.2394894, 53.4806665],[-2.2393218, 53.4805811],[-2.2389664, 53.4808293],[-2.238784, 53.4809458],[-2.2386365, 53.480969],[-2.2385131, 53.4809642],[-2.2384152, 53.4809402],[-2.2382395, 53.4808548],[-2.2380343, 53.4807471],[-2.237864, 53.480633],[-2.2376199, 53.4804789],[-2.237404, 53.4806314],[-2.2377125, 53.4807998],[-2.2378466, 53.4808876],[-2.2379163, 53.480933],[-2.2379565, 53.4809945],[-2.23797, 53.481056],[-2.2379552, 53.481103],[-2.2376843, 53.4813864],[-2.2376424, 53.4814481],[-2.237619, 53.4814992],[-2.2376136, 53.4815606],[-2.2376384, 53.4816193],[-2.2376887, 53.4816783],[-2.2377706, 53.4817397],[-2.2381642, 53.4818478],[-2.2382104, 53.4817944]]]}',
             status: 'commissioned',
             installedDate: moment().format('YYYY-MM-DD'),
             commissionedDate: null,
@@ -184,6 +218,7 @@ describe('Asset Service Tests', () => {
             maintainedByRef: 'KAM',
             name: 'Delta Area',
             description: 'The delta area',
+            location: '{ "type": "Polygon", "coordinates": [[[-2.2382104, 53.4817944],[-2.2383079, 53.4816753],[-2.2382717, 53.4816561],[-2.2382449, 53.4815611],[-2.2391314, 53.4809362],[-2.2392293, 53.4808357],[-2.2394894, 53.4806665],[-2.2393218, 53.4805811],[-2.2389664, 53.4808293],[-2.238784, 53.4809458],[-2.2386365, 53.480969],[-2.2385131, 53.4809642],[-2.2384152, 53.4809402],[-2.2382395, 53.4808548],[-2.2380343, 53.4807471],[-2.237864, 53.480633],[-2.2376199, 53.4804789],[-2.237404, 53.4806314],[-2.2377125, 53.4807998],[-2.2378466, 53.4808876],[-2.2379163, 53.480933],[-2.2379565, 53.4809945],[-2.23797, 53.481056],[-2.2379552, 53.481103],[-2.2376843, 53.4813864],[-2.2376424, 53.4814481],[-2.237619, 53.4814992],[-2.2376136, 53.4815606],[-2.2376384, 53.4816193],[-2.2376887, 53.4816783],[-2.2377706, 53.4817397],[-2.2381642, 53.4818478],[-2.2382104, 53.4817944]]]}',
             status: 'commissioned',
             installedDate: moment().format('YYYY-MM-DD'),
             commissionedDate: moment().format('YYYY-MM-DD'),
@@ -207,6 +242,7 @@ describe('Asset Service Tests', () => {
             maintainedByRef: 'KAM',
             name: 'Delta Area',
             description: 'The delta area',
+            location: '{ "type": "Polygon", "coordinates": [[[-2.2382104, 53.4817944],[-2.2383079, 53.4816753],[-2.2382717, 53.4816561],[-2.2382449, 53.4815611],[-2.2391314, 53.4809362],[-2.2392293, 53.4808357],[-2.2394894, 53.4806665],[-2.2393218, 53.4805811],[-2.2389664, 53.4808293],[-2.238784, 53.4809458],[-2.2386365, 53.480969],[-2.2385131, 53.4809642],[-2.2384152, 53.4809402],[-2.2382395, 53.4808548],[-2.2380343, 53.4807471],[-2.237864, 53.480633],[-2.2376199, 53.4804789],[-2.237404, 53.4806314],[-2.2377125, 53.4807998],[-2.2378466, 53.4808876],[-2.2379163, 53.480933],[-2.2379565, 53.4809945],[-2.23797, 53.481056],[-2.2379552, 53.481103],[-2.2376843, 53.4813864],[-2.2376424, 53.4814481],[-2.237619, 53.4814992],[-2.2376136, 53.4815606],[-2.2376384, 53.4816193],[-2.2376887, 53.4816783],[-2.2377706, 53.4817397],[-2.2381642, 53.4818478],[-2.2382104, 53.4817944]]]}',
             status: 'commissioned',
             installedDate: moment().format('YYYY-MM-DD'),
             commissionedDate: moment().format('YYYY-MM-DD'),
@@ -230,6 +266,7 @@ describe('Asset Service Tests', () => {
             maintainedByRef: 'KAM',
             name: 'Delta Area',
             description: 'The delta area',
+            location: '{ "type": "Polygon", "coordinates": [[[-2.2382104, 53.4817944],[-2.2383079, 53.4816753],[-2.2382717, 53.4816561],[-2.2382449, 53.4815611],[-2.2391314, 53.4809362],[-2.2392293, 53.4808357],[-2.2394894, 53.4806665],[-2.2393218, 53.4805811],[-2.2389664, 53.4808293],[-2.238784, 53.4809458],[-2.2386365, 53.480969],[-2.2385131, 53.4809642],[-2.2384152, 53.4809402],[-2.2382395, 53.4808548],[-2.2380343, 53.4807471],[-2.237864, 53.480633],[-2.2376199, 53.4804789],[-2.237404, 53.4806314],[-2.2377125, 53.4807998],[-2.2378466, 53.4808876],[-2.2379163, 53.480933],[-2.2379565, 53.4809945],[-2.23797, 53.481056],[-2.2379552, 53.481103],[-2.2376843, 53.4813864],[-2.2376424, 53.4814481],[-2.237619, 53.4814992],[-2.2376136, 53.4815606],[-2.2376384, 53.4816193],[-2.2376887, 53.4816783],[-2.2377706, 53.4817397],[-2.2381642, 53.4818478],[-2.2382104, 53.4817944]]]}',
             status: 'commissioned',
             installedDate: moment().format('YYYY-MM-DD'),
             commissionedDate: moment().format('YYYY-MM-DD'),

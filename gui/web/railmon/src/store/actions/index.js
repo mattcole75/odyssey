@@ -21,6 +21,7 @@ export {
 export {
     assetGetAssets,
     assetGetAsset,
+    assetGetChildAssets,
     assetPatchAsset,
     assetReset
 } from './asset';

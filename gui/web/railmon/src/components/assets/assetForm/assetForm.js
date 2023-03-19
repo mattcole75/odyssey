@@ -2,9 +2,10 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useParams, useNavigate } from 'react-router-dom';
 
-import { assetGetAsset, assetPatchAsset, adminGetOrganisationList } from '../../../store/actions/index';
+import { assetGetAsset, assetGetChildAssets, assetPatchAsset, adminGetOrganisationList } from '../../../store/actions/index';
 
 import { useForm } from 'react-hook-form';
+import ChildAssets from './childAssetList/childAssetList';
 // import assetRoles from '../../../../config/lists/assetRoles';
 import moment from 'moment';
 
@@ -19,13 +20,14 @@ const AssetForm = () => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
 
-    const { loading, error, asset } = useSelector(state => state.asset);
+    const { loading, error, asset, childAssets } = useSelector(state => state.asset);
     const { idToken } = useSelector(state => state.auth);
     const { organisations } = useSelector(state => state.admin);
 
     const [ inuseStatus, setInuseStatus ] = useState(asset != null ? asset.inuse : true);
 
     const onGetAsset = useCallback((idToken, id, identifier) => dispatch(assetGetAsset(idToken, id, identifier)), [dispatch]);
+    const onGetChildAssets = useCallback((idToken, id, identifier) => dispatch(assetGetChildAssets(idToken, id, identifier)), [dispatch]);
     const onPatchAsset = useCallback((idToken, data, identifier) => dispatch(assetPatchAsset(idToken, data, identifier)), [dispatch]);
     const onGetOrganisations = useCallback((idToken, identifier) => dispatch(adminGetOrganisationList(idToken, identifier)), [dispatch]);
 
@@ -40,8 +42,9 @@ const AssetForm = () => {
     useEffect(() => {
         if(id !== 'new') {
             onGetAsset(idToken, id, 'GET_ASSET');
+            onGetChildAssets(idToken, id, 'GET_CHILD_ASSETS');
         }
-    }, [id, idToken, onGetAsset, onGetOrganisations]);
+    }, [id, idToken, onGetAsset, onGetChildAssets, onGetOrganisations]);
 
     // watch for a change to the asset pointer and reset the form.
     useEffect(() => {
@@ -263,6 +266,13 @@ const AssetForm = () => {
                         </div>
                     </div>
                 </div>
+
+                {/* Child asset list */}
+                <div className='text-start'>
+                    <h1 className='h3 mb-3 fw-normal text-start'>Child Assets</h1>
+                </div>
+                <ChildAssets assets={ childAssets } />
+                    
 
                 <div className='text-start'>
                     <h1 className='h3 mb-3 fw-normal text-start'>Record Details</h1>

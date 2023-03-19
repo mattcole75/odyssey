@@ -28,6 +28,15 @@ module.exports = (app) => {
                 res.status(response.status).send(response);
         });
     });
+    app.get('/' + service + '/api/' + version + '/childassets', (req, res) => {
+        res.set('Content-Type', 'application/json');
+        controller.getChildAssets(req, (err, response) => {
+            if(err)
+                res.status(err.status).send(err);
+            else
+                res.status(response.status).send(response);
+        });
+    });
 
     app.get('/' + service + '/api/' + version + '/asset', (req, res) => {
         res.set('Content-Type', 'application/json');

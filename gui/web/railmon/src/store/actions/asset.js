@@ -24,6 +24,14 @@ const getAssetSuccess = (asset, identifier) => {
     };
 }
 
+const getChildAssetsSuccess = (assets, identifier) => {
+    return {
+        type: actionType.ASSET_GET_CHILD_ASSETS_SUCCESS,
+        assets: assets,
+        identifier: identifier
+    };
+}
+
 const patchAssetSuccess = (asset, identifier) => {
     return {
         type: actionType.ASSET_PATCH_ASSET_SUCCESS,
@@ -84,7 +92,7 @@ export const assetGetAssets = (idToken, query, identifier) => {
     };
 }
 
-export const assetGetAsset = (idToken, query, identifier) => {
+export const assetGetAsset = (idToken, param, identifier) => {
     return dispatch => {
 
         dispatch(start());
@@ -93,13 +101,39 @@ export const assetGetAsset = (idToken, query, identifier) => {
             headers: {
                 'content-type': 'application/json',
                 idToken: idToken,
-                query: query
+                param: param
             }
         };
 
         asset.get('/asset', config)
             .then(res => {
                 dispatch(getAssetSuccess(res.data.res, identifier));
+            })
+            .then(() => {
+                dispatch(finish());
+            })
+            .catch(err => {
+                dispatch(fail(whatIsTheErrorMessage(err)));
+            });
+    };
+}
+
+export const assetGetChildAssets = (idToken, param, identifier) => {
+    return dispatch => {
+
+        dispatch(start());
+
+        const config = {
+            headers: {
+                'content-type': 'application/json',
+                idToken: idToken,
+                param: param
+            }
+        };
+
+        asset.get('/childassets', config)
+            .then(res => {
+                dispatch(getChildAssetsSuccess(res.data.res, identifier));
             })
             .then(() => {
                 dispatch(finish());
