@@ -1,3 +1,6 @@
+.cursor-point {
+  cursor: pointer;
+}
 .form-auth {
   width: 100%;
   max-width: 330px;
@@ -323,4 +326,10 @@ p::before {
 .form-control-dark:focus {
   border-color: transparent;
   box-shadow: 0 0 0 3px rgba(255, 255, 255, .25);
+}
+
+.map-container {
+  height: 25rem;
+  margin-top: 1rem;
+  margin-bottom: 1rem;
 }

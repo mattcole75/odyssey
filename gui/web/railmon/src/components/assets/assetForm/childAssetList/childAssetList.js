@@ -8,27 +8,27 @@ const ChildAssets = (props) => {
     const navigate = useNavigate();
     
     return (
-        <div className='container'>
-            <hr className='mb-3' />
+        <div className='container border rounded'>
+            {/* <hr className='mb-3' /> */}
             <div className='mb-2'>
                 { assets.length > 0
-                    ?   <table className='table table-striped table-hover cursor-pointer'>
+                    ?   <table className='table table-striped table-hover'>
                             <thead>
-                                <tr>
+                                <tr className='fs-5'>
                                     <th scope="col">Name</th>
                                     <th scope="col">Status</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {assets && assets.map((item) => (
-                                    <tr key={item.id} onClick={ () => { navigate(`/asset/${ item.id }`) } }>
+                                    <tr className='cursor-point' key={item.id} onClick={ () => { navigate(`/asset/${ item.id }`) } }>
                                         <td>{item.name}</td>
                                         <td>{capitalizeFirstLetter(item.status)}</td>
                                     </tr>
                                 ))}
                             </tbody>
                         </table>
-                    :   <div className='alert alert-warning text-sm-center' role='alert'>There are no child assets registered</div>
+                    :   <div className='mt-3 alert alert-warning text-sm-center' role='alert'>There are no child assets registered</div>
                 }
                 
             </div>

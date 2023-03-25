@@ -15,7 +15,11 @@ export {
     adminGetOrganisations,
     adminGetOrganisationList,
     adminUpdateOganisation,
-    adminCreateOganisation
+    adminCreateOganisation,
+    adminGetLocationCategories,
+    adminGetLocationCategoryList,
+    adminUpdateLocationCategory,
+    adminCreateLocationCategory
 } from './admin';
 
 export {

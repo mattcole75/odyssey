@@ -43,6 +43,9 @@ const App = () => {
 	const Organisations = React.lazy(() => {
 		return import('./components/admin/organisations/organisations');
 	});
+	const LocationCategories = React.lazy(() => {
+		return import('./components/admin/locationCategories/locationCategories');
+	});
 	const Assets = React.lazy(() => {
 		return import('./components/assets/assets')
 	});
@@ -61,6 +64,7 @@ const App = () => {
 			{ isAuthenticated && <Route path='/asset/:id' element={ <Asset /> } /> }
 			{ isAuthenticated && isAdministrator && <Route path='admin/users' element={ <Users /> } /> }
 			{ isAuthenticated && isAdministrator && <Route path='admin/organisations' element={ <Organisations /> } /> }
+			{ isAuthenticated && isAdministrator && <Route path='admin/locationcategories' element={ <LocationCategories /> } /> }
 		</Routes>
 	);
 

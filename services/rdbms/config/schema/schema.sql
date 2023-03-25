@@ -8,13 +8,16 @@ create table asset (
     id int not null auto_increment, -- the primary key
 
     assetRef int null, -- reference to a perent child relationship, null would indicate the asset at the top of the hierarchy
-    ownedByRef varchar(64) not null, -- the organisation who ownes this asset ref - organisation service
-    maintainedByRef varchar(64) not null, -- the organisation who maintains this asset - organisation service
+    ownedByRef varchar(64) null, -- the organisation who ownes this asset ref - organisation service
+    maintainedByRef varchar(64) null, -- the organisation who maintains this asset - organisation service
+    locationCategoryRef varchar(64) null, -- what type of access is required Red Zone, Segregated, Street Running
 
     name varchar(32) not null unique, -- the name describing the asset is unique
     description varchar(256) not null, -- a short functional description or contract requirement
 
+    locationType varchar(8) null, -- type area or type point
     location json null, -- the location json value for the map interface
+    locationDescription varchar(256) null, -- a brief description of the location
 
     status varchar(64) not null default 'design', -- valid options are Design, procure, Install, commissioned, decommissioned, disposed
     installedDate date null, -- the date the asset was installed
@@ -29,7 +32,8 @@ create table asset (
     primary key (id),
     fulltext key text (name, description, status),
     constraint fk_asset_assetRef foreign key (assetRef) references asset (id) on update cascade on delete cascade,
-    constraint ck_asset_status check (status in ('design', 'procure', 'installed', 'commissioned', 'decommissioned', 'disposed'))
+    constraint ck_asset_status check (status in ('design', 'procure', 'installed', 'commissioned', 'decommissioned', 'disposed')),
+    constraint ck_asset_locationType check (locationType in ('area', 'point'))
 );
 
 -- the specific equioment model details
@@ -236,7 +240,6 @@ create table taskRecordRequirement (
 -- drop procedure if exists sp_getAssets;
 
 delimiter //
-
 create procedure sp_selectAssets (in searchText varchar(64))
     begin
         if(searchText <> '') then
@@ -257,11 +260,10 @@ create procedure sp_selectChildAssets (in uid int)
             order by name;
     end//
 
-create procedure sp_insertAsset (in assetRef int, ownedByRef varchar(64), maintainedByRef varchar(64), name varchar(32), description varchar(256), location json,
-                                out insertId int)
+create procedure sp_insertAsset (in assetRef int, ownedByRef varchar(64), maintainedByRef varchar(64), name varchar(32), description varchar(256), out insertId int)
     begin
-        insert into asset (assetRef, ownedByRef, maintainedByRef, name, description, location)
-        values (assetRef, ownedByRef, maintainedByRef, name, description, location);
+        insert into asset (assetRef, ownedByRef, maintainedByRef, name, description)
+        values (assetRef, ownedByRef, maintainedByRef, name, description);
 
         set insertId := last_insert_id();
         select insertId;
@@ -270,7 +272,7 @@ create procedure sp_insertAsset (in assetRef int, ownedByRef varchar(64), mainta
 create procedure sp_selectAsset (in uid int)
     begin
         select 
-        id, assetRef, ownedByRef, maintainedByRef, name, description, location, status,
+        id, assetRef, ownedByRef, maintainedByRef, locationCategoryRef, name, description, locationType, location, locationDescription, status,
         date_format(installedDate, '%Y-%m-%d') as installedDate,
         date_format(commissionedDate, '%Y-%m-%d') as commissionedDate,
         date_format(decommissionedDate, '%Y-%m-%d') as decommissionedDate,
@@ -278,24 +280,35 @@ create procedure sp_selectAsset (in uid int)
         created, updated, inuse from asset where id = uid;
     end//
 
-create procedure sp_updateAsset (in uid int, ownedByRef varchar(64), maintainedByRef varchar(64), name varchar(32), description varchar(256), location json, status varchar(64), installedDate date, commissionedDate date, decommissionedDate date, disposedDate date, inuse boolean)
+create procedure sp_updateAsset (in uid int, ownedByRef varchar(64), maintainedByRef varchar(64), locationCategoryRef varchar(64), name varchar(32), description varchar(256), status varchar(64), installedDate date, commissionedDate date, decommissionedDate date, disposedDate date, locationType varchar(8), locationDescription varchar(256), inuse boolean)
     begin
         update asset
         set ownedByRef = ownedByRef,
             maintainedByRef = maintainedByRef,
+            locationCategoryRef = locationCategoryRef,
             name = name,
             description = description,
-            location = location,
             status = status,
             installedDate = installedDate,
             commissionedDate = commissionedDate,
             decommissionedDate = decommissionedDate,
             disposedDate = disposedDate,
+            locationType = locationType,
+            locationDescription = locationDescription,
             inuse = inuse
         where id = uid;
 
         call sp_selectAsset(uid);
 
+    end//
+
+create procedure sp_updateAssetLocation (in uid int, location json)
+    begin
+        update asset
+        set location = location
+        where id = uid;
+
+        call sp_selectAsset(uid);
     end//
 
 delimiter ;

@@ -51,6 +51,31 @@ const createOrganisationSuccess = (uid, organisation, identifier) => {
     };
 }
 
+const getLocationCategoriesSuccess = (locationCategories, identifier) => {
+    return {
+        type: actionType.ADMIN_GET_LOCATION_CATEGORIES_SUCCESS,
+        locationCategories: locationCategories,
+        identifier: identifier
+    };
+}
+
+const updateLocationCategorySuccess = (locationCategory, identifier) => {
+    return {
+        type: actionType.ADMIN_UPDATE_LOCATION_CATEGORY_SUCCESS,
+        locationCategory: locationCategory,
+        identifier: identifier
+    };
+}
+
+const createLocationCategorySuccess = (uid, locationCategory, identifier) => {
+    return {
+        type: actionType.ADMIN_CREATE_LOCATION_CATEGORY_SUCCESS,
+        uid: uid,
+        locationCategory: locationCategory,
+        identifier: identifier
+    };
+}
+
 const finish = () => {
     return {
         type: actionType.ADMIN_FINISH
@@ -221,6 +246,108 @@ export const adminCreateOganisation = (idToken, data, identifier) => {
         .then(res => {
             const { insertedId } = res.data.res;
             dispatch(createOrganisationSuccess(insertedId, data, identifier));
+        })
+        .then(() => {
+            dispatch(finish());
+        })
+        .catch(err => {
+            dispatch(fail(whatIsTheErrorMessage(err))); 
+        });
+    };
+}
+
+export const adminGetLocationCategories = (idToken, query, identifier) => {
+    return dispatch => {
+
+        dispatch(start());
+
+        const config = {
+            headers: {
+                'content-type': 'application/json',
+                idToken: idToken,
+                query: query
+            }
+        };
+        
+        admin.get('/locationcategories', config)
+            .then(res => {
+                dispatch(getLocationCategoriesSuccess(res.data.res, identifier));
+            })
+            .then(() => {
+                dispatch(finish());
+            })
+            .catch(err => {
+                dispatch(fail(whatIsTheErrorMessage(err)));
+            })
+    };
+}
+
+export const adminGetLocationCategoryList = (idToken, identifier) => {
+    return dispatch => {
+
+        dispatch(start());
+
+        const config = {
+            headers: {
+                'content-type': 'application/json',
+                idToken: idToken
+            }
+        };
+        
+        admin.get('/locationcategorylist', config)
+            .then(res => {
+                dispatch(getLocationCategoriesSuccess(res.data.res, identifier));
+            })
+            .then(() => {
+                dispatch(finish());
+            })
+            .catch(err => {
+                dispatch(fail(whatIsTheErrorMessage(err)));
+            })
+    };
+}
+
+export const adminUpdateLocationCategory = (idToken, data, identifier) => {
+
+    return dispatch => {
+        dispatch(start());
+
+        const config = {
+            headers: {
+                'content-type': 'application/json',
+                idToken: idToken
+            }
+        };
+
+        admin.patch('/locationcategory', data, config)
+        .then(() => {
+            dispatch(updateLocationCategorySuccess(data, identifier));
+        })
+        .then(() => {
+            dispatch(finish());
+        })
+        .catch(err => {
+            dispatch(fail(whatIsTheErrorMessage(err))); 
+        });
+    };
+}
+
+export const adminCreateLocationCategory = (idToken, data, identifier) => {
+
+    return dispatch => {
+        dispatch(start());
+
+        const config = {
+            headers: {
+                'content-type': 'application/json',
+                idToken: idToken
+            }
+        };
+
+        admin.post('/locationCategory', data, config)
+        .then(res => {
+            const { insertedId } = res.data.res;
+            dispatch(createLocationCategorySuccess(insertedId, data, identifier));
         })
         .then(() => {
             dispatch(finish());

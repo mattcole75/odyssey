@@ -26,6 +26,7 @@ const Navigation = (props) => {
 							<ul className='dropdown-menu text-small' aria-labelledby='dropdownAdmin1'>
 								<NavigationMenuItem link='/admin/users' icon='bi-people'> Users</NavigationMenuItem>
 								<NavigationMenuItem link='/admin/organisations' icon='bi-building'> Organisations</NavigationMenuItem>
+								<NavigationMenuItem link='/admin/locationcategories' icon='bi-bookmarks'> Location Categories</NavigationMenuItem>
 							</ul>
 						</div>
 					:	null

@@ -2,10 +2,11 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useParams, useNavigate } from 'react-router-dom';
 
-import { assetGetAsset, assetGetChildAssets, assetPatchAsset, adminGetOrganisationList } from '../../../store/actions/index';
+import { assetGetAsset, assetGetChildAssets, assetPatchAsset, adminGetOrganisationList, adminGetLocationCategoryList } from '../../../store/actions/index';
 
 import { useForm } from 'react-hook-form';
 import ChildAssets from './childAssetList/childAssetList';
+import LocationView from './location/locationView';
 // import assetRoles from '../../../../config/lists/assetRoles';
 import moment from 'moment';
 
@@ -22,7 +23,7 @@ const AssetForm = () => {
 
     const { loading, error, asset, childAssets } = useSelector(state => state.asset);
     const { idToken } = useSelector(state => state.auth);
-    const { organisations } = useSelector(state => state.admin);
+    const { organisations, locationCategories } = useSelector(state => state.admin);
 
     const [ inuseStatus, setInuseStatus ] = useState(asset != null ? asset.inuse : true);
 
@@ -30,12 +31,15 @@ const AssetForm = () => {
     const onGetChildAssets = useCallback((idToken, id, identifier) => dispatch(assetGetChildAssets(idToken, id, identifier)), [dispatch]);
     const onPatchAsset = useCallback((idToken, data, identifier) => dispatch(assetPatchAsset(idToken, data, identifier)), [dispatch]);
     const onGetOrganisations = useCallback((idToken, identifier) => dispatch(adminGetOrganisationList(idToken, identifier)), [dispatch]);
+    const onGetLocationCategories = useCallback((idToken,identifier) => dispatch(adminGetLocationCategoryList(idToken, identifier)), [dispatch]);
 
     const { register, reset, getValues, formState: { errors } } = useForm({ mode: 'onChange' });
 
     useEffect(() => {
         onGetOrganisations(idToken, 'GET_ORGS');
-    }, [idToken, onGetOrganisations]);
+        onGetLocationCategories(idToken, 'GET_LOCATION_CATEGORIES');
+
+    }, [ idToken, onGetOrganisations, onGetLocationCategories ]);
     
 
     // load asset details on page refresh given an id
@@ -54,11 +58,12 @@ const AssetForm = () => {
 
     const save = useCallback(() => {  
         if(asset !== null) {
-            const { ownedByRef, maintainedByRef, name, description, status, installedDate, commissionedDate, decommissionedDate, disposedDate } = getValues();
+            const { ownedByRef, maintainedByRef,locationCategoryRef, name, description, status, installedDate, commissionedDate, decommissionedDate, disposedDate, locationType, locationDescription } = getValues();
             onPatchAsset(idToken, { ...asset,
                 id: id,
-                ownedByRef: ownedByRef,
-                maintainedByRef: maintainedByRef,
+                ownedByRef: ownedByRef === '' ? null : ownedByRef,
+                maintainedByRef: maintainedByRef === '' ? null : maintainedByRef,
+                locationCategoryRef: locationCategoryRef === '' ? null : locationCategoryRef,
                 name: name,
                 description: description,
                 status: status,
@@ -66,6 +71,8 @@ const AssetForm = () => {
                 commissionedDate: commissionedDate === '' ? null : commissionedDate,
                 decommissionedDate: decommissionedDate === '' ? null : decommissionedDate,
                 disposedDate: disposedDate === '' ? null : disposedDate,
+                locationType: locationType === '' ? null : locationType,
+                locationDescription: locationDescription === '' ? null : locationDescription,
                 inuse: inuseStatus === false ? false : true
              }, 'PATCH_ASSET'); // update
         }
@@ -95,24 +102,25 @@ const AssetForm = () => {
             
             {/* heading */}
 
-            <div className='d-flex gap-2 w-100 justify-content-between mt-3'>
-                <div className='text-start'>
-                    <h1 className='h3 mb-3 fw-normal text-start'>Asset Details</h1>
-                </div>
-                { asset
-                    ?   <small className='opacity-75 text-nowrap'>
-                            { asset.status === 'commissioned'
-                                ?   <span className='badge text-end bg-success'>{ capitalizeFirstLetter(asset.status) }</span>
-                                :   <span className='badge text-end bg-warning'>{ capitalizeFirstLetter(asset.status) }</span>
-                            }
-                        </small>
-                    :   null 
-                }
-            </div>
+            
             
             <form>
                 {/* asset details */}
                 <div className='row g-2 mb-2'>
+                    <div className='d-flex gap-2 w-100 justify-content-between mt-3'>
+                        <div className='text-start'>
+                            <h1 className='h3 mb-3 fw-normal text-start'>Asset Details</h1>
+                        </div>
+                        { asset
+                            ?   <small className='opacity-75 text-nowrap'>
+                                    { asset.status === 'commissioned'
+                                        ?   <span className='badge text-end bg-success'>{ capitalizeFirstLetter(asset.status) }</span>
+                                        :   <span className='badge text-end bg-warning'>{ capitalizeFirstLetter(asset.status) }</span>
+                                    }
+                                </small>
+                            :   null 
+                        }
+                    </div>
                     <div className='col-sm-6'>
                         <div className='form-floating'>
                             <input type='text' className='form-control form-auth-ele-top' id='name' placeholder='Asset name' autoComplete='off' required minLength={3} maxLength={50}
@@ -193,23 +201,22 @@ const AssetForm = () => {
                 { errors.description && <p className='form-auth-error mt-1'>{errors.description.message}</p> }
 
                 {/* Asset Status */}
-                <div className='d-flex gap-2 w-100 justify-content-between mt-3'>
-                    <div className='text-start'>
-                        <h1 className='h3 mb-3 fw-normal text-start'>Asset Status</h1>
-                    </div>
-                    { asset
-                        ?   <small className='opacity-75 text-nowrap'>
-                                { asset.inuse 
-                                    ?   <span className='badge text-end bg-success'>Enabled</span>
-                                    :   <span className='badge text-end bg-danger'>Disabled</span>
-                                }
-                            </small>
-                        :   null 
-                    }
-                </div>
-                
-
                 <div className='row g-2 mb-2'>
+                    <div className='d-flex gap-2 w-100 justify-content-between mt-3'>
+                        <div className='text-start'>
+                            <h1 className='h3 mb-3 fw-normal text-start'>Asset Status</h1>
+                        </div>
+                        { asset
+                            ?   <small className='opacity-75 text-nowrap'>
+                                    { asset.inuse 
+                                        ?   <span className='badge text-end bg-success'>Enabled</span>
+                                        :   <span className='badge text-end bg-danger'>Disabled</span>
+                                    }
+                                </small>
+                            :   null 
+                        }
+                    </div>
+
                     <div className='col-sm-6'>
                         <div className='form-floating'>
                             <select className='form-select form-auth-ele-top' id='status' aria-label='Asset status'
@@ -242,7 +249,7 @@ const AssetForm = () => {
                     <div className='col-sm-6'>
                         <div className='form-floating'>
                             <select className='form-select form-auth-ele-top' id='inuse' aria-label='Asset status' required
-                                { ...register('inuse', { onChange: toggleInuseStatus, required: true })}
+                                { ...register('inuse', { onChange: toggleInuseStatus, required: 'You must select an enabled status' })}
                             >
                                 <option value=''>Select...</option>
                                 <option value={1}>Enabled</option>
@@ -266,19 +273,74 @@ const AssetForm = () => {
                         </div>
                     </div>
                 </div>
+                { errors.assetStatus && <p className='form-auth-error mt-1'>{errors.assetStatus.message}</p> }
+                { errors.inuse && <p className='form-auth-error mt-1'>{errors.inuse.message}</p> }
+
+                {/* Location Section */}
+                <div className='row g-2 mb-2'>
+                    <div className='text-start'>
+                        <h1 className='h3 fw-normal text-start'>Location</h1>
+                    </div>
+
+                    <div className='col-sm-6'>
+                        <div className='form-floating'>
+                            <select className='form-select' id='locationType' aria-label='Location Type'
+                                { ...register('locationType') }
+                            >
+                                <option value=''>Select...</option>
+                                <option value='area'>Area</option>
+                                <option value='point'>Point</option>
+                            </select>
+                            <label htmlFor='locationType'>Location Type</label>
+                        </div>
+                    </div>
+
+                    <div className='col-sm-6'>
+                        <div className='form-floating'>
+                            <select className='form-select' id='locationCategoryRef' aria-label='Location Category'
+                                { ...register('locationCategoryRef') }
+                            >
+                                <option value=''>Select...</option>
+                                {
+                                    locationCategories && locationCategories.map(item => {
+                                       return (<option key={item._id} value={item._id}>{item.name}</option>)
+                                    })
+                                }
+                                
+                            </select>
+                            <label htmlFor='locationCategoryRef'>Location Category</label>
+                        </div>
+                    </div>
+
+                    <div className='form-floating'>
+                        <textarea className='form-control' id='locationDescription' placeholder='Location Description' rows='2' required minLength={3} maxLength={256}  style={{height:'auto'}}
+                            { ...register('locationDescription') }
+                        />
+                        <label htmlFor='locationDescription'>Location Description</label>
+                    </div>
+
+                    <div className='mb-3'>
+                        { asset && asset.location
+                            ?   <LocationView name= { asset.name } location={ asset.location } />
+                            :   null
+
+                        }
+                    </div>
+                </div>
 
                 {/* Child asset list */}
-                <div className='text-start'>
-                    <h1 className='h3 mb-3 fw-normal text-start'>Child Assets</h1>
+                <div className='mb-3'>
+                    <div className='text-start'>
+                        <h1 className='h3 mb-3 fw-normal text-start'>Child Assets</h1>
+                    </div>
+                    <ChildAssets assets={ childAssets } />
                 </div>
-                <ChildAssets assets={ childAssets } />
-                    
-
-                <div className='text-start'>
-                    <h1 className='h3 mb-3 fw-normal text-start'>Record Details</h1>
-                </div>
-
+               
+                {/* record details section */}
                 <div className='row g-2 mb-4'>
+                    <div className='text-start'>
+                        <h1 className='h3 mb-3 fw-normal text-start'>Record Details</h1>
+                    </div>
                     <div className='col-sm-6'>
                         { asset
                             ?   <div className=''>

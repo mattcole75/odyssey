@@ -6,6 +6,7 @@ const initialState = {
     error: null,
     users: [],
     organisations: [],
+    locationCategories: [],
     identifier: null,
     redirectPath: '/admin/users'
 }
@@ -67,6 +68,38 @@ const createOrganisationSuccess = (state, action) => {
     };
 }
 
+const getLocationCategoriesSuccess = (state, action) => {
+    return { ...state,
+        locationCategories: action.locationCategories,
+        identifier: action.identifier
+    };
+}
+
+const updateLocationCategorySuccess = (state, action) => {
+    let updatedLocationCategories = [ ...state.locationCategories ];
+    const index = updatedLocationCategories.findIndex(ele => ele._id === action.locationCategory.uid);
+    updatedLocationCategories[index] = { ...updatedLocationCategories[index],
+        name: action.locationCategory.name,
+        description: action.locationCategory.description,
+        inuse: action.locationCategory.inuse };
+    return { ...state, 
+        locationCategories: updatedLocationCategories
+    };
+}
+
+const createLocationCategorySuccess = (state, action) => {
+    let updatedLocationCategories = [ ...state.locationCategories ];
+    const newLocationCategory = { ...action.locationCategory,
+        _id: action.uid,
+        created: moment().format(),
+        updated: moment().format()
+    }
+    updatedLocationCategories.push(newLocationCategory);
+    return { ...state,
+        locationCategories: updatedLocationCategories
+    };
+}
+
 const finish = (state) => {
     return { ...state,
         loading: false,
@@ -93,6 +126,9 @@ const reducer = (state = initialState, action) => {
         case actionType.ADMIN_GET_ORGANISATIONS_SUCCESS: return getOrganisationsSuccess(state, action);
         case actionType.ADMIN_UPDATE_ORGANISATION_SUCCESS: return updateOrganisationSuccess(state, action);
         case actionType.ADMIN_CREATE_ORGANISATION_SUCCESS: return createOrganisationSuccess(state, action);
+        case actionType.ADMIN_GET_LOCATION_CATEGORIES_SUCCESS: return getLocationCategoriesSuccess(state, action);
+        case actionType.ADMIN_UPDATE_LOCATION_CATEGORY_SUCCESS: return updateLocationCategorySuccess(state, action);
+        case actionType.ADMIN_CREATE_LOCATION_CATEGORY_SUCCESS: return createLocationCategorySuccess(state, action);
         case actionType.ADMIN_FINISH: return finish(state);
         case actionType.ADMIN_FAIL: return fail(state, action);
         case actionType.ADMIN_RESET: return reset();

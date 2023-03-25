@@ -18,6 +18,7 @@ module.exports = () => {
     app.use(morgan('[:date[clf]] :method :url :status :response-time ms - :res[content-length]'));
 
     require('../app/routes/organisation')(app);
+    require('../app/routes/LocationCategory')(app);
 
     app.use((err, req, res, next) => {
         console.error(err.stack);

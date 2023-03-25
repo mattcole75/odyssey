@@ -13,7 +13,7 @@ const Assets = (props) => {
             <div className='mb-2'>
                 <table className='table table-striped table-hover cursor-pointer'>
                     <thead>
-                        <tr>
+                        <tr className='fs-5'>
                             <th scope="col">Name</th>
                             <th scope="col">Owner</th>
                             <th scope="col">Maintainer</th>
@@ -22,7 +22,7 @@ const Assets = (props) => {
                     </thead>
                     <tbody>
                         {assets && assets.map((item) => (
-                            <tr key={item.id} onClick={ () => { navigate(`/asset/${ item.id }`) } }>
+                            <tr className='cursor-point' key={item.id} onClick={ () => { navigate(`/asset/${ item.id }`) } }>
                                 <td>{item.name}</td>
                                 <td>{item.ownedByRef}</td>
                                 <td>{item.maintainedByRef}</td>

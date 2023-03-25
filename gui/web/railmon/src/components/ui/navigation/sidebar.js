@@ -78,6 +78,12 @@ const Sidebar = (props) => {
                                 </li>
                             : null
                         }
+                        { isAuthenticated && isAdministrator
+                            ?   <li className='nav-item'>
+                                    <NavLink to='/admin/locationcategories' className='nav-link text-white' onClick={ toggleShowSidebar }><i className='bi-bookmarks' />  Location Categories</NavLink>
+                                </li>
+                            : null
+                        }
                     </ul>
                 </div>
             </nav>

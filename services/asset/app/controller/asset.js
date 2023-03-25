@@ -122,10 +122,36 @@ const patchAsset = (req, next) => {
     });
 };
 
+const patchAssetLocation = (req, next) => {
+
+    // add code to check request for validity -- future
+
+    // define the request object
+    const request = {
+        headers: req.headers,
+        body: {
+            rules: { rules: { roles: ['superuser', 'administrator'] } },
+            values: req.body
+            // values: [ req.body.assetRef, req.body.ownedByRef, req.body.maintainedByRef, req.body.name, req.body.description, req.body.operational, req.body.operationalStarDate, req.body.operationalEndDate, req.body.locationType, req.body.area, req.body.pin ]
+        }
+    }
+
+    repository.patchAssetLocation(request, (err, res) => {
+        if(err) {
+            log.error(`status: ${ err.status } PATCH asset location v${ version } result: ${ JSON.stringify(err) }`);
+            next(err, null);
+        } else {
+            log.info(`status: ${ res.status } PATCH asset location v${ version }`);
+            next(null, res);
+        }
+    });
+};
+
 module.exports = {
     postAsset: postAsset,
     getAssets: getAssets,
     getChildAssets: getChildAssets,
     getAsset: getAsset,
-    patchAsset: patchAsset
+    patchAsset: patchAsset,
+    patchAssetLocation: patchAssetLocation
 }
