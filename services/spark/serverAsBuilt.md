@@ -4,7 +4,7 @@ Node Express MongoDB Apache  server build for Spark on AWS.
 ## AWS Setup
 1. Use Amazon’s lightsail and spin up a debian 10 linux server.
 2. Configure the instance name and networking to assign a static IP Address.
-3. Create a new SSH keypair and download your pc if you have not already done so.
+3. Create a new SSH keypair and download to your pc if you have not already done so.
 
 ## SSH Test
 using your favourite terminal use the following command to start a session:
@@ -30,7 +30,7 @@ Enter a super user session:
 ```
 sudo -s
 ```
-*Note: sometimes the installation executes a command without sudo and crashed the installation. sudo -s, places the terminal into a super user (root #) state.*
+*Note: sometimes the installation executes a command without sudo and crashes the installation. sudo -s, places the terminal into a super user (root #) state.*
 
 Download and install the packages:
 ```
@@ -116,7 +116,7 @@ Set the admin db as the authentication db
 mongosh -u admin -p --authenticationDatabase admin
 ```
 ## install the spark API
-The node application will be installed in /opt. This can cause permission issues to follow the instructions carefully!!
+The node application will be installed in /opt. This can cause permission issues so follow the instructions carefully!!
 
 1. Create the spark directory under /opt
 ```
@@ -209,7 +209,7 @@ sudo systemctl reload apache2
 
 sudo apache2ctl configtest
 ```
-Apache will now forward server traffic on port 80 to the node application on poer 1337. Test it by pointing your browser a the IP Address; you should get the {"msg":"Server is up!"}.
+Apache will now forward server traffic on port 80 to the node application on port 1337. Test it by pointing your browser a the IP Address; you should get the {"msg":"Server is up!"}.
 
 The only thing left to do is to update the DNS for the metspark.co.uk domain
 

@@ -27,8 +27,7 @@ POST http://localhost:1337/admin/api/0.1/organisation
 
 Requires JSON Header:
     {
-        idToken: 'the given IdToken',
-        query: 'organisation name to search'
+        idToken: 'the given IdToken'
     }
 Requires JSON Body:
     {
@@ -37,7 +36,7 @@ Requires JSON Body:
     }
 
 Returns:
-    - 201 Created
+    - 201 Created - insertedId
     - 400 Duplicate entry
     - 400 Bad request - validation failure
     - 500 Internal error message
@@ -46,6 +45,24 @@ Returns:
 ### GET Organisations
 ```
 GET http://localhost:1337/admin/api/0.1/organisations
+
+Requires JSON Header:
+    {
+        idToken: 'the given IdToken'
+    }
+Returns:
+    - 200 OK [an array of organisations]
+    - 200 OK
+    - 400 Bad request - validation failure
+    - 400 Invalid request
+    - 401 Unauthorised
+    - 500 Internal error message
+
+```
+
+### GET Organisation list for drop down menus
+```
+GET http://localhost:1337/admin/api/0.1/organisationlist
 
 Requires JSON Header:
     {
@@ -75,6 +92,89 @@ Requires JSON Body:
         name: 'the organisations name',
         assetRole: (owner, maintainer, or supplier),
         inuse: true or false
+    }
+
+Returns:
+    - 200 OK
+    - 400 Bad request - validation failure
+    - 401 Unauthorised
+    - 403 Account disabled, contact your system administrator
+    - 404 Not found
+    - 500 Internal error message
+```
+
+### POST new location category:
+
+```
+POST http://localhost:1337/admin/api/0.1/locaationcategory
+
+Requires JSON Header:
+    {
+        idToken: 'the given IdToken',
+    }
+Requires JSON Body:
+    {
+        name: 'the location category name',
+        description: 'a meaningful description'
+    }
+
+Returns:
+    - 201 Created - insertedId
+    - 400 Duplicate entry
+    - 400 Bad request - validation failure
+    - 500 Internal error message
+```
+
+### GET location categories
+```
+GET http://localhost:1337/admin/api/0.1/locationcategories
+
+Requires JSON Header:
+    {
+        idToken: 'the given IdToken',
+        query: 'search on the name field'
+    }
+Returns:
+    - 200 OK [an array of location categories]
+    - 200 OK
+    - 400 Bad request - validation failure
+    - 400 Invalid request
+    - 401 Unauthorised
+    - 500 Internal error message
+
+```
+
+### GET location categories
+```
+GET http://localhost:1337/admin/api/0.1/locationcategorylist
+
+Requires JSON Header:
+    {
+        idToken: 'the given IdToken'
+    }
+Returns:
+    - 200 OK [an array of location categories that are in use]
+    - 200 OK
+    - 400 Bad request - validation failure
+    - 400 Invalid request
+    - 401 Unauthorised
+    - 500 Internal error message
+
+```
+
+### PATCH location category
+```
+PATCH http://localhost:1337/admin/api/0.1/user/locationcategory
+
+Requires JSON Header:
+    {
+        idToken: 'the given IdToken'
+    }
+
+Requires JSON Body:
+    {
+        name: 'the location category name',
+        description: 'a meaningful description'
     }
 
 Returns:
