@@ -101,9 +101,6 @@ const AssetForm = () => {
             }
             
             {/* heading */}
-
-            
-            
             <form>
                 {/* asset details */}
                 <div className='row g-2 mb-2'>
@@ -321,7 +318,7 @@ const AssetForm = () => {
 
                     <div className='mb-3'>
                         { asset && asset.location
-                            ?   <LocationView name= { asset.name } location={ asset.location } />
+                            ?   <LocationView asset={ asset } />
                             :   null
 
                         }
