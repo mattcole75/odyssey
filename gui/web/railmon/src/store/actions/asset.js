@@ -24,9 +24,9 @@ const getAssetSuccess = (asset, identifier) => {
     };
 }
 
-const getChildAssetsSuccess = (assets, identifier) => {
+const getContainedAssetsSuccess = (assets, identifier) => {
     return {
-        type: actionType.ASSET_GET_CHILD_ASSETS_SUCCESS,
+        type: actionType.ASSET_GET_CONTAINED_ASSETS_SUCCESS,
         assets: assets,
         identifier: identifier
     };
@@ -118,7 +118,7 @@ export const assetGetAsset = (idToken, param, identifier) => {
     };
 }
 
-export const assetGetChildAssets = (idToken, param, identifier) => {
+export const assetGetContainedAssets = (idToken, param, identifier) => {
     return dispatch => {
 
         dispatch(start());
@@ -131,9 +131,9 @@ export const assetGetChildAssets = (idToken, param, identifier) => {
             }
         };
 
-        asset.get('/childassets', config)
+        asset.get('/containedassets', config)
             .then(res => {
-                dispatch(getChildAssetsSuccess(res.data.res, identifier));
+                dispatch(getContainedAssetsSuccess(res.data.res, identifier));
             })
             .then(() => {
                 dispatch(finish());

@@ -155,7 +155,7 @@ describe('Asset Service Tests', () => {
     });
 
     it('should, return a list of assets associated with a parent id', async () => {
-        await assetEndPoint.get('/childassets')
+        await assetEndPoint.get('/containedassets')
             .set({
                 idToken: idToken,
                 param: parentAssetRef

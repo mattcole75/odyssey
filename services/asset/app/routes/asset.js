@@ -28,9 +28,9 @@ module.exports = (app) => {
                 res.status(response.status).send(response);
         });
     });
-    app.get('/' + service + '/api/' + version + '/childassets', (req, res) => {
+    app.get('/' + service + '/api/' + version + '/containedassets', (req, res) => {
         res.set('Content-Type', 'application/json');
-        controller.getChildAssets(req, (err, response) => {
+        controller.getContainedAssets(req, (err, response) => {
             if(err)
                 res.status(err.status).send(err);
             else

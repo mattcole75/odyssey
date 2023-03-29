@@ -253,7 +253,7 @@ create procedure sp_selectAssets (in searchText varchar(64))
         end if;
     end//
 
-create procedure sp_selectChildAssets (in uid int)
+create procedure sp_selectContainedAssets (in uid int)
     begin
         select id, assetRef, ownedByRef, maintainedByRef, name, status from asset 
             where assetRef = uid

@@ -57,11 +57,11 @@ const getAsset = (req, next) => {
         });
 };
 
-const getChildAssets = (req, next) => {
+const getContainedAssets = (req, next) => {
     const { idtoken, param } = req.headers;
     const { rules } = req.body;
     //declare the sql string
-    const sproc = `call sp_selectChildAssets('${param}')`;
+    const sproc = `call sp_selectContainedAssets('${param}')`;
 
     axios.get('/get',
         { headers: {'Content-Type': 'application/json', idToken: idtoken, rules: rules, sproc: sproc } })
@@ -127,7 +127,7 @@ const patchAssetLocation = (req, next) => {
 module.exports = {
     postAsset: postAsset,
     getAssets: getAssets,
-    getChildAssets: getChildAssets,
+    getContainedAssets: getContainedAssets,
     getAsset: getAsset,
     patchAsset: patchAsset,
     patchAssetLocation: patchAssetLocation

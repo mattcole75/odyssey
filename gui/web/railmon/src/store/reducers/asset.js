@@ -5,7 +5,7 @@ const initialState = {
     error: null,
     assets: [],
     asset: null,
-    childAssets: [],
+    containedAssets: [],
     identifier: null,
     redirectPath: '/assets'
 }
@@ -33,9 +33,9 @@ const getAssetSuccess = (state, action) => {
     };
 }
 
-const getChildAssetsSuccess = (state, action) => {
+const getContainedAssetsSuccess = (state, action) => {
     return { ...state,
-        childAssets: action.assets,
+        containedAssets: action.assets,
         identifier: action.identifier
     };
 }
@@ -70,7 +70,7 @@ const reducer = (state = initialState, action) => {
         case actionType.ASSET_START: return start(state);
         case actionType.ASSET_GET_ASSETS_SUCCESS: return getAssetsSuccess(state, action);
         case actionType.ASSET_GET_ASSET_SUCCESS: return getAssetSuccess(state, action);
-        case actionType.ASSET_GET_CHILD_ASSETS_SUCCESS: return getChildAssetsSuccess(state, action);
+        case actionType.ASSET_GET_CONTAINED_ASSETS_SUCCESS: return getContainedAssetsSuccess(state, action);
         case actionType.ASSET_PATCH_ASSET_SUCCESS: return patchAssetSuccess(state, action);
         case actionType.ASSET_FINISH: return finish(state);
         case actionType.ASSET_FAIL: return fail(state, action);

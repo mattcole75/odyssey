@@ -25,7 +25,7 @@ export {
 export {
     assetGetAssets,
     assetGetAsset,
-    assetGetChildAssets,
+    assetGetContainedAssets,
     assetPatchAsset,
     assetReset
 } from './asset';

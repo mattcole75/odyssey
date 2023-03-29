@@ -51,7 +51,7 @@ const getAssets = (req, next) => {
     });
 };
 
-const getChildAssets = (req, next) => {
+const getContainedAssets = (req, next) => {
 
     // add code to check request for validity -- future
 
@@ -63,12 +63,12 @@ const getChildAssets = (req, next) => {
         }
     }
 
-    repository.getChildAssets(request, (err, res) => {
+    repository.getContainedAssets(request, (err, res) => {
         if(err) {
-            log.error(`status: ${ err.status } GET child assets v${ version } result: ${ JSON.stringify(err) }`);
+            log.error(`status: ${ err.status } GET contained assets v${ version } result: ${ JSON.stringify(err) }`);
             next(err, null);
         } else {
-            log.info(`status: ${ res.status } GET child assets v${ version }`);
+            log.info(`status: ${ res.status } GET contained assets v${ version }`);
             next(null, res);
         }
     });
@@ -150,7 +150,7 @@ const patchAssetLocation = (req, next) => {
 module.exports = {
     postAsset: postAsset,
     getAssets: getAssets,
-    getChildAssets: getChildAssets,
+    getContainedAssets: getContainedAssets,
     getAsset: getAsset,
     patchAsset: patchAsset,
     patchAssetLocation: patchAssetLocation
