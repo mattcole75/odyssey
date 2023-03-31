@@ -233,12 +233,129 @@ create table taskRecordRequirement (
     constraint fk_taskRecord_taskInstructionRef foreign key (taskInstructionRef) references taskInstruction (id) on update cascade on delete cascade
 );
 
--- *********************
--- Stored Procedures
--- *********************
+-- *************************
+-- Fatigue monitoring tables
+-- *************************
 
--- drop procedure if exists sp_getAssets;
+create table fatigueIndex (s
+    id int not null auto_increment,
 
+    userRef varchar(64) not null,
+
+    -- fategue score how is this going to work
+
+    created timestamp not null default now(), -- when was this record created
+    updated timestamp not null default now() on update now(), -- when was the last time this record was updated
+    inuse boolean not null default true, -- can this record be used / viewed
+    
+    primary key (id)
+);
+
+-- a list or plan showing turns of duty or leave for individuals or groups in an organization.
+create table roster ( 
+    id int not null auto_increment,
+
+    name varchar(64) not null, -- the roster name typically associated with the department it's covering
+    description varchar(64) not null, -- the roster description
+
+    created timestamp not null default now(), -- when was this record created
+    updated timestamp not null default now() on update now(), -- when was the last time this record was updated
+    inuse boolean not null default true, -- can this record be used / viewed
+
+    primary key (id)
+);
+
+create table team (
+    id int not null auto_increment,
+
+    departmentRef varchar(64) not null, -- external api reference
+
+    name varchar(64) not null, -- the team's name
+    description varchar(256) not null, -- the team's description
+
+    created timestamp not null default now(), -- when was this record created
+    updated timestamp not null default now() on update now(), -- when was the last time this record was updated
+    inuse boolean not null default true, -- can this record be used / viewed
+
+    primary key (id)
+);
+
+create table teamAllocation (
+    id int not null auto_increment,
+
+    teamRef int not null, -- internal team reference
+    personRef varchar(64) not null, -- external api reference
+
+    created timestamp not null default now(), -- when was this record created
+    updated timestamp not null default now() on update now(), -- when was the last time this record was updated
+    inuse boolean not null default true, -- can this record be used / viewed
+
+    primary key (id),
+    constraint fk_teamAllocation_teamRef foreign key (teamRef) references team (id) on update cascade on delete cascade
+);
+
+-- A shift is a formal schedule that determines the work hours of a shift-based employee team
+-- many duties make up one
+create table shift ( 
+    id int not null auto_increment, -- the primary key
+
+    rosterRef int not null, -- reference to the roster table
+
+    name varchar(64) not null,
+    description varchar(512) not null,
+
+    effectiveDate date not null, -- this is the day the shift comences
+
+    shiftStartDay tinyint not null, -- what day of the week does the shift start
+    startTime time not null, -- what is the start time of this shift
+    durationMinutes smallint not null, -- how many minutes will this shift last
+    intervalMinutes smallint not null, -- how many minutes between shift end and shift start
+    repeats tinyint not null, -- how many times does the shift repeat (starts Monday repeats 4 times to Friday)
+
+    requiredPeople tinyint not null, -- how many people should be alocated to this shift
+
+    created timestamp not null default now(), -- when was this record created
+    updated timestamp not null default now() on update now(), -- when was the last time this record was updated
+    inuse boolean not null default true, -- can this record be used / viewed
+
+    primary key (id),
+    constraint fk_shift_rosterRef foreign key (rosterRef) references roster (id) on update cascade on delete cascade
+);
+
+create table shiftPattern (
+    id int not null auto_increment, -- the primary key
+
+    teamRef int not null, -- the foreign key reference to the team table
+
+    name varchar(64) not null,
+    description varchar(512) not null,
+
+    created timestamp not null default now(), -- when was this record created
+    updated timestamp not null default now() on update now(), -- when was the last time this record was updated
+    inuse boolean not null default true, -- can this record be used / viewed
+
+    primary key (id),
+    constraint fk_shiftPattern_teamRef foreign key (teamRef) references team (id) on update cascade on delete cascade
+);
+
+create table shiftSequence ( -- how shifts follow on from each other
+    id int not null auto_increment, -- the primary key
+
+    shiftPatternRef int not null, -- the reference to the shift pattern table
+    shiftRef int not null, -- the reference to the shift table
+    shiftSequenceOrder tinyint not null, -- the shift sequence order
+
+    created timestamp not null default now(), -- when was this record created
+    updated timestamp not null default now() on update now(), -- when was the last time this record was updated
+    inuse boolean not null default true, -- can this record be used / viewed
+
+    primary key (id),
+    constraint fk_shiftSequence_shiftPatternRef foreign key (shiftPatternRef) references shiftPattern (id) on update cascade on delete cascade
+);
+
+-- ***********************
+-- Asset Stored Procedures
+-- ***********************
 delimiter //
 create procedure sp_selectAssets (in searchText varchar(64))
     begin
@@ -312,3 +429,17 @@ create procedure sp_updateAssetLocation (in uid int, location json)
     end//
 
 delimiter ;
+
+-- ************************
+-- Roster Stored Procedures
+-- ************************
+delimiter //
+create procedure sp_insertRoster (in name varchar(32), description varchar(256), out insertId int)
+    begin
+        insert into roster (name, description)
+        values (name, description);
+
+        set insertId := last_insert_id();
+        select insertId;
+    end//
+delimeter ;
