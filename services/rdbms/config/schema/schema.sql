@@ -237,7 +237,7 @@ create table taskRecordRequirement (
 -- Fatigue monitoring tables
 -- *************************
 
-create table fatigueIndex (s
+create table fatigueIndex (
     id int not null auto_increment,
 
     userRef varchar(64) not null,
@@ -353,10 +353,10 @@ create table shiftSequence ( -- how shifts follow on from each other
     constraint fk_shiftSequence_shiftPatternRef foreign key (shiftPatternRef) references shiftPattern (id) on update cascade on delete cascade
 );
 
+delimiter //
 -- ***********************
 -- Asset Stored Procedures
 -- ***********************
-delimiter //
 create procedure sp_selectAssets (in searchText varchar(64))
     begin
         if(searchText <> '') then
@@ -419,7 +419,7 @@ create procedure sp_updateAsset (in uid int, ownedByRef varchar(64), maintainedB
 
     end//
 
-create procedure sp_updateAssetLocation (in uid int, location json)
+create procedure sp_updateAssetLocationMap (in uid int, location json)
     begin
         update asset
         set location = location
@@ -428,18 +428,15 @@ create procedure sp_updateAssetLocation (in uid int, location json)
         call sp_selectAsset(uid);
     end//
 
-delimiter ;
-
 -- ************************
 -- Roster Stored Procedures
 -- ************************
-delimiter //
 create procedure sp_insertRoster (in name varchar(32), description varchar(256), out insertId int)
     begin
-        insert into roster (name, description)
-        values (name, description);
+        insert into roster (name, description) values (name, description);
 
         set insertId := last_insert_id();
         select insertId;
     end//
-delimeter ;
+
+delimiter ;

@@ -164,3 +164,25 @@ export const assetPatchAsset = (idToken, data, identifier) => {
         });
     };
 }
+
+export const assetPatchAssetLocationMap = (idToken, id, data, identifier) => {
+    return dispatch => {
+        dispatch(start());
+        
+        asset.patch('/assetlocationmap', data, {
+            headers: {
+                idToken: idToken,
+                param: id
+            }
+        })
+        .then(res => {
+            dispatch(patchAssetSuccess(res.data.res, identifier));
+        })
+        .then(() => {
+            dispatch(finish());
+        })
+        .catch(err => {
+            dispatch(fail(whatIsTheErrorMessage(err))); 
+        });
+    };
+}

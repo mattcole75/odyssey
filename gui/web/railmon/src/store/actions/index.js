@@ -27,5 +27,6 @@ export {
     assetGetAsset,
     assetGetContainedAssets,
     assetPatchAsset,
+    assetPatchAssetLocationMap,
     assetReset
 } from './asset';

@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useParams, useNavigate } from 'react-router-dom';
 
-import { assetGetAsset, assetGetContainedAssets, assetPatchAsset, adminGetOrganisationList, adminGetLocationCategoryList } from '../../../store/actions/index';
+import { assetGetAsset, assetGetContainedAssets, assetPatchAsset, adminGetOrganisationList, adminGetLocationCategoryList, assetPatchAssetLocationMap } from '../../../store/actions/index';
 
 import { useForm } from 'react-hook-form';
 import ContainedAssets from './containedAssetList/containedAssetList';
@@ -11,7 +11,10 @@ import LocationView from './location/locationView';
 import moment from 'moment';
 
 import Backdrop from '../../ui/backdrop/backdrop';
+import Modal from '../../ui/modal/modal';
 import Spinner from '../../ui/spinner/spinner';
+
+import LocationEdit from './location/locationEdit';
 
 import { capitalizeFirstLetter } from '../../../shared/utility';
 
@@ -26,14 +29,21 @@ const AssetForm = () => {
     const { organisations, locationCategories } = useSelector(state => state.admin);
 
     const [ inuseStatus, setInuseStatus ] = useState(asset != null ? asset.inuse : true);
+    const [ editingMap, setEditingMap ] = useState(false);
 
     const onGetAsset = useCallback((idToken, id, identifier) => dispatch(assetGetAsset(idToken, id, identifier)), [dispatch]);
     const onGetContainedAssets = useCallback((idToken, id, identifier) => dispatch(assetGetContainedAssets(idToken, id, identifier)), [dispatch]);
     const onPatchAsset = useCallback((idToken, data, identifier) => dispatch(assetPatchAsset(idToken, data, identifier)), [dispatch]);
+    const onPatchLocationMap = useCallback((idToken, id, data, identifier) => dispatch(assetPatchAssetLocationMap(idToken, id, data, identifier)), [dispatch]);
     const onGetOrganisations = useCallback((idToken, identifier) => dispatch(adminGetOrganisationList(idToken, identifier)), [dispatch]);
     const onGetLocationCategories = useCallback((idToken,identifier) => dispatch(adminGetLocationCategoryList(idToken, identifier)), [dispatch]);
 
     const { register, reset, getValues, formState: { errors } } = useForm({ mode: 'onChange' });
+
+    // editing map toggle
+    const toggleMapEditing = () => {
+        setEditingMap(prevState => !prevState);
+    };
 
     useEffect(() => {
         onGetOrganisations(idToken, 'GET_ORGS');
@@ -55,7 +65,6 @@ const AssetForm = () => {
         reset(asset);
     }, [asset, reset]);
     
-
     const save = useCallback(() => {  
         if(asset !== null) {
             const { ownedByRef, maintainedByRef,locationCategoryRef, name, description, status, installedDate, commissionedDate, decommissionedDate, disposedDate, locationType, locationDescription } = getValues();
@@ -81,6 +90,11 @@ const AssetForm = () => {
         // }
     }, [asset, getValues, id, idToken, inuseStatus, onPatchAsset]);
 
+    const saveMap = useCallback((data) => {
+        console.log('MCC', { location: data });
+        onPatchLocationMap(idToken, id, { location: data }, 'PATCH_ASSET_LOCATION_MAP');
+    }, [onPatchLocationMap, id, idToken]);
+
     
     const toggleInuseStatus = () => {
         setInuseStatus(prevState => !prevState);
@@ -90,15 +104,31 @@ const AssetForm = () => {
     if(loading)
         spinner = <Spinner />;
 
+    // modal edit map
+    let modal = null;
+    if(editingMap) {
+        modal = <Modal
+            show={ editingMap }
+            modalClosed={ toggleMapEditing }
+            content={
+                <LocationEdit
+                    asset={ asset }
+                    close={ toggleMapEditing }
+                    save={ saveMap }
+                />
+            } />
+    }
+
     return (
         <div className='form-admin container'>
-             <Backdrop show={loading} />
-            {spinner}
-            {error &&
+             <Backdrop show={ loading } />
+            { spinner }
+            { error &&
                 <div className='container alert alert-danger text-center' role='alert'>
-                    {error}
+                    { error }
                 </div>
             }
+            { modal }
             
             {/* heading */}
             <form>
@@ -317,8 +347,20 @@ const AssetForm = () => {
                     </div>
                     
                     {/* asset map section */}
-                    <div className='text-start'>
-                        <h1 className='h3 fw-normal text-start'>Map</h1>
+                    <div className='d-flex gap-2 w-100 justify-content-between mt-3'>
+                        <div className='text-start'>
+                            <h1 className='h3 mb-3 fw-normal text-start'>Map</h1>
+                        </div>
+                        { asset && asset.location
+                            ?   <button
+                                    className='btn btn-outline-primary'
+                                    type='button'
+                                    onClick={ toggleMapEditing }>Edit Map</button>
+                            :    <button
+                                    className='btn btn-outline-primary'
+                                    type='button'
+                                    onClick={ toggleMapEditing }>Add Map</button>
+                        }
                     </div>
                     { asset && asset.location
                             ?   <div className='mb-3'>

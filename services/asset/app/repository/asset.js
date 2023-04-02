@@ -104,14 +104,14 @@ const patchAsset = (req, next) => {
         });
 };
 
-const patchAssetLocation = (req, next) => {
+const patchAssetLocationMap = (req, next) => {
 
-    const { idtoken } = req.headers;
+    const { idtoken, param } = req.headers;
     const { rules, values } = req.body;
 
-    const sproc = "call sp_updateAssetLocation(" +
-        (values.id == null ? null + ", " : values.id + ", ") +
-        (values.location == null ? null + ") " : "'" + values.location + "')");
+    const sproc = "call sp_updateAssetLocationMap(" +
+        (param == null ? null + ", " : param + ", ") +
+        (values.location == null ? null + ") " : "'" + JSON.stringify(values.location) + "')");
 
     axios.patch('/patch',
         { rules: rules, sproc: sproc },
@@ -130,6 +130,6 @@ module.exports = {
     getContainedAssets: getContainedAssets,
     getAsset: getAsset,
     patchAsset: patchAsset,
-    patchAssetLocation: patchAssetLocation
+    patchAssetLocationMap: patchAssetLocationMap
 }
 

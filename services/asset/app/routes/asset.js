@@ -28,6 +28,7 @@ module.exports = (app) => {
                 res.status(response.status).send(response);
         });
     });
+
     app.get('/' + service + '/api/' + version + '/containedassets', (req, res) => {
         res.set('Content-Type', 'application/json');
         controller.getContainedAssets(req, (err, response) => {
@@ -58,9 +59,9 @@ module.exports = (app) => {
         });
     });
 
-    app.patch('/' + service + '/api/' + version + '/assetlocation', (req, res) => {
+    app.patch('/' + service + '/api/' + version + '/assetlocationmap', (req, res) => {
         res.set('Content-Type', 'application/json');
-        controller.patchAssetLocation(req, (err, response) => {
+        controller.patchAssetLocationMap(req, (err, response) => {
             if(err)
                 res.status(err.status).send(err);
             else

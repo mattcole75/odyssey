@@ -122,7 +122,7 @@ const patchAsset = (req, next) => {
     });
 };
 
-const patchAssetLocation = (req, next) => {
+const patchAssetLocationMap = (req, next) => {
 
     // add code to check request for validity -- future
 
@@ -136,7 +136,7 @@ const patchAssetLocation = (req, next) => {
         }
     }
 
-    repository.patchAssetLocation(request, (err, res) => {
+    repository.patchAssetLocationMap(request, (err, res) => {
         if(err) {
             log.error(`status: ${ err.status } PATCH asset location v${ version } result: ${ JSON.stringify(err) }`);
             next(err, null);
@@ -153,5 +153,5 @@ module.exports = {
     getContainedAssets: getContainedAssets,
     getAsset: getAsset,
     patchAsset: patchAsset,
-    patchAssetLocation: patchAssetLocation
+    patchAssetLocationMap: patchAssetLocationMap
 }
