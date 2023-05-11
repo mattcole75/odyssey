@@ -61,8 +61,8 @@ describe('Asset Service Tests', () => {
             })
             .send({
                 assetRef: null,
-                ownedByRef: 'TfGM',
-                maintainedByRef: 'KAM',
+                ownedByRef: null,
+                maintainedByRef: null,
                 name: 'Delta Area',
                 description: 'The delta area'
             })
@@ -84,8 +84,8 @@ describe('Asset Service Tests', () => {
             })
             .send({
                 assetRef: parentAssetRef,
-                ownedByRef: 'TfGM',
-                maintainedByRef: 'KAM',
+                ownedByRef: null,
+                maintainedByRef: null,
                 name: 'MKT08M',
                 description: 'Market Street motorised point machine'
             })
@@ -107,8 +107,8 @@ describe('Asset Service Tests', () => {
             })
             .send({
                 assetRef: null,
-                ownedByRef: 'TfGM',
-                maintainedByRef: 'KAM',
+                ownedByRef: null,
+                maintainedByRef: null,
                 name: 'Delta Area',
                 description: 'The delta area'
             })
@@ -187,8 +187,8 @@ describe('Asset Service Tests', () => {
         })
         .send({
             id: parentAssetRef,
-            ownedByRef: 'TfGM',
-            maintainedByRef: 'KAM',
+            ownedByRef: null,
+            maintainedByRef: null,
             name: 'Delta Area',
             description: 'The delta area',
             status: 'commissioned',
@@ -211,8 +211,8 @@ describe('Asset Service Tests', () => {
         })
         .send({
             id: parentAssetRef,
-            ownedByRef: 'TfGM',
-            maintainedByRef: 'KAM',
+            ownedByRef: null,
+            maintainedByRef: null,
             name: 'Delta Area',
             description: 'The delta area',
             status: 'commissioned',
@@ -234,8 +234,8 @@ describe('Asset Service Tests', () => {
         })
         .send({
             id: parentAssetRef,
-            ownedByRef: 'TfGM',
-            maintainedByRef: 'KAM',
+            ownedByRef: null,
+            maintainedByRef: null,
             name: 'Delta Area',
             description: 'The delta area',
             status: 'commissioned',
@@ -257,8 +257,8 @@ describe('Asset Service Tests', () => {
         })
         .send({
             id: parentAssetRef,
-            ownedByRef: 'TfGM',
-            maintainedByRef: 'KAM',
+            ownedByRef: null,
+            maintainedByRef: null,
             name: 'Delta Area',
             description: 'The delta area',
             status: 'commissioned',
@@ -280,8 +280,8 @@ describe('Asset Service Tests', () => {
         })
         .send({
             id: parentAssetRef,
-            ownedByRef: 'TfGM',
-            maintainedByRef: 'KAM',
+            ownedByRef: null,
+            maintainedByRef: null,
             name: 'Delta Area',
             description: 'The delta area',
             status: 'commissioned',
@@ -469,7 +469,15 @@ describe('Asset Service Tests', () => {
             param: parentAssetRef2
         })
         .send({
-            location: '{ "type": "Feature", "properties": { "title": "MKT08M", "description": "Market Street Points" }, "geometry": { "coordinates": [-2.238204, 53.481785], "type": "Point" } }'
+            location: {
+                "type": "Feature", 
+                "properties": { 
+                    "title": "MKT08M", 
+                    "description": "Market Street Points" }, 
+                    "geometry": { 
+                        "coordinates": [-2.238204, 53.481785], 
+                        "type": "Point" }
+                }
         })
         .set('Accept', 'application/json')
         .expect('Content-Type', /json/)

@@ -3,14 +3,47 @@ create database odyssey;
 
 use odyssey;
 
+-- an ancillary table supporting the application organisation requirements.
+
+create table organisation (
+    id int not null auto_increment,
+    name varchar(32) not null unique,
+    abbreviation varchar(4) not null unique, -- a three char abbreviation
+    assetRole varchar(16), -- owner, maintainer, supplier
+
+    created timestamp not null default now(), -- when was this record created
+    updated timestamp not null default now() on update now(), -- when was the last time this record was updated
+    inuse boolean not null default true, -- can this record be used / viewed
+
+    primary key (id),
+    fulltext key text (name, abbreviation, assetRole),
+    constraint ck_organisation_assetRole check (assetRole in ('owner', 'maintainer', 'supplier'))
+);
+
+-- an ancillary table supporting assets with location categories.
+create table assetLocationCategory (
+    id int not null auto_increment, -- the primary key
+    name varchar(32) not null unique, -- segregated, street running, pedestrian zone, red zone
+    description varchar(256) not null,
+
+    created timestamp not null default now(), -- when was this record created
+    updated timestamp not null default now() on update now(), -- when was the last time this record was updated
+    inuse boolean not null default true, -- can this record be used / viewed
+
+    primary key (id),
+    fulltext key text (name, description)
+);
+
 -- an asset is a physical space allocated to provide functionality that satisfies some requirement
 create table asset (
     id int not null auto_increment, -- the primary key
 
     assetRef int null, -- reference to a perent child relationship, null would indicate the asset at the top of the hierarchy
-    ownedByRef varchar(64) null, -- the organisation who ownes this asset ref - organisation service
-    maintainedByRef varchar(64) null, -- the organisation who maintains this asset - organisation service
-    locationCategoryRef varchar(64) null, -- what type of access is required Red Zone, Segregated, Street Running
+    locationCategoryRef int null, -- reference to the location category table
+    
+    ownedByRef int null, -- the organisation who ownes this asset reference to the organisation table
+    maintainedByRef int null, -- the organisation who maintains this asset reference to the organisation table
+    -- locationCategoryRef varchar(64) null, -- what type of access is required Red Zone, Segregated, Street Running
 
     name varchar(32) not null unique, -- the name describing the asset is unique
     description varchar(256) not null, -- a short functional description or contract requirement
@@ -32,6 +65,9 @@ create table asset (
     primary key (id),
     fulltext key text (name, description, status),
     constraint fk_asset_assetRef foreign key (assetRef) references asset (id) on update cascade on delete cascade,
+    constraint fk_asset_assetLocationCategoryRef foreign key (locationCategoryRef) references assetLocationCategory (id) on update cascade on delete cascade,
+    constraint fk_asset_owedByRef foreign key (ownedByRef) references organisation (id) on update cascade on delete cascade,
+    constraint fk_asset_maintainedByRef foreign key (maintainedByRef) references organisation (id) on update cascade on delete cascade,
     constraint ck_asset_status check (status in ('design', 'procure', 'installed', 'commissioned', 'decommissioned', 'disposed')),
     constraint ck_asset_locationType check (locationType in ('area', 'point'))
 );
@@ -42,7 +78,7 @@ create table equipmentModel (
 
     manufacturerRef varchar(64) not null, -- the organisational reference for the manufacturer this reference the organisation service
 
-    partNumber varchar(64),
+    partNumber varchar(64) null,
     website varchar(256) null,
     expectedLifeWeeks smallInt not null, -- how many months will this equipment last
     mtbfHours int not null, -- what is the mean time (hours) between failures
@@ -360,24 +396,28 @@ delimiter //
 create procedure sp_selectAssets (in searchText varchar(64))
     begin
         if(searchText <> '') then
-            select id, assetRef, ownedByRef, maintainedByRef, name, status from asset
-            where match(name, description, status) against(searchText in boolean mode)
-            order by name;
+            select a.id, b.name as owner, c.name as maintainer, a.name, a.status from asset a
+                left outer join organisation b on a.ownedByRef = b.id
+                left outer join organisation c on a.maintainedByRef = c.id
+            where match(a.name, a.description, a.status) against(searchText in boolean mode)
+            order by a.name;
         else
-            select id, assetRef, ownedByRef, maintainedByRef, name, status from asset 
-            where assetRef is null
-            order by name;
+            select  a.id, b.name as owner, c.name as maintainer, a.name, a.status from asset a
+                left outer join organisation b on a.ownedByRef = b.id
+                left outer join organisation c on a.maintainedByRef = c.id
+            where a.assetRef is null
+            order by a.name;
         end if;
     end//
 
 create procedure sp_selectContainedAssets (in uid int)
     begin
         select id, assetRef, ownedByRef, maintainedByRef, name, status from asset 
-            where assetRef = uid
-            order by name;
+        where assetRef = uid
+        order by name;
     end//
 
-create procedure sp_insertAsset (in assetRef int, ownedByRef varchar(64), maintainedByRef varchar(64), name varchar(32), description varchar(256), out insertId int)
+create procedure sp_insertAsset (in assetRef int, ownedByRef int, maintainedByRef int, name varchar(32), description varchar(256), out insertId int)
     begin
         insert into asset (assetRef, ownedByRef, maintainedByRef, name, description)
         values (assetRef, ownedByRef, maintainedByRef, name, description);
@@ -397,7 +437,7 @@ create procedure sp_selectAsset (in uid int)
         created, updated, inuse from asset where id = uid;
     end//
 
-create procedure sp_updateAsset (in uid int, ownedByRef varchar(64), maintainedByRef varchar(64), locationCategoryRef varchar(64), name varchar(32), description varchar(256), status varchar(64), installedDate date, commissionedDate date, decommissionedDate date, disposedDate date, locationType varchar(8), locationDescription varchar(256), inuse boolean)
+create procedure sp_updateAsset (in uid int, ownedByRef int, maintainedByRef int, locationCategoryRef int, name varchar(32), description varchar(256), status varchar(64), installedDate date, commissionedDate date, decommissionedDate date, disposedDate date, locationType varchar(8), locationDescription varchar(256), inuse boolean)
     begin
         update asset
         set ownedByRef = ownedByRef,
@@ -428,6 +468,92 @@ create procedure sp_updateAssetLocationMap (in uid int, location json)
         call sp_selectAsset(uid);
     end//
 
+create procedure sp_insertAssetLocationCategory (in name varchar(32), description varchar(256), out insertId int)
+    begin
+        insert into assetLocationCategory (name , description)
+        value (name, description);
+
+        set insertId := last_insert_id();
+        select insertId;
+    end//
+
+create procedure sp_updateAssetLocationCategory (in uid int, name varchar(32), description varchar(256), inuse boolean)
+    begin
+        update assetLocationCategory
+        set name = name,
+            description = description,
+            inuse = inuse
+        where id = uid;
+
+        call sp_selectAssetLocationCategories('');
+    end//
+
+create procedure sp_selectAssetLocationCategories (in searchText varchar(64))
+    begin
+        if(searchText <> '') then
+            select id, name, description, created, updated, inuse from assetLocationCategory
+            where match(name, description) against(searchText in boolean mode)
+            order by name;
+        else
+            select id, name, description, created, updated, inuse from assetLocationCategory order by name;
+        end if;
+    end//
+
+create procedure sp_selectAssetLocationCategoryList (in searchText varchar(64))
+    begin
+        if(searchText <> '') then
+            select id, name, description from assetLocationCategory 
+            where inuse = 1 
+            and match(name, abbreviation, assetRole) against(searchText in boolean mode)
+            order by name;
+        else
+            select id, name, description from assetLocationCategory where inuse = 1 order by name;
+        end if;
+    end//
+
+create procedure sp_insertOrganisation (in name varchar(32), abbreviation varchar(4), assetRole varchar(16), out insertId int)
+    begin
+        insert into organisation (name, abbreviation, assetRole)
+        value (name, abbreviation, assetRole);
+
+        set insertId := last_insert_id();
+        select insertId;
+    end//
+
+create procedure sp_updateOrganisation (in uid int, name varchar(32), abbreviation varchar(4), assetRole varchar(16), inuse boolean)
+    begin
+        update organisation
+        set name = name,
+            abbreviation = abbreviation,
+            assetRole = assetRole,
+            inuse = inuse
+        where id = uid;
+
+        call sp_selectOrganisations('');
+    end//
+
+create procedure sp_selectOrganisations (in searchText varchar(64))
+    begin
+        if(searchText <> '') then
+            select id, name, abbreviation, assetRole, created, updated, inuse from organisation
+            where match(name, abbreviation, assetRole) against(searchText in boolean mode)
+            order by name;
+        else
+            select id, name, abbreviation, assetRole, created, updated, inuse from organisation order by name;
+        end if;
+    end//
+
+create procedure sp_selectOrganisationList (in searchText varchar(64))
+    begin
+        if(searchText <> '') then
+            select id, name, abbreviation, assetRole from organisation
+            where inuse = 1
+            and match(name, abbreviation, assetRole) against(searchText in boolean mode)
+            order by name;
+        else
+            select id, name, abbreviation, assetRole from organisation where inuse = 1 order by name;
+        end if;
+    end//
 -- ************************
 -- Roster Stored Procedures
 -- ************************

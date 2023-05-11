@@ -152,7 +152,6 @@ const getUser = (req, next) => {
 const getUsers = (req, next) => {
 
     const { localid, idtoken, query } = req.headers;
-    console.log('query', query);
 
     let errors = [];
 
@@ -206,7 +205,6 @@ const authorise = (req, authenticated, rules, next) => {
     const id = new ObjectId(req.headers.localid);
     const { roles, email, _id } = authenticated;
     // const { roles, allowSameUser } = rules;
-    
 
     if (email === adminEmail){
         // console.log('adminEmail', email, adminEmail);

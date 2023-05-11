@@ -19,7 +19,7 @@ const LocationCategoryForm = (props) => {
 
     const onSave = useCallback((data) => {
         if(locationCategory !== null) {
-            save({ ...data, uid: locationCategory._id }); // update
+            save({ ...data, id: locationCategory.id }); // update
         } else {
             save({ ...data }); // new
         }

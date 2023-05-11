@@ -23,7 +23,7 @@ const Organisations = (props) => {
                     </thead>
                     <tbody>
                         {organisations && organisations.map((item) => (
-                            <tr key={item._id} onClick={() => selectUserItem(item)}>
+                            <tr key={item.id} onClick={() => selectUserItem(item)}>
                                 <td>{item.name}</td>
                                 <td>{item.abbreviation}</td>
                                 <td>{item.assetRole}</td>

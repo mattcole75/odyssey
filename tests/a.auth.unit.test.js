@@ -214,7 +214,7 @@ describe('Deny access tests:', () => {
             })
     });
 
-    it('should, fail to return user data, given a loged in user but with invadid token', async () => {
+    it('should, fail to return user data, given a logged in user but with invadid token', async () => {
         await authEndPoint.get('/user')
             .set({
                 idToken: wrongToken,
@@ -222,15 +222,15 @@ describe('Deny access tests:', () => {
             })
             .set('Accept', 'application/json')
             .expect('Content-Type', /json/)
-            .expect(403)
+            .expect(404)
             .then(res => {
                 expect(res.body).toBeDefined();
-                expect(res.body.status).toBe(403);
+                expect(res.body.status).toBe(404);
                 expect(res.body.msg).toBe('Unauthorised');
             })
     });
 
-    it('should, fail to return user data, given a loged in user but with invadid localId', async () => {
+    it('should, fail to return user data, given a logged in user but with invadid localId', async () => {
         await authEndPoint.get('/user')
             .set({
                 idToken: badUsers[3].idToken,
@@ -502,7 +502,7 @@ describe('Test the user input validators', () => {
 // auth token tests
 describe('Authorise transaction tests', () => {
 
-    it('should, return 404 for a non-existing', async () => {
+    it('should, return 403 for a non recognised token', async () => {
         await authEndPoint.post('/approvetransaction')
             .set({
                 idToken: wrongToken
@@ -515,7 +515,7 @@ describe('Authorise transaction tests', () => {
             })
             .set('Accept', 'application/json')
             .expect('Content-Type', /json/)
-            .expect(404)
+            .expect(403)
     });
 
     it('should, return 400 for an empty string token', async () => {
@@ -612,7 +612,7 @@ describe('Authorise transaction tests', () => {
             .expect(200)
     });
 
-    it('should, return 404 for a logged out user', async () => {
+    it('should, return 403 for a logged out user', async () => {
         await authEndPoint.post('/approvetransaction')
             .set({
                 idToken: goodUsers[1].idToken
@@ -625,7 +625,7 @@ describe('Authorise transaction tests', () => {
             })
             .set('Accept', 'application/json')
             .expect('Content-Type', /json/)
-            .expect(404)
+            .expect(403)
     });
 });
 

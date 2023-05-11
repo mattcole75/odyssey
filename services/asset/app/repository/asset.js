@@ -1,4 +1,3 @@
-const { get } = require('../../../../config/config');
 const axios = require('../../config/axios');
 
 const postAsset = (req, next) => {
@@ -8,8 +7,8 @@ const postAsset = (req, next) => {
     
     const sproc = "call sp_insertAsset(" +
         (values.assetRef == null ? null + ", " : values.assetRef + ", ") + // assetRef
-        (values.ownedByRef == null ? null + ", " : "'" + values.ownedByRef + "', ") + // ownedByRef
-        (values.maintainedByRef == null ? null + ", " : "'" + values.maintainedByRef + "', ") + // maintainedByRef
+        (values.ownedByRef == null ? null + ", " : values.ownedByRef + ", ") + // ownedByRef
+        (values.maintainedByRef == null ? null + ", " : values.maintainedByRef + ", ") + // maintainedByRef
         (values.name == null ? null + ", " : "'" + values.name + "', ") + // name
         (values.description == null ? null + ", " : "'" + values.description + "', ") + // description
         "@insertId)";
@@ -79,9 +78,9 @@ const patchAsset = (req, next) => {
     const { rules, values } = req.body;
     const sproc = "call sp_updateAsset(" +
         (values.id == null ? null + ", " : values.id + ", ") +
-        (values.ownedByRef == null ? null + ", " : "'" + values.ownedByRef + "', ") +
-        (values.maintainedByRef == null ? null + ", " : "'" + values.maintainedByRef + "', ") +
-        (values.locationCategoryRef == null ? null + ", " : "'" + values.locationCategoryRef + "', ") +
+        (values.ownedByRef == null ? null + ", " : values.ownedByRef + ", ") +
+        (values.maintainedByRef == null ? null + ", " : values.maintainedByRef + ", ") +
+        (values.locationCategoryRef == null ? null + ", " : values.locationCategoryRef + ", ") +
         (values.name == null ? null + ", " : "'" + values.name + "', ") +
         (values.description == null ? null + ", " : "'" + values.description + "', ") +
         (values.status == null ? null + ", " : "'" + values.status + "', ") +

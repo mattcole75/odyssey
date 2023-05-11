@@ -6,6 +6,8 @@ const moment = require('moment');
 let idToken = null;
 let localId = null;
 let parentAssetRef;
+let uid1 = null;
+let uid2 = null;
 
 let wrongToken = '7c58e9e7cd20ae44f354d59f7a73ebb7e346d5e5a61517e33e0e97c4c79d25a826debfc57ca2e99c66108f80801059a9d2d94d14886fc98539e4ab324a5da2e125aa7e7d26af000e103fcbc75b0ed9caa75895ba26efa248fc0c2154a581786679c6a2a9120fadc9e68fef80bc30d6a8644cd19362e035a85e130d675e2e30a9';
 
@@ -18,7 +20,8 @@ describe('Organisation Service Tests', () => {
                 idToken: wrongToken
             })
             .send({
-                name: 'Transport for Greater Manchester (TfGM)',
+                name: 'Transport for Greater Manchester',
+                abbreviation: 'TfGM',
                 assetRole: 'Owner',
             })
             .set('Accept', 'application/json')
@@ -81,64 +84,64 @@ describe('Organisation Service Tests', () => {
             });
     });
 
-    it('should, insert an organisation Company A', async () => {
+    it('should, insert an organisation TfGM', async () => {
         await adminEndPoint.post('/organisation')
             .set({
                 idToken: idToken
             })
             .send({
-                name: 'Company A',
-                abbreviation: 'COA',
+                name: 'Transport for Greater Manchester',
+                abbreviation: 'TfGM',
                 assetRole: 'Owner'
             })
             .set('Accept', 'application/json')
             .expect('Content-Type', /json/)
             .expect(201)
             .then(res => {
-                const { acknowledged, insertedId } = res.body.res;
-                expect(acknowledged).toBe(true);
-                expect(insertedId).toBeDefined();
+                const { insertId } = res.body.res;
+                expect(insertId).toBeDefined();
+                expect(insertId).toBe(1);
             });
     });
 
-    it('should, insert an organisation Company B', async () => {
+    it('should, insert an organisation Metrolink', async () => {
         await adminEndPoint.post('/organisation')
             .set({
                 idToken: idToken
             })
             .send({
-                name: 'Company B',
-                abbreviation: 'COB',
+                name: 'Metrolink',
+                abbreviation: 'MET',
                 assetRole: 'Maintainer'
             })
             .set('Accept', 'application/json')
             .expect('Content-Type', /json/)
             .expect(201)
             .then(res => {
-                const { acknowledged, insertedId } = res.body.res;
-                expect(acknowledged).toBe(true);
-                expect(insertedId).toBeDefined();
+                const { insertId } = res.body.res;
+                expect(insertId).toBeDefined();
+                expect(insertId).toBe(2);
             });
     });
 
-    it('should, insert an organisation Company C', async () => {
+    it('should, insert an organisation Grey Inc', async () => {
         await adminEndPoint.post('/organisation')
             .set({
                 idToken: idToken
             })
             .send({
-                name: 'Company C',
-                abbreviation: 'COC',
+                name: 'Grey Inc',
+                abbreviation: 'GRY',
                 assetRole: 'Supplier'
             })
             .set('Accept', 'application/json')
             .expect('Content-Type', /json/)
             .expect(201)
             .then(res => {
-                const { acknowledged, insertedId } = res.body.res;
-                expect(acknowledged).toBe(true);
-                expect(insertedId).toBeDefined();
-                uid1 = insertedId;
+                const { insertId } = res.body.res;
+                expect(insertId).toBeDefined();
+                expect(insertId).toBe(3);
+                uid1 = insertId;
             });
     });
 
@@ -149,16 +152,18 @@ describe('Organisation Service Tests', () => {
                 idToken: idToken
             })
             .send({
-                name: 'Company C',
-                abbreviation: 'COC',
+                name: 'Grey Inc',
+                abbreviation: 'GRY',
                 assetRole: 'Supplier'
             })
             .set('Accept', 'application/json')
             .expect('Content-Type', /json/)
-            .expect(400)
+            .expect(500)
             .then(res => {
-                expect(res.body.status).toBe(400);
-                expect(res.body.res).toBe('Duplicate entry');
+                const { code, errno, sqlMessage, sqlState } = res.body.res;
+                expect(code).toBe('ER_DUP_ENTRY');
+                expect(errno).toBe(1062);
+                expect(sqlState).toBe('23000');
             });
     });
 
@@ -169,16 +174,18 @@ describe('Organisation Service Tests', () => {
                 idToken: idToken
             })
             .send({
-                name: 'Company C',
-                abbreviation: 'COC',
+                name: 'Grey',
+                abbreviation: 'GRY',
                 assetRole: 'Supplier'
             })
             .set('Accept', 'application/json')
             .expect('Content-Type', /json/)
-            .expect(400)
+            .expect(500)
             .then(res => {
-                expect(res.body.status).toBe(400);
-                expect(res.body.res).toBe('Duplicate entry');
+                const { code, errno, sqlMessage, sqlState } = res.body.res;
+                expect(code).toBe('ER_DUP_ENTRY');
+                expect(errno).toBe(1062);
+                expect(sqlState).toBe('23000');
             });
     });
 
@@ -200,7 +207,7 @@ describe('Organisation Service Tests', () => {
         await adminEndPoint.get('/organisations')
             .set({
                 idToken: idToken,
-                query: 'C'
+                query: 'Grey'
             })
             .set('Accept', 'application/json')
             .expect('Content-Type', /json/)
@@ -216,9 +223,9 @@ describe('Organisation Service Tests', () => {
                 idToken: idToken,
             })
             .send({
-                uid: uid1,
-                name: 'Company C Ltd',
-                abbreviation: 'COC',
+                id: uid1,
+                name: 'Grey Ltd',
+                abbreviation: 'GRY',
                 assetRole: 'Supplier',
                 inuse: true
             })
@@ -236,14 +243,15 @@ describe('Organisation Service Tests', () => {
     it('should, return a list of organisations by role filter', async () => {
         await adminEndPoint.get('/organisationlist')
             .set({
-                idToken: idToken
+                idToken: idToken,
+                query: ''
             })
             .set('Accept', 'application/json')
             .expect('Content-Type', /json/)
             .expect(200)
             .then(res => {
-                console.log(res.body.res);
-                // expect(res.body.res).toHaveLength(1);
+                // console.log(res.body.res);
+                expect(res.body.res).toHaveLength(3);
             })
     });
     
@@ -333,9 +341,9 @@ describe('Location Category Service Tests', () => {
             .expect('Content-Type', /json/)
             .expect(201)
             .then(res => {
-                const { acknowledged, insertedId } = res.body.res;
-                expect(acknowledged).toBe(true);
-                expect(insertedId).toBeDefined();
+                const { insertId } = res.body.res;
+                expect(insertId).toBeDefined();
+                expect(insertId).toBe(1);
             });
     });
 
@@ -352,13 +360,13 @@ describe('Location Category Service Tests', () => {
             .expect('Content-Type', /json/)
             .expect(201)
             .then(res => {
-                const { acknowledged, insertedId } = res.body.res;
-                expect(acknowledged).toBe(true);
-                expect(insertedId).toBeDefined();
+                const { insertId } = res.body.res;
+                expect(insertId).toBeDefined();
+                expect(insertId).toBe(2);
             });
     });
 
-    it('should, insert a location category for street running ', async () => {
+    it('should, insert a location category for street running', async () => {
         await adminEndPoint.post('/locationcategory')
             .set({
                 idToken: idToken
@@ -371,10 +379,29 @@ describe('Location Category Service Tests', () => {
             .expect('Content-Type', /json/)
             .expect(201)
             .then(res => {
-                const { acknowledged, insertedId } = res.body.res;
-                expect(acknowledged).toBe(true);
-                expect(insertedId).toBeDefined();
-                uid2 = insertedId;
+                const { insertId } = res.body.res;
+                expect(insertId).toBeDefined();
+                expect(insertId).toBe(3);
+                uid2 = insertId;
+            });
+    });
+
+    it('should, insert a location category for a pedestrian zone', async () => {
+        await adminEndPoint.post('/locationcategory')
+            .set({
+                idToken: idToken
+            })
+            .send({
+                name: 'Pedestrian Zone',
+                description: 'Requires full risk assessment'
+            })
+            .set('Accept', 'application/json')
+            .expect('Content-Type', /json/)
+            .expect(201)
+            .then(res => {
+                const { insertId } = res.body.res;
+                expect(insertId).toBeDefined();
+                expect(insertId).toBe(4);
             });
     });
 
@@ -390,10 +417,12 @@ describe('Location Category Service Tests', () => {
             })
             .set('Accept', 'application/json')
             .expect('Content-Type', /json/)
-            .expect(400)
+            .expect(500)
             .then(res => {
-                expect(res.body.status).toBe(400);
-                expect(res.body.res).toBe('Duplicate entry');
+                const { code, errno, sqlMessage, sqlState } = res.body.res;
+                expect(code).toBe('ER_DUP_ENTRY');
+                expect(errno).toBe(1062);
+                expect(sqlState).toBe('23000');
             });
     });
 
@@ -407,7 +436,7 @@ describe('Location Category Service Tests', () => {
             .expect('Content-Type', /json/)
             .expect(200)
             .then(res => {
-                expect(res.body.res).toHaveLength(3);
+                expect(res.body.res).toHaveLength(4);
             })
     });
 
@@ -431,7 +460,7 @@ describe('Location Category Service Tests', () => {
                 idToken: idToken,
             })
             .send({
-                uid: uid2,
+                id: uid2,
                 name: 'Street Running',
                 description: 'Requires full risk assessment',
                 inuse: true
@@ -440,23 +469,25 @@ describe('Location Category Service Tests', () => {
             .expect('Content-Type', /json/)
             .expect(200)
             // .then(res => {
-                // console.log(res.body);
-                // const { acknowledged, insertedId } = res.body.res;
-                // expect(acknowledged).toBe(true);
-                // expect(insertedId).toBeDefined();
+            //     console.log(res.body);
+            //     // const { acknowledged, insertedId } = res.body.res;
+            //     // expect(acknowledged).toBe(true);
+            //     // expect(insertedId).toBeDefined();
             // })
     });
 
-    it('should, return a list of location categories by role filter', async () => {
+    it('should, return a list of location categories that are in use', async () => {
         await adminEndPoint.get('/locationcategorylist')
             .set({
-                idToken: idToken
+                idToken: idToken,
+                query: ''
             })
             .set('Accept', 'application/json')
             .expect('Content-Type', /json/)
             .expect(200)
             .then(res => {
-                expect(res.body.res).toHaveLength(3);
+                // console.log(res.body);
+                expect(res.body.res).toHaveLength(4);
             })
     });
     

@@ -1,81 +1,82 @@
-const { ObjectId } = require('mongodb');
-const database = require('../../config/database');
-const moment = require('moment');
+// const { ObjectId } = require('mongodb');
+// const database = require('../../config/database');
+// const moment = require('moment');
+
+const axios = require('../../config/axios');
 
 const post = (req, next) => {
-    const dbConnect = database.getDb();
+    
+    const { idtoken } = req.headers;
+    const { rules, values } = req.body;
+    
+    const sproc = "call sp_insertAssetLocationCategory(" +
+        (values.name == null ? null + ", " : "'" + values.name + "', ") + // name
+        (values.description == null ? null + ", " : "'" + values.description + "', ") + // description
+        "@insertId)";
 
-    const data = { ...req, created: moment().format(), updated: moment().format(), inuse: true }
-
-    dbConnect
-        .collection('locationCategories')
-        .insertOne(data, (err, res) => {
-            if(err) {
-                if(err.code === 11000) // duplicate entry
-                    next({ status: 400, res: 'Duplicate entry' }, null);
-                else
-                    next({ status: 500, res: err }, null);
-            } else
-                next(null, { status: 201, res: res });
-            });
-}
+    axios.post('/post',
+        { rules: rules, sproc: sproc },
+        { headers: {'Content-Type': 'application/json', idToken: idtoken } })
+        .then(res => {
+            next(null, res.data);
+        })
+        .catch(err => {
+            next(err.response.data, null);
+        });
+};
 
 const patch = (req, next) => {
-    const { uid, data } = req;
-    const dbConnect = database.getDb();
-    const id = new ObjectId(uid);
 
-    dbConnect
-        .collection('locationCategories')
-        .updateOne(
-            { _id: id }, 
-            { $set: data },
-            { upsert: true }, ((err, res) => {
-                const { acknowledged, modifiedCount, upsertedId, upsertedCount } = res;
-                if (err)
-                    next({ status: 500, res: err }, null);
-                else if (acknowledged === true && modifiedCount === 1 && upsertedId === null && upsertedCount === 0)
-                    next(null, { status: 200, res: 'OK' });
-                else
-                    next({ status: 400, res: "Invalid request" }, null);
-        }));
-}
+    const { idtoken } = req.headers;
+    const { rules, values } = req.body;
+    const sproc = "call sp_updateAssetLocationCategory(" +
+        (values.id == null ? null + ", " : values.id + ", ") +
+        (values.name == null ? null + ", " : "'" + values.name + "', ") +
+        (values.description == null ? null + ", " : "'" + values.description + "', ") +
+        (values.inuse == null ? null + ") " : values.inuse + ")");
 
-const get = (query, next) => {
-    let filter = null;
-
-    if(query !== '')
-        filter = { $text: { $search: query, $caseSensitive: false }}
-        
-    const dbConnect = database.getDb();
-
-    dbConnect
-        .collection('locationCategories')
-        .find(filter).sort({ name: 1 })
-        // .limit(200)
-        .toArray(function (err, res) {
-        if (err) {
-            next({ status: 400, msg: err }, null);
-        }
-        else 
-            next(null, { status: 200, res: res });
+    axios.patch('/patch',
+        { rules: rules, sproc: sproc },
+        { headers: {'Content-Type': 'application/json', idToken: idtoken } })
+        .then(res => {
+            next(null, res.data);
+        })
+        .catch(err => {
+            next(err.response.data, null);
         });
-}
+};
+
+const get = (req, next) => {
+    const { idtoken, query } = req.headers;
+    const { rules } = req.body;
+    //declare the sql string
+    const sproc = `call sp_selectAssetLocationCategories('${query}')`;
+
+    axios.get('/get',
+        { headers: {'Content-Type': 'application/json', idToken: idtoken, rules: rules, sproc: sproc } })
+        .then(res => {
+            next(null, res.data);
+        })
+        .catch(err => {
+            next(err.response.data, null);
+        });
+};
 
 const getLocationCategoryList = (req, next) => {
-    const dbConnect = database.getDb();
+    const { idtoken, query } = req.headers;
+    const { rules } = req.body;
+    //declare the sql string
+    const sproc = `call sp_selectAssetLocationCategoryList('${query}')`;
 
-    dbConnect
-        .collection('locationCategories')
-        .find({ inuse: true }).sort({ name: 1 })
-        .toArray(function (err, res) {
-        if (err) {
-            next({ status: 400, msg: err }, null);
-        }
-        else 
-            next(null, { status: 200, res: res });
+    axios.get('/get',
+        { headers: {'Content-Type': 'application/json', idToken: idtoken, rules: rules, sproc: sproc } })
+        .then(res => {
+            next(null, res.data);
+        })
+        .catch(err => {
+            next(err.response.data, null);
         });
-}
+};
 
 module.exports = {
     post: post,

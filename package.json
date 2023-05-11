@@ -9,7 +9,7 @@
     "assetTest": "jest ./tests/b.asset.unit.test.js --runInBand",
     "locationTest": "echo 'db.locations.deleteMany({}) ' | mongosh location && jest ./tests/e.location.unit.test.js --runInBand",
     "populate": "jest -t 'Test the location microservice POST methods'",
-    "startRailmon": "node services/auth/service.js",
+    "railmon": "concurrently \"cd services/auth && node service.js\" \"cd services/administration && node service.js\" \"cd services/rdbms && node service.js\" \"cd services/asset && node service.js\" \"cd gui/web/railmon && npm run start\"",
     "sparkDbInit1": "echo \"db.createCollection('sensorData', { 'timeseries': {timeField: 'timestamp', metaField: 'id', granularity: 'minutes'}, expireAfterSeconds: 31536000})\" | mongosh spark",
     "sparkDbInit2": "echo \"db.createCollection('pointData', { 'timeseries': {timeField: 'timestamp', metaField: 'id', granularity: 'minutes'}, expireAfterSeconds: 31536000})\" | mongosh spark",
     "sparkTest": "echo 'db.sensorData.deleteMany({})' | mongosh spark && jest ./tests/c.spark.unit.test.js --runInBand",
@@ -32,6 +32,7 @@
     "mysql": "^2.18.1"
   },
   "devDependencies": {
+    "concurrently": "^8.0.1",
     "jest": "^29.3.1",
     "supertest": "^6.3.3"
   }

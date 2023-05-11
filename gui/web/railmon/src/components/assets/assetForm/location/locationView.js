@@ -60,7 +60,6 @@ const LocationView = (props) => {
                     });
                 } else { // Point
                     // add Marker to the map and centre
-                    console.log(JSON.parse(location).features[0].geometry.coordinates);
                     new mapboxgl.Marker().setLngLat(JSON.parse(location).features[0].geometry.coordinates).addTo(map.current);
                     map.current.flyTo({ center: JSON.parse(location).features[0].geometry.coordinates });
                 }

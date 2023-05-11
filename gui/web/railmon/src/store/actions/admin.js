@@ -188,7 +188,8 @@ export const adminGetOrganisationList = (idToken, identifier) => {
         const config = {
             headers: {
                 'content-type': 'application/json',
-                idToken: idToken
+                idToken: idToken,
+                query: ''
             }
         };
         
@@ -290,7 +291,8 @@ export const adminGetLocationCategoryList = (idToken, identifier) => {
         const config = {
             headers: {
                 'content-type': 'application/json',
-                idToken: idToken
+                idToken: idToken,
+                query: ''
             }
         };
         

@@ -24,8 +24,8 @@ const Assets = (props) => {
                         {assets && assets.map((item) => (
                             <tr className='cursor-point' key={item.id} onClick={ () => { navigate(`/asset/${ item.id }`) } }>
                                 <td>{item.name}</td>
-                                <td>{item.ownedByRef}</td>
-                                <td>{item.maintainedByRef}</td>
+                                <td>{item.owner}</td>
+                                <td>{item.maintainer}</td>
                                 <td>{capitalizeFirstLetter(item.status)}</td>
                             </tr>
                         ))}

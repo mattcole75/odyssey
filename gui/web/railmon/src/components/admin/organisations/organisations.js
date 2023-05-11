@@ -37,7 +37,7 @@ const organisations = React.memo(() => {
     }, [dispatch]);
 
     const saveHandler = useCallback((data) => {
-        if(data.uid != null)
+        if(data.id != null)
             onUpdate(idToken, data, 'ORG_UPDATE');
         else
             onCreate(idToken, data, "ORG_CREATE")

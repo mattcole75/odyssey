@@ -70,9 +70,9 @@ const AssetForm = () => {
             const { ownedByRef, maintainedByRef,locationCategoryRef, name, description, status, installedDate, commissionedDate, decommissionedDate, disposedDate, locationType, locationDescription } = getValues();
             onPatchAsset(idToken, { ...asset,
                 id: id,
-                ownedByRef: ownedByRef === '' ? null : ownedByRef,
-                maintainedByRef: maintainedByRef === '' ? null : maintainedByRef,
-                locationCategoryRef: locationCategoryRef === '' ? null : locationCategoryRef,
+                ownedByRef: ownedByRef === '' ? null : parseInt(ownedByRef),
+                maintainedByRef: maintainedByRef === '' ? null : parseInt(maintainedByRef),
+                locationCategoryRef: locationCategoryRef === '' ? null : parseInt(locationCategoryRef),
                 name: name,
                 description: description,
                 status: status,
@@ -179,7 +179,7 @@ const AssetForm = () => {
                                 {
                                     organisations && organisations.map(item => {
                                         if(item.assetRole === 'Owner')
-                                            return (<option key={item._id} value={item._id}>{item.name}</option>)
+                                            return (<option key={item.id} value={item.id}>{item.name}</option>)
                                         else
                                             return null;
                                     })
@@ -196,7 +196,7 @@ const AssetForm = () => {
                                 {
                                     organisations && organisations.map(item => {
                                         if(item.assetRole === 'Maintainer')
-                                            return (<option key={item._id} value={item._id}>{item.name}</option>)
+                                            return (<option key={item.id} value={item.id}>{item.name}</option>)
                                         else
                                             return null;
                                     })
@@ -330,7 +330,7 @@ const AssetForm = () => {
                                 <option value=''>Select...</option>
                                 {
                                     locationCategories && locationCategories.map(item => {
-                                       return (<option key={item._id} value={item._id}>{item.name}</option>)
+                                       return (<option key={item.id} value={item.id}>{item.name}</option>)
                                     })
                                 }
                                 

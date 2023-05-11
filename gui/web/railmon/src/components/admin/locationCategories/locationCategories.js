@@ -38,7 +38,7 @@ const locationCategories = React.memo(() => {
     }, [dispatch]);
 
     const saveHandler = useCallback((data) => {
-        if(data.uid != null)
+        if(data.id != null)
             onUpdate(idToken, data, 'LOCATION_CATEGORY_UPDATE');
         else
             onCreate(idToken, data, "LOCATION_CATEGORY_CREATE")

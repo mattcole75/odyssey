@@ -21,7 +21,7 @@ const OrgForm = (props) => {
 
     const onSave = useCallback((data) => {
         if(organisation !== null) {
-            save({ ...data, uid: organisation._id }); // update
+            save({ ...data, id: organisation.id }); // update
         } else {
             save({ ...data }); // new
         }

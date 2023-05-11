@@ -21,7 +21,7 @@ const locationCategories = (props) => {
                     </thead>
                     <tbody>
                         {locationCategories && locationCategories.map((item) => (
-                            <tr key={item._id} onClick={() => selectLocationCategoryItem(item)}>
+                            <tr key={item.id} onClick={() => selectLocationCategoryItem(item)}>
                                 <td>{item.name}</td>
                                 <td>{item.inuse 
                                         ? <span className='badge text-nowrap bg-success'>Enabled</span>

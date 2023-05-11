@@ -11,7 +11,7 @@ const postAsset = (req, next) => {
     const request = {
         headers: req.headers,
         body: {
-            rules: { rules: { roles: ['superuser', 'administrator'] } },
+            rules: { roles: ['superuser', 'administrator'] },
             values: req.body
             // values: [ req.body.assetRef, req.body.ownedByRef, req.body.maintainedByRef, req.body.name, req.body.description, req.body.operational, req.body.operationalStarDate, req.body.operationalEndDate, req.body.locationType, req.body.area, req.body.pin ]
         }
@@ -36,7 +36,7 @@ const getAssets = (req, next) => {
     const request = {
         headers: req.headers,
         body: {
-            rules: { rules: { roles: ['user'] } }
+            rules: { roles: ['user'] }
         }
     }
 
@@ -59,7 +59,7 @@ const getContainedAssets = (req, next) => {
     const request = {
         headers: req.headers,
         body: {
-            rules: { rules: { roles: ['user'] } }
+            rules: { roles: ['user'] }
         }
     }
 
@@ -82,7 +82,7 @@ const getAsset = (req, next) => {
     const request = {
         headers: req.headers,
         body: {
-            rules: { rules: { roles: ['user'] } }
+            rules: { roles: ['user'] }
         }
     }
 
@@ -105,7 +105,7 @@ const patchAsset = (req, next) => {
     const request = {
         headers: req.headers,
         body: {
-            rules: { rules: { roles: ['superuser', 'administrator'] } },
+            rules: { roles: ['superuser', 'administrator'] },
             values: req.body
             // values: [ req.body.assetRef, req.body.ownedByRef, req.body.maintainedByRef, req.body.name, req.body.description, req.body.operational, req.body.operationalStarDate, req.body.operationalEndDate, req.body.locationType, req.body.area, req.body.pin ]
         }
@@ -130,7 +130,7 @@ const patchAssetLocationMap = (req, next) => {
     const request = {
         headers: req.headers,
         body: {
-            rules: { rules: { roles: ['superuser', 'administrator'] } },
+            rules: { roles: ['superuser', 'administrator'] },
             values: req.body
             // values: [ req.body.assetRef, req.body.ownedByRef, req.body.maintainedByRef, req.body.name, req.body.description, req.body.operational, req.body.operationalStarDate, req.body.operationalEndDate, req.body.locationType, req.body.area, req.body.pin ]
         }
