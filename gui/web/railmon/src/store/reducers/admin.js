@@ -44,7 +44,7 @@ const getOrganisationsSuccess = (state, action) => {
 
 const updateOrganisationSuccess = (state, action) => {
     let updatedOrganisations = [ ...state.organisations ];
-    const index = updatedOrganisations.findIndex(ele => ele._id === action.organisation.uid);
+    const index = updatedOrganisations.findIndex(ele => ele.id === action.organisation.id);
     updatedOrganisations[index] = { ...updatedOrganisations[index],
         name: action.organisation.name,
         abbreviation: action.organisation.abbreviation,
@@ -58,7 +58,7 @@ const updateOrganisationSuccess = (state, action) => {
 const createOrganisationSuccess = (state, action) => {
     let updatedOrganisations = [ ...state.organisations ];
     const newOrganisation = { ...action.organisation,
-        _id: action.uid,
+        id: action.id,
         created: moment().format(),
         updated: moment().format()
     }
@@ -77,7 +77,7 @@ const getLocationCategoriesSuccess = (state, action) => {
 
 const updateLocationCategorySuccess = (state, action) => {
     let updatedLocationCategories = [ ...state.locationCategories ];
-    const index = updatedLocationCategories.findIndex(ele => ele._id === action.locationCategory.uid);
+    const index = updatedLocationCategories.findIndex(ele => ele.id === action.locationCategory.id);
     updatedLocationCategories[index] = { ...updatedLocationCategories[index],
         name: action.locationCategory.name,
         description: action.locationCategory.description,
@@ -90,7 +90,7 @@ const updateLocationCategorySuccess = (state, action) => {
 const createLocationCategorySuccess = (state, action) => {
     let updatedLocationCategories = [ ...state.locationCategories ];
     const newLocationCategory = { ...action.locationCategory,
-        _id: action.uid,
+        id: action.id,
         created: moment().format(),
         updated: moment().format()
     }

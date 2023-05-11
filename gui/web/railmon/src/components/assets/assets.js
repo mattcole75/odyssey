@@ -8,9 +8,7 @@ import Spinner from '../ui/spinner/spinner';
 const assets = React.memo(() => {
 
     // const dispatch = useDispatch();
-
     // const [ user, setUser ] = useState(null);
-
     // const { idToken, localId } = useSelector(state => state.auth);
     const { loading, error, assets } = useSelector(state => state.asset);
 
@@ -36,7 +34,6 @@ const assets = React.memo(() => {
 
     
     return (
-
         <section>
             <Backdrop show={loading} />
             {spinner}
@@ -53,7 +50,6 @@ const assets = React.memo(() => {
             <div>
                 <Assets assets={assets}  />
             </div>
-
         </section>
     )
 

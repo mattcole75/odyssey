@@ -42,10 +42,10 @@ const updateOrganisationSuccess = (organisation, identifier) => {
     };
 }
 
-const createOrganisationSuccess = (uid, organisation, identifier) => {
+const createOrganisationSuccess = (id, organisation, identifier) => {
     return {
         type: actionType.ADMIN_CREATE_ORGANISATION_SUCCESS,
-        uid: uid,
+        id: id,
         organisation: organisation,
         identifier: identifier
     };
@@ -67,10 +67,10 @@ const updateLocationCategorySuccess = (locationCategory, identifier) => {
     };
 }
 
-const createLocationCategorySuccess = (uid, locationCategory, identifier) => {
+const createLocationCategorySuccess = (id, locationCategory, identifier) => {
     return {
         type: actionType.ADMIN_CREATE_LOCATION_CATEGORY_SUCCESS,
-        uid: uid,
+        id: id,
         locationCategory: locationCategory,
         identifier: identifier
     };
@@ -245,8 +245,8 @@ export const adminCreateOganisation = (idToken, data, identifier) => {
 
         admin.post('/organisation', data, config)
         .then(res => {
-            const { insertedId } = res.data.res;
-            dispatch(createOrganisationSuccess(insertedId, data, identifier));
+            const { insertId } = res.data.res;
+            dispatch(createOrganisationSuccess(insertId, data, identifier));
         })
         .then(() => {
             dispatch(finish());
@@ -323,6 +323,7 @@ export const adminUpdateLocationCategory = (idToken, data, identifier) => {
 
         admin.patch('/locationcategory', data, config)
         .then(() => {
+            
             dispatch(updateLocationCategorySuccess(data, identifier));
         })
         .then(() => {
@@ -348,8 +349,8 @@ export const adminCreateLocationCategory = (idToken, data, identifier) => {
 
         admin.post('/locationCategory', data, config)
         .then(res => {
-            const { insertedId } = res.data.res;
-            dispatch(createLocationCategorySuccess(insertedId, data, identifier));
+            const { insertId } = res.data.res;
+            dispatch(createLocationCategorySuccess(insertId, data, identifier));
         })
         .then(() => {
             dispatch(finish());

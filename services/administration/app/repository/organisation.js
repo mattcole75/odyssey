@@ -59,6 +59,7 @@ const patch = (req, next) => {
         { rules: rules, sproc: sproc },
         { headers: {'Content-Type': 'application/json', idToken: idtoken } })
         .then(res => {
+            console.log('mc', res.data);
             next(null, res.data);
         })
         .catch(err => {

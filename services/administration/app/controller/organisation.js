@@ -209,7 +209,7 @@ const getOrganisationList = (req, next) => {
         }
     }
 
-    repository.get(request, (err, res) => {
+    repository.getOrganisationList(request, (err, res) => {
         if(err){
             log.error(`status: ${ err.status } GET organisation list v${ version } result: ${ JSON.stringify(err) }`);
             next(err, null);

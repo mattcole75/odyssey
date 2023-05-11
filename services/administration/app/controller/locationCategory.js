@@ -88,8 +88,8 @@ const getLocationCategoryList = (req, next) => {
         }
     }
 
-    repository.get(request, (err, res) => {
-        if(err){
+    repository.getLocationCategoryList(request, (err, res) => {
+        if(err) {
             log.error(`status: ${ err.status } GET location category list v${ version } result: ${ JSON.stringify(err) }`);
             next(err, null);
         } else {
