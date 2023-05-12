@@ -396,13 +396,13 @@ delimiter //
 create procedure sp_selectAssets (in searchText varchar(64))
     begin
         if(searchText <> '') then
-            select a.id, b.name as owner, c.name as maintainer, a.name, a.status from asset a
+            select a.id, b.name as owner, b.abbreviation as ownerAbbr, c.name as maintainer, c.abbreviation as maintainerAbbr, a.name, a.status from asset a
                 left outer join organisation b on a.ownedByRef = b.id
                 left outer join organisation c on a.maintainedByRef = c.id
             where match(a.name, a.description, a.status) against(searchText in boolean mode)
             order by a.name;
         else
-            select  a.id, b.name as owner, c.name as maintainer, a.name, a.status from asset a
+            select  a.id, b.name as owner, b.abbreviation as ownerAbbr, c.name as maintainer, c.abbreviation as maintainerAbbr, a.name, a.status from asset a
                 left outer join organisation b on a.ownedByRef = b.id
                 left outer join organisation c on a.maintainedByRef = c.id
             where a.assetRef is null

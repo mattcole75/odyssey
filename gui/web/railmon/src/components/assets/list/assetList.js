@@ -15,23 +15,26 @@ const Assets = (props) => {
                     <thead>
                         <tr className='fs-5'>
                             <th scope="col">Name</th>
-                            <th scope="col">Owner</th>
-                            <th scope="col">Maintainer</th>
+                            <th className='col-truncate item-name' scope="col">Owner</th>
+                            <th className='col-truncate item-code' scope="col">Owner</th>
+                            <th className='col-truncate item-name' scope="col">Maintainer</th>
+                            <th className='col-truncate item-code' scope="col">Maint</th>
                             <th scope="col">Status</th>
                         </tr>
                     </thead>
                     <tbody>
                         {assets && assets.map((item) => (
                             <tr className='cursor-point' key={item.id} onClick={ () => { navigate(`/asset/${ item.id }`) } }>
-                                <td>{item.name}</td>
-                                <td>{item.owner}</td>
-                                <td>{item.maintainer}</td>
-                                <td>{capitalizeFirstLetter(item.status)}</td>
+                                <td><div className='col-truncate'>{item.name}</div></td>
+                                <td className='item-name'>{item.owner}</td>
+                                <td className='item-code'>{item.ownerAbbr}</td>
+                                <td className='item-name'>{item.maintainer}</td>
+                                <td className='item-code'>{item.maintainerAbbr}</td>
+                                <td ><div className='col-truncate'>{capitalizeFirstLetter(item.status)}</div></td>
                             </tr>
                         ))}
                     </tbody>
                 </table>
-                
             </div>
         </div>
     );
