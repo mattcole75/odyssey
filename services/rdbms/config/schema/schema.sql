@@ -429,12 +429,15 @@ create procedure sp_insertAsset (in assetRef int, ownedByRef int, maintainedByRe
 create procedure sp_selectAsset (in uid int)
     begin
         select 
-        id, assetRef, ownedByRef, maintainedByRef, locationCategoryRef, name, description, locationType, location, locationDescription, status,
-        date_format(installedDate, '%Y-%m-%d') as installedDate,
-        date_format(commissionedDate, '%Y-%m-%d') as commissionedDate,
-        date_format(decommissionedDate, '%Y-%m-%d') as decommissionedDate,
-        date_format(disposedDate, '%Y-%m-%d') as disposedDate,
-        created, updated, inuse from asset where id = uid;
+        a.id, b.name as parent, b.id as parentId, a.ownedByRef, a.maintainedByRef, a.locationCategoryRef, a.name, a.description, a.locationType, a.location, a.locationDescription, a.status,
+        date_format(a.installedDate, '%Y-%m-%d') as installedDate,
+        date_format(a.commissionedDate, '%Y-%m-%d') as commissionedDate,
+        date_format(a.decommissionedDate, '%Y-%m-%d') as decommissionedDate,
+        date_format(a.disposedDate, '%Y-%m-%d') as disposedDate,
+        a.created, a.updated, a.inuse
+        from asset a
+            left outer join asset b on a.assetRef = b.id
+        where a.id = uid;
     end//
 
 create procedure sp_updateAsset (in uid int, ownedByRef int, maintainedByRef int, locationCategoryRef int, name varchar(32), description varchar(256), status varchar(64), installedDate date, commissionedDate date, decommissionedDate date, disposedDate date, locationType varchar(8), locationDescription varchar(256), inuse boolean)

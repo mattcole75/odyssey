@@ -166,7 +166,7 @@ const AssetForm = () => {
                             <label htmlFor='name'>Asset Name</label>
                         </div>
                         <div className='form-floating'>
-                            <input type='text' className='form-control form-auth-ele-bot' id='assetRef' placeholder='Asset Reference' autoComplete='off' readOnly value={ asset && asset.assetRef ? asset.assetRef : 'Top Level Asset' } />
+                            <input type='text' className='form-control form-auth-ele-bot' id='assetRef' placeholder='Asset Reference' autoComplete='off' readOnly value={ asset && asset.parent ? asset.parent : 'Top Level Asset' } />
                             <label htmlFor='assetRef'>Parent Asset</label>
                         </div>
                     </div>
