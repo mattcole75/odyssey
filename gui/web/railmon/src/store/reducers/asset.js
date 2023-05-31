@@ -1,4 +1,5 @@
 import * as actionType from '../actions/actionTypes';
+import moment from 'moment';
 
 const initialState = {
     loading: false,
@@ -40,7 +41,22 @@ const getContainedAssetsSuccess = (state, action) => {
     };
 }
 
-const patchAssetSuccess = (state, action) => {
+const createAssetSuccess = (state, action) => {
+    let updatedAssets = [ ...state.assets ];
+    const newAsset = { ...action.asset,
+        id: action.id,
+        status: 'design',
+        created: moment().format(),
+        updated: moment().format()
+    }
+    updatedAssets.push(newAsset);
+    return { ...state,
+        assets: updatedAssets,
+        identifier: action.identifier
+    };
+}
+
+const updateAssetSuccess = (state, action) => {
     return { ...state,
         asset: action.asset,
         identifier: action.identifier
@@ -71,7 +87,8 @@ const reducer = (state = initialState, action) => {
         case actionType.ASSET_GET_ASSETS_SUCCESS: return getAssetsSuccess(state, action);
         case actionType.ASSET_GET_ASSET_SUCCESS: return getAssetSuccess(state, action);
         case actionType.ASSET_GET_CONTAINED_ASSETS_SUCCESS: return getContainedAssetsSuccess(state, action);
-        case actionType.ASSET_PATCH_ASSET_SUCCESS: return patchAssetSuccess(state, action);
+        case actionType.ASSET_CREATE_ASSET_SUCCESS: return createAssetSuccess(state, action);
+        case actionType.ASSET_UPDATE_ASSET_SUCCESS: return updateAssetSuccess(state, action);
         case actionType.ASSET_FINISH: return finish(state);
         case actionType.ASSET_FAIL: return fail(state, action);
         case actionType.ASSET_RESET: return reset();

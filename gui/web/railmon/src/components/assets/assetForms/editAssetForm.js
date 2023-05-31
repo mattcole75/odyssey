@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useParams, useNavigate } from 'react-router-dom';
 
-import { assetGetAsset, assetGetContainedAssets, assetPatchAsset, adminGetOrganisationList, adminGetLocationCategoryList, assetPatchAssetLocationMap } from '../../../store/actions/index';
+import { assetGetAsset, assetGetContainedAssets, assetUpdateAsset, assetCreateAsset, assetUpdateAssetLocationMap } from '../../../store/actions/index';
 
 import { useForm } from 'react-hook-form';
 import ContainedAssets from './containedAssetList/containedAssetList';
@@ -15,28 +15,30 @@ import Modal from '../../ui/modal/modal';
 import Spinner from '../../ui/spinner/spinner';
 
 import LocationEdit from './location/locationEdit';
+import AddAssetForm from './addAssetForm';
 
 import { capitalizeFirstLetter } from '../../../shared/utility';
 
-const AssetForm = () => {
+const EditAssetForm = () => {
 
     const { id } = useParams();
+    
     const dispatch = useDispatch();
     const navigate = useNavigate();
 
-    const { loading, error, asset, containedAssets } = useSelector(state => state.asset);
+    const { loading, error, asset, containedAssets, identifier } = useSelector(state => state.asset);
     const { idToken } = useSelector(state => state.auth);
     const { organisations, locationCategories } = useSelector(state => state.admin);
 
     const [ inuseStatus, setInuseStatus ] = useState(asset != null ? asset.inuse : true);
     const [ editingMap, setEditingMap ] = useState(false);
+    const [ addingAsset, setAddingAsset ] = useState(false);
 
     const onGetAsset = useCallback((idToken, id, identifier) => dispatch(assetGetAsset(idToken, id, identifier)), [dispatch]);
     const onGetContainedAssets = useCallback((idToken, id, identifier) => dispatch(assetGetContainedAssets(idToken, id, identifier)), [dispatch]);
-    const onPatchAsset = useCallback((idToken, data, identifier) => dispatch(assetPatchAsset(idToken, data, identifier)), [dispatch]);
-    const onPatchLocationMap = useCallback((idToken, id, data, identifier) => dispatch(assetPatchAssetLocationMap(idToken, id, data, identifier)), [dispatch]);
-    const onGetOrganisations = useCallback((idToken, identifier) => dispatch(adminGetOrganisationList(idToken, identifier)), [dispatch]);
-    const onGetLocationCategories = useCallback((idToken,identifier) => dispatch(adminGetLocationCategoryList(idToken, identifier)), [dispatch]);
+    const onUpdateAsset = useCallback((idToken, data, identifier) => dispatch(assetUpdateAsset(idToken, data, identifier)), [dispatch]);
+    const onCreateAsset = useCallback((idToken, data, identifier) => dispatch(assetCreateAsset(idToken, data, identifier)), [dispatch]);
+    const onUpdateLocationMap = useCallback((idToken, id, data, identifier) => dispatch(assetUpdateAssetLocationMap(idToken, id, data, identifier)), [dispatch]);
 
     const { register, reset, getValues, formState: { errors } } = useForm({ mode: 'onChange' });
 
@@ -45,30 +47,44 @@ const AssetForm = () => {
         setEditingMap(prevState => !prevState);
     };
 
-    useEffect(() => {
-        onGetOrganisations(idToken, 'GET_ORGS');
-        onGetLocationCategories(idToken, 'GET_LOCATION_CATEGORIES');
+    // adding asset toggle
+    const toggleAssetAdding = () => {
+        setAddingAsset(prevState => !prevState);
+    };
 
-    }, [ idToken, onGetOrganisations, onGetLocationCategories ]);
+    // useEffect(() => {
+    //     onGetOrganisations(idToken, 'GET_ORGS');
+    //     onGetLocationCategories(idToken, 'GET_LOCATION_CATEGORIES');
+
+    // }, [ idToken, onGetOrganisations, onGetLocationCategories ]);
     
-
     // load asset details on page refresh given an id
     useEffect(() => {
-        if(id !== 'new') {
+        if(Number.isInteger(parseInt(id))) {
             onGetAsset(idToken, id, 'GET_ASSET');
             onGetContainedAssets(idToken, id, 'GET_CHILD_ASSETS');
+        } else {
+            navigate('/')
         }
-    }, [id, idToken, onGetAsset, onGetContainedAssets, onGetOrganisations]);
+    }, [id, idToken, navigate, onGetAsset, onGetContainedAssets]);
+
+    useEffect(() => {
+        if(identifier === 'POST_CONTAINED_ASSET') {
+            onGetContainedAssets(idToken, id, 'GET_CHILD_ASSETS');
+            toggleAssetAdding();
+        }
+            
+    }, [id, idToken, identifier, onGetContainedAssets]);
 
     // watch for a change to the asset pointer and reset the form.
     useEffect(() => {
         reset(asset);
     }, [asset, reset]);
     
-    const save = useCallback(() => {  
-        if(asset !== null) {
+    const patch = useCallback(() => {
+        if(asset !== null) { // edit
             const { ownedByRef, maintainedByRef,locationCategoryRef, name, description, status, installedDate, commissionedDate, decommissionedDate, disposedDate, locationType, locationDescription } = getValues();
-            onPatchAsset(idToken, { ...asset,
+            onUpdateAsset(idToken, { ...asset,
                 id: id,
                 ownedByRef: ownedByRef === '' ? null : parseInt(ownedByRef),
                 maintainedByRef: maintainedByRef === '' ? null : parseInt(maintainedByRef),
@@ -84,16 +100,19 @@ const AssetForm = () => {
                 locationDescription: locationDescription === '' ? null : locationDescription,
                 inuse: inuseStatus === false ? false : true
              }, 'PATCH_ASSET'); // update
-        }
-        // else {
-        //     save({ ...data }); // new
+        } 
+        // else { // new asset
+        //     save({ ...data });
         // }
-    }, [asset, getValues, id, idToken, inuseStatus, onPatchAsset]);
+    }, [asset, getValues, id, idToken, inuseStatus, onUpdateAsset]);
+
+    const post = useCallback((data) => {
+        onCreateAsset(idToken, data, 'POST_CONTAINED_ASSET');
+    }, [onCreateAsset, idToken]);
 
     const saveMap = useCallback((data) => {
-        console.log('MCC', { location: data });
-        onPatchLocationMap(idToken, id, { location: data }, 'PATCH_ASSET_LOCATION_MAP');
-    }, [onPatchLocationMap, id, idToken]);
+        onUpdateLocationMap(idToken, id, { location: data }, 'PATCH_ASSET_LOCATION_MAP');
+    }, [onUpdateLocationMap, id, idToken]);
 
     
     const toggleInuseStatus = () => {
@@ -117,6 +136,20 @@ const AssetForm = () => {
                     save={ saveMap }
                 />
             } />
+    }
+
+    if(addingAsset) {
+        modal = <Modal
+                    show={ addingAsset }
+                    modalClosed={ toggleAssetAdding }
+                    content={
+                        <AddAssetForm 
+                            toggle={ toggleAssetAdding }
+                            save={ post }
+                            containerId={id}
+                            containerName={asset.name}
+                        />
+                    } />
     }
 
     return (
@@ -353,11 +386,11 @@ const AssetForm = () => {
                         </div>
                         { asset && asset.location
                             ?   <button
-                                    className='btn btn-outline-primary'
+                                    className='btn btn-outline-primary mb-2'
                                     type='button'
                                     onClick={ toggleMapEditing }>Edit Map</button>
                             :    <button
-                                    className='btn btn-outline-primary'
+                                    className='btn btn-outline-primary mb-1'
                                     type='button'
                                     onClick={ toggleMapEditing }>Add Map</button>
                         }
@@ -374,13 +407,24 @@ const AssetForm = () => {
                 {/* contained asset list */}
                 {asset && asset.locationType === 'area'
                     ?   <div className='mb-3'>
-                            <div className='text-start'>
-                                <h1 className='h3 mb-3 fw-normal text-start'>Contained Assets</h1>
+                            <div className='d-flex gap-2 w-100 justify-content-between'>
+                                <div className='text-start'>
+                                    <h1 className='h3 mb-3 fw-normal text-start'>Contained Assets</h1>
+                                </div>
+
+                                <button
+                                    className='btn btn-outline-primary mb-3'
+                                    type='button'
+                                    onClick={ toggleAssetAdding }>Add Asset</button>
                             </div>
-                            <ContainedAssets assets={ containedAssets } />
+                            <div className='mb-3'>
+                                <ContainedAssets assets={ containedAssets } />
+                            </div>
                         </div>
+                    
                     :   null
                 }
+                
                 
                
                 {/* record details section */}
@@ -418,7 +462,7 @@ const AssetForm = () => {
                     <button
                         className='w-100 btn btn-primary'
                         type='button'
-                        onClick={ save }>Save</button>
+                        onClick={ patch }>Save</button>
                 </div>
 
                 <div className='form-floating mb-3'>
@@ -433,4 +477,4 @@ const AssetForm = () => {
     );
 }
 
-export default AssetForm;
+export default EditAssetForm;

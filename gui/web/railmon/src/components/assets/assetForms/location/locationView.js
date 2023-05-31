@@ -77,7 +77,7 @@ const LocationView = (props) => {
 
     return (
         <div className='container ps-0 pe-0'>
-            <div ref={ mapContainer } className='map-container mt-0 mb-0' />
+            <div ref={ mapContainer } className='map-container border rounded mt-0 mb-0' />
         </div>
     );
 }

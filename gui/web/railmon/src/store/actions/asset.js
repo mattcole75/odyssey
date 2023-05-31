@@ -32,9 +32,19 @@ const getContainedAssetsSuccess = (assets, identifier) => {
     };
 }
 
-const patchAssetSuccess = (asset, identifier) => {
+const createAssetSuccess = (id, asset, identifier) => {
     return {
-        type: actionType.ASSET_PATCH_ASSET_SUCCESS,
+        type: actionType.ASSET_CREATE_ASSET_SUCCESS,
+        id: id,
+        asset: asset,
+        identifier: identifier
+    }
+    
+};
+
+const updateAssetSuccess = (asset, identifier) => {
+    return {
+        type: actionType.ASSET_UPDATE_ASSET_SUCCESS,
         asset: asset,
         identifier: identifier
     }
@@ -144,17 +154,39 @@ export const assetGetContainedAssets = (idToken, param, identifier) => {
     };
 }
 
-export const assetPatchAsset = (idToken, data, identifier) => {
+export const assetCreateAsset = (idToken, data, identifier) => {
+    return dispatch => {
+        dispatch(start());
+
+        asset.post('/asset', data, {
+            headers: {
+                idToken: idToken
+            }
+        })
+        .then(res => {
+            const { insertId } = res.data.res;
+            dispatch(createAssetSuccess(insertId, data, identifier));
+        })
+        .then(() => {
+            dispatch(finish());
+        })
+        .catch(err => {
+            dispatch(fail(whatIsTheErrorMessage(err)));
+        });
+    };
+}
+
+export const assetUpdateAsset = (idToken, data, identifier) => {
     return dispatch => {
         dispatch(start());
 
         asset.patch('/asset', data, {
             headers: {
-                idToken: idToken,
+                idToken: idToken
             }
         })
         .then(res => {
-            dispatch(patchAssetSuccess(res.data.res, identifier));
+            dispatch(updateAssetSuccess(res.data.res, identifier));
         })
         .then(() => {
             dispatch(finish());
@@ -165,7 +197,7 @@ export const assetPatchAsset = (idToken, data, identifier) => {
     };
 }
 
-export const assetPatchAssetLocationMap = (idToken, id, data, identifier) => {
+export const assetUpdateAssetLocationMap = (idToken, id, data, identifier) => {
     return dispatch => {
         dispatch(start());
         
@@ -176,7 +208,7 @@ export const assetPatchAssetLocationMap = (idToken, id, data, identifier) => {
             }
         })
         .then(res => {
-            dispatch(patchAssetSuccess(res.data.res, identifier));
+            dispatch(updateAssetSuccess(res.data.res, identifier));
         })
         .then(() => {
             dispatch(finish());

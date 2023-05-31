@@ -65,11 +65,11 @@ const organisations = React.memo(() => {
     return (
 
         <section>
-            <Backdrop show={loading} />
-            {spinner}
-            {error &&
+            <Backdrop show={ loading } />
+            { spinner }
+            { error &&
                 <div className='container alert alert-danger text-center' role='alert'>
-                    {error}
+                    { error }
                 </div>
             }
             {modal}

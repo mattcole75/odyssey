@@ -2,7 +2,7 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { capitalizeFirstLetter } from '../../../../shared/utility';
 
-const ChildAssets = (props) => {
+const ContainedAssets = (props) => {
 
     const { assets } = props;
     const navigate = useNavigate();
@@ -36,4 +36,4 @@ const ChildAssets = (props) => {
     );
 }
 
-export default ChildAssets;
+export default ContainedAssets;

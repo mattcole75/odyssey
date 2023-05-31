@@ -7,8 +7,10 @@ const postAsset = (req, next) => {
     
     const sproc = "call sp_insertAsset(" +
         (values.assetRef == null ? null + ", " : values.assetRef + ", ") + // assetRef
-        (values.ownedByRef == null ? null + ", " : values.ownedByRef + ", ") + // ownedByRef
-        (values.maintainedByRef == null ? null + ", " : values.maintainedByRef + ", ") + // maintainedByRef
+        ((values.ownedByRef == null || values.ownedByRef == '') ? null + ", " : values.ownedByRef + ", ") +
+        ((values.maintainedByRef == null || values.maintainedByRef == '') ? null + ", " : values.maintainedByRef + ", ") +
+        // (values.ownedByRef == null ? null + ", " : values.ownedByRef + ", ") + // ownedByRef
+        // (values.maintainedByRef == null ? null + ", " : values.maintainedByRef + ", ") + // maintainedByRef
         (values.name == null ? null + ", " : "'" + values.name + "', ") + // name
         (values.description == null ? null + ", " : "'" + values.description + "', ") + // description
         "@insertId)";

@@ -4,9 +4,9 @@ import { useDispatch, useSelector } from "react-redux";
 import { assetGetAssets } from '../../../store/actions/index';
 
 
-const Search = React.memo(() => {
+const Search = React.memo((props) => {
 
-    // const { loadUsers } = props;
+    const { newAssetHandler } = props;
     const [enteredFilter, setEnteredFilter] = useState('');
     const inputRef = useRef();
 
@@ -41,8 +41,12 @@ const Search = React.memo(() => {
                     <span className='heading-primary_main'>Asset Register</span>
                 </h1>
             </div>
+
+            <div className='d-flex align-items-center col-lg-auto mb-3 mb-lg-0 ms-3 me-3'>
+                <button className='btn btn-outline-primary' onClick={ newAssetHandler }>Add Asset</button>
+            </div>
             
-            <form className='col-12 col-lg-auto mb-3 mb-lg-0'>
+            <form className='d-flex col-12 align-items-center col-lg-auto mb-3 mb-lg-0'>
                 <input
                     type="search"
                     className='form-control'
