@@ -212,16 +212,18 @@ const authorise = (req, authenticated, rules, next) => {
     }
     
     // if (allowSameUser && id && _id === id) {
-    if (rules.allowSameUser && id && _id.equals(id)) {
-        // console.log('allow same user', allowSameUser, id, _id);
-        return next(null, { status: 200, message: 'OK' });
-    }
+    // if (rules.allowSameUser && id && _id.equals(id)) {
+    //     // console.log('allow same user', allowSameUser, id, _id);
+    //     return next(null, { status: 200, message: 'OK' });
+    // }
          
     if (!roles) {
         // console.log('no role', role);
         return next({ status: 403, message: 'Forbidden' }, null);
     }
-         
+    
+    console.log('rules.roles', rules);
+    console.log('roles', roles);
     // if(role.every(r => roles.includes(r))) {
     if(rules.roles.every(r => roles.includes(r))) {
         // console.log('role compliance', roles, role);

@@ -22,10 +22,10 @@ const AddAssetForm = (props) => {
         <div className='form-admin'>
             <h1 className='h3 mb-3 fw-normal text-start'>New Asset</h1>
             { containerId == null
-                ?   <div class="alert alert-primary" role="alert">
+                ?   <div className='alert alert-primary' role='alert'>
                         Top level asset
                     </div>
-                :   <div class="alert alert-primary" role="alert">
+                :   <div className='alert alert-primary' role='alert'>
                         { `Contained within the ${ containerName }` }
                     </div>
             }

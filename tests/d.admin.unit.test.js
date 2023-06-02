@@ -255,7 +255,6 @@ describe('Organisation Service Tests', () => {
             })
     });
     
-
 });
 
 describe('Location Category Service Tests', () => {
@@ -491,7 +490,6 @@ describe('Location Category Service Tests', () => {
             })
     });
     
-
 });
 
 // auth bug fixes

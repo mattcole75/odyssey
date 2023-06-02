@@ -3,14 +3,12 @@ const axios = require('../../config/axios');
 const postAsset = (req, next) => {
     
     const { idtoken } = req.headers;
-    const { rules, values } = req.body;
+    const { values, rules } = req.body;
     
     const sproc = "call sp_insertAsset(" +
         (values.assetRef == null ? null + ", " : values.assetRef + ", ") + // assetRef
         ((values.ownedByRef == null || values.ownedByRef == '') ? null + ", " : values.ownedByRef + ", ") +
         ((values.maintainedByRef == null || values.maintainedByRef == '') ? null + ", " : values.maintainedByRef + ", ") +
-        // (values.ownedByRef == null ? null + ", " : values.ownedByRef + ", ") + // ownedByRef
-        // (values.maintainedByRef == null ? null + ", " : values.maintainedByRef + ", ") + // maintainedByRef
         (values.name == null ? null + ", " : "'" + values.name + "', ") + // name
         (values.description == null ? null + ", " : "'" + values.description + "', ") + // description
         "@insertId)";
@@ -27,13 +25,12 @@ const postAsset = (req, next) => {
 };
 
 const getAssets = (req, next) => {
-    const { idtoken, query } = req.headers;
-    const { rules } = req.body;
+    const { idtoken, query, rules } = req.headers;
     //declare the sql string
     const sproc = `call sp_selectAssets('${query}')`;
 
     axios.get('/get',
-        { headers: {'Content-Type': 'application/json', idToken: idtoken, rules: rules, sproc: sproc } })
+        { headers: {'Content-Type': 'application/json', idToken: idtoken, rules: JSON.stringify(rules), sproc: sproc } })
         .then(res => {
             next(null, res.data);
         })
@@ -44,12 +41,11 @@ const getAssets = (req, next) => {
 
 const getAsset = (req, next) => {
 
-    const { idtoken, param } = req.headers;
-    const { rules } = req.body;
+    const { idtoken, param, rules } = req.headers;
     const sproc = `call sp_selectAsset(${param})`;
 
     axios.get('/get',
-        { headers: {'Content-Type': 'application/json', idToken: idtoken, rules: rules, sproc: sproc } })
+        { headers: {'Content-Type': 'application/json', idToken: idtoken, rules: JSON.stringify(rules), sproc: sproc } })
         .then(res => {
             next(null, { status: res.data.status, res: res.data.res[0] });
         })
@@ -59,13 +55,12 @@ const getAsset = (req, next) => {
 };
 
 const getContainedAssets = (req, next) => {
-    const { idtoken, param } = req.headers;
-    const { rules } = req.body;
+    const { idtoken, param, rules } = req.headers;
     //declare the sql string
     const sproc = `call sp_selectContainedAssets('${param}')`;
 
     axios.get('/get',
-        { headers: {'Content-Type': 'application/json', idToken: idtoken, rules: rules, sproc: sproc } })
+        { headers: {'Content-Type': 'application/json', idToken: idtoken, rules: JSON.stringify(rules), sproc: sproc } })
         .then(res => {
             next(null, res.data);
         })
@@ -77,7 +72,7 @@ const getContainedAssets = (req, next) => {
 const patchAsset = (req, next) => {
 
     const { idtoken } = req.headers;
-    const { rules, values } = req.body;
+    const { values, rules } = req.body;
     const sproc = "call sp_updateAsset(" +
         (values.id == null ? null + ", " : values.id + ", ") +
         (values.ownedByRef == null ? null + ", " : values.ownedByRef + ", ") +
@@ -108,7 +103,7 @@ const patchAsset = (req, next) => {
 const patchAssetLocationMap = (req, next) => {
 
     const { idtoken, param } = req.headers;
-    const { rules, values } = req.body;
+    const { values, rules } = req.body;
 
     const sproc = "call sp_updateAssetLocationMap(" +
         (param == null ? null + ", " : param + ", ") +

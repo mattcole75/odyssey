@@ -46,8 +46,10 @@ const post = (req, next) => {
 };
 
 const get = (req, next) => {
+
     // pull the token and access rules from the request
     const { idtoken, rules } = req.headers;
+
     // declare local header variable
     let header;
     // build header
@@ -61,7 +63,7 @@ const get = (req, next) => {
         return next({ status: 400, res: 'Bad Request' }, null);
     }
     // authenticate user with the auth microservice
-    axios.post('/approvetransaction', { rules: rules }, { headers: header })
+    axios.post('/approvetransaction', { rules: JSON.parse(rules) }, { headers: header })
         .then(authRes => {
             if(authRes.data.status === 200) {
                 // call the repository and execute the query

@@ -59,10 +59,7 @@ const get = (req, next) => {
 
     // define the request object
     const request = {
-        headers: req.headers,
-        body: {
-            rules: { roles: ['superuser', 'administrator'] }
-        }
+        headers: { ...req.headers, rules: { roles: ['superuser', 'administrator'] } }
     }
 
     repository.get(request, (err, res) => {
@@ -82,10 +79,7 @@ const getLocationCategoryList = (req, next) => {
 
     // define the request object
     const request = {
-        headers: req.headers,
-        body: {
-            rules: { roles: ['superuser', 'administrator'] }
-        }
+        headers: { ...req.headers, rules: { roles: ['user'] } }
     }
 
     repository.getLocationCategoryList(request, (err, res) => {

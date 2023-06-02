@@ -7,7 +7,7 @@ const axios = require('../../config/axios');
 const post = (req, next) => {
     
     const { idtoken } = req.headers;
-    const { rules, values } = req.body;
+    const { values, rules } = req.body;
     
     const sproc = "call sp_insertAssetLocationCategory(" +
         (values.name == null ? null + ", " : "'" + values.name + "', ") + // name
@@ -28,7 +28,7 @@ const post = (req, next) => {
 const patch = (req, next) => {
 
     const { idtoken } = req.headers;
-    const { rules, values } = req.body;
+    const { values, rules } = req.body;
     const sproc = "call sp_updateAssetLocationCategory(" +
         (values.id == null ? null + ", " : values.id + ", ") +
         (values.name == null ? null + ", " : "'" + values.name + "', ") +
@@ -47,13 +47,12 @@ const patch = (req, next) => {
 };
 
 const get = (req, next) => {
-    const { idtoken, query } = req.headers;
-    const { rules } = req.body;
+    const { idtoken, query, rules } = req.headers;
     //declare the sql string
     const sproc = `call sp_selectAssetLocationCategories('${query}')`;
 
     axios.get('/get',
-        { headers: {'Content-Type': 'application/json', idToken: idtoken, rules: rules, sproc: sproc } })
+        { headers: {'Content-Type': 'application/json', idToken: idtoken, rules: JSON.stringify(rules), sproc: sproc } })
         .then(res => {
             next(null, res.data);
         })
@@ -63,13 +62,12 @@ const get = (req, next) => {
 };
 
 const getLocationCategoryList = (req, next) => {
-    const { idtoken, query } = req.headers;
-    const { rules } = req.body;
+    const { idtoken, query, rules } = req.headers;
     //declare the sql string
     const sproc = `call sp_selectAssetLocationCategoryList('${query}')`;
 
     axios.get('/get',
-        { headers: {'Content-Type': 'application/json', idToken: idtoken, rules: rules, sproc: sproc } })
+        { headers: {'Content-Type': 'application/json', idToken: idtoken, rules: JSON.stringify(rules), sproc: sproc } })
         .then(res => {
             next(null, res.data);
         })

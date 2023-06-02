@@ -13,7 +13,6 @@ const postAsset = (req, next) => {
         body: {
             rules: { roles: ['superuser', 'administrator'] },
             values: req.body
-            // values: [ req.body.assetRef, req.body.ownedByRef, req.body.maintainedByRef, req.body.name, req.body.description, req.body.operational, req.body.operationalStarDate, req.body.operationalEndDate, req.body.locationType, req.body.area, req.body.pin ]
         }
     }
 
@@ -34,10 +33,7 @@ const getAssets = (req, next) => {
 
     // define the request object
     const request = {
-        headers: req.headers,
-        body: {
-            rules: { roles: ['user'] }
-        }
+        headers: { ...req.headers, rules: { roles: ['user' ] } }
     }
 
     repository.getAssets(request, (err, res) => {
@@ -57,10 +53,7 @@ const getContainedAssets = (req, next) => {
 
     // define the request object
     const request = {
-        headers: req.headers,
-        body: {
-            rules: { roles: ['user'] }
-        }
+        headers: { ...req.headers, rules: { roles: ['user'] } }
     }
 
     repository.getContainedAssets(request, (err, res) => {
@@ -80,10 +73,7 @@ const getAsset = (req, next) => {
 
     // define the request object
     const request = {
-        headers: req.headers,
-        body: {
-            rules: { roles: ['user'] }
-        }
+        headers: { ...req.headers, rules: { roles: ['user'] } }
     }
 
     repository.getAsset(request, (err, res) => {
@@ -107,7 +97,6 @@ const patchAsset = (req, next) => {
         body: {
             rules: { roles: ['superuser', 'administrator'] },
             values: req.body
-            // values: [ req.body.assetRef, req.body.ownedByRef, req.body.maintainedByRef, req.body.name, req.body.description, req.body.operational, req.body.operationalStarDate, req.body.operationalEndDate, req.body.locationType, req.body.area, req.body.pin ]
         }
     }
 
@@ -129,10 +118,9 @@ const patchAssetLocationMap = (req, next) => {
     // define the request object
     const request = {
         headers: req.headers,
-        body: {
+        body: { 
             rules: { roles: ['superuser', 'administrator'] },
-            values: req.body
-            // values: [ req.body.assetRef, req.body.ownedByRef, req.body.maintainedByRef, req.body.name, req.body.description, req.body.operational, req.body.operationalStarDate, req.body.operationalEndDate, req.body.locationType, req.body.area, req.body.pin ]
+            values:  req.body 
         }
     }
 

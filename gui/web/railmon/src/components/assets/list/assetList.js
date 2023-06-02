@@ -1,11 +1,12 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useSelector } from 'react-redux';
+import { Link } from 'react-router-dom';
 import { capitalizeFirstLetter } from '../../../shared/utility';
 
 const Assets = (props) => {
 
     const { assets } = props;
-    const navigate = useNavigate();
+    const roles = useSelector(state => state.auth.roles);
     
     return (
         <div className='container'>
@@ -20,17 +21,33 @@ const Assets = (props) => {
                             <th className='col-truncate item-name' scope="col">Maintainer</th>
                             <th className='col-truncate item-code' scope="col">Maint</th>
                             <th scope="col">Status</th>
+                            <th scope="col"></th>
                         </tr>
                     </thead>
                     <tbody>
                         {assets && assets.map((item) => (
-                            <tr className='cursor-point' key={item.id} onClick={ () => { navigate(`/asset/${ item.id }`) } }>
+                            <tr key={item.id} >
                                 <td><div className='col-truncate'>{item.name}</div></td>
                                 <td className='item-name'>{item.owner}</td>
                                 <td className='item-code'>{item.ownerAbbr}</td>
                                 <td className='item-name'>{item.maintainer}</td>
                                 <td className='item-code'>{item.maintainerAbbr}</td>
                                 <td ><div className='col-truncate'>{capitalizeFirstLetter(item.status)}</div></td>
+                                <td className='ps-3 pe-3'>
+                    <div className='dropdown'>
+                        <div className='' role='button' data-bs-toggle='dropdown' aria-expanded='false'>
+                            <span className='bi-three-dots-vertical fs-7' />
+                        </div>
+                        <ul className='dropdown-menu fs-7'>
+                            <li><Link className='dropdown-item' to={`/asset/${ item.id }`} >Open</Link></li>
+                            { roles.includes('administrator')
+                                ?   <li><button type='button' className='dropdown-item' onClick={ () => {} }>Delete</button></li>
+                                :   null
+                            }
+                           
+                        </ul>
+                    </div>
+                </td>
                             </tr>
                         ))}
                     </tbody>

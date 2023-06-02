@@ -22,7 +22,7 @@ const Users = (props) => {
                     </thead>
                     <tbody>
                         {users && users.map((item) => (
-                            <tr key={item._id} onClick={() => selectUserItem(item)}>
+                            <tr className='cursor-point' key={item._id} onClick={() => selectUserItem(item)}>
                                 <td>{item.displayName}</td>
                                 <td>{item.email}</td>
                                 <td>{item.inuse 
