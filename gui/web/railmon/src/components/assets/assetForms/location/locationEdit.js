@@ -26,8 +26,9 @@ const EditMap = (props) => {
         
         map.current = new mapboxgl.Map({
             container: mapContainer.current,
-            // style: 'mapbox://styles/mapbox/light-v11', // style URL
-            style: 'mapbox://styles/mattcole75/clfifj5rj005701o0ibg3a3ip',
+            style: 'mapbox://styles/mattcole75/clfifj5rj005701o0ibg3a3ip' // style URL
+            // style: 'mapbox://styles/mattcole75/clid5bqr2002801r0adfa8pj9'
+            // style: 'mapbox://styles/mattcole75/clibvg1tf02yu01pnbktxbc60',
             // center: [lng, lat], // starting position
             // zoom: zoom // starting zoom
         });

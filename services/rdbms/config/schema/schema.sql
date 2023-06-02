@@ -412,7 +412,7 @@ create procedure sp_selectAssets (in searchText varchar(64))
 
 create procedure sp_selectContainedAssets (in uid int)
     begin
-        select id, assetRef, ownedByRef, maintainedByRef, name, status from asset 
+        select id, name, status, locationType  from asset 
         where assetRef = uid
         order by name;
     end//

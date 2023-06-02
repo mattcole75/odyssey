@@ -16,14 +16,16 @@ const ContainedAssets = (props) => {
                             <thead>
                                 <tr className='fs-5'>
                                     <th scope="col">Name</th>
+                                    <th scope="col">Location Type</th>
                                     <th scope="col">Status</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {assets && assets.map((item) => (
                                     <tr className='cursor-point' key={item.id} onClick={ () => { navigate(`/asset/${ item.id }`) } }>
-                                        <td>{item.name}</td>
-                                        <td>{capitalizeFirstLetter(item.status)}</td>
+                                        <td>{ capitalizeFirstLetter(item.name) }</td>
+                                        <td>{ item.locationType ? capitalizeFirstLetter(item.locationType) : null }</td>
+                                        <td>{ capitalizeFirstLetter(item.status) }</td>
                                     </tr>
                                 ))}
                             </tbody>

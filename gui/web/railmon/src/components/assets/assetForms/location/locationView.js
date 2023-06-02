@@ -22,7 +22,12 @@ const LocationView = (props) => {
             style: 'mapbox://styles/mattcole75/clfifj5rj005701o0ibg3a3ip',
             // center: [lng, lat], // starting position
             // zoom: zoom // starting zoom
-        });        
+        });
+        
+        // disable map zoom when using scroll
+        map.current.scrollZoom.disable();
+        // Add zoom and rotation controls to the map.
+        map.current.addControl(new mapboxgl.NavigationControl());
     });
 
     useEffect(() => {
