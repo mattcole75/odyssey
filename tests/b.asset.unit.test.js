@@ -2414,6 +2414,64 @@ describe('Asset Service Tests', () => {
         .expect(200)
     });
 
+    it('should, update an asset records allocation (assetRef) to null (top level asset)', async () => {
+        await assetEndPoint.patch('/assetallocation')
+        .set({
+            idToken: idToken,
+            param: parentAssetRef2
+        })
+        .send({
+            assetRef: null
+        })
+        .set('Accept', 'application/json')
+        .expect('Content-Type', /json/)
+        .expect(200)
+    });
+
+    it('should, return a list of assets', async () => {
+        await assetEndPoint.get('/assets')
+            .set({
+                idToken: idToken,
+                query: ''
+            })
+            .set('Accept', 'application/json')
+            .expect('Content-Type', /json/)
+            .expect(200)
+            .then(res => {
+                console.log(res.body.res);
+                expect(res.body.res).toHaveLength(2)
+            })
+    });
+
+    it('should, update an asset records allocation (assetRef) to 1', async () => {
+        await assetEndPoint.patch('/assetallocation')
+        .set({
+            idToken: idToken,
+            param: parentAssetRef2
+        })
+        .send({
+            assetRef: parentAssetRef
+        })
+        .set('Accept', 'application/json')
+        .expect('Content-Type', /json/)
+        .expect(200)
+    });
+
+    it('should, return a list of assets', async () => {
+        await assetEndPoint.get('/assets')
+            .set({
+                idToken: idToken,
+                query: ''
+            })
+            .set('Accept', 'application/json')
+            .expect('Content-Type', /json/)
+            .expect(200)
+            .then(res => {
+                console.log(res.body.res);
+                expect(res.body.res).toHaveLength(1)
+            })
+    });
+
 });
 
 // auth bug fixes

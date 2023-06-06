@@ -557,6 +557,57 @@ create procedure sp_selectOrganisationList (in searchText varchar(64))
             select id, name, abbreviation, assetRole from organisation where inuse = 1 order by name;
         end if;
     end//
+
+create procedure sp_updateAssetAssetRef (in uid int, assetRef int)
+    begin
+        update asset
+        set assetRef = assetRef
+        where id = uid;
+
+        call sp_selectAsset(uid);
+    end//
+
+create procedure sp_selectAssetDescendant (in uid int)
+    begin
+
+        with descendants as
+            (
+                 select  a.id, a.assetRef from asset a where a.id = 1
+                    union all
+                select a.id, a.assetRef from asset a inner join asset c on a.assetRef = c.id
+            )
+
+            select distinct id, assetRef from descendants order by id;
+
+        -- with descendants as
+        --     (
+        --         select null id, uid assetRef, 0 as level
+        --             union
+        --                 select  a.id, a.assetRef , 1 as level from asset a where a.id = uid
+        --             union all
+        --                 select a.id, a.assetRef , c.level + 1 from asset a join asset c on a.id = c.assetRef
+        --     )
+
+        --     select distinct id, assetRef, level from descendants order by level, id;
+    end//
+
+-- DECLARE @parent varchar(10) = 'a';
+-- WITH cte AS
+-- (
+--   select null parent, @parent child, 0 as level
+--    union
+--   SELECT  a.parent, a.child , 1 as level
+--     FROM pc a
+--    WHERE a.parent = @parent
+--    UNION ALL
+--   SELECT a.parent, a.child , c.level +    1
+--     FROM pc a JOIN cte c ON a.parent = c.child
+-- )
+-- SELECT distinct parent, child , level
+--   FROM cte
+--  order by level, parent;
+
+
 -- ************************
 -- Roster Stored Procedures
 -- ************************

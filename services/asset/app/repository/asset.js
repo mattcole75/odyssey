@@ -120,12 +120,34 @@ const patchAssetLocationMap = (req, next) => {
         });
 };
 
+const patchAssetReallocate = (req, next) => {
+    const { idtoken, param } = req.headers;
+    const { values, rules } = req.body;
+
+    const sproc = " call sp_updateAssetAssetRef(" +
+        (param + ", ") +
+        (values.assetRef == null ? null +")" : values.assetRef + ")");
+    
+    console.log('sproc', sproc);
+    
+    axios.patch('/patch',
+        { rules: rules, sproc: sproc },
+        { headers: {'Content-Type': 'application/json', idtoken: idtoken } })
+        .then(res => {
+            next(null, res.data);
+        })
+        .catch(err => {
+            next(err.response.data, null);
+        });
+};
+
 module.exports = {
     postAsset: postAsset,
     getAssets: getAssets,
     getContainedAssets: getContainedAssets,
     getAsset: getAsset,
     patchAsset: patchAsset,
-    patchAssetLocationMap: patchAssetLocationMap
+    patchAssetLocationMap: patchAssetLocationMap,
+    patchAssetReallocate: patchAssetReallocate
 }
 

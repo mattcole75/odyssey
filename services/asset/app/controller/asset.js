@@ -135,11 +135,33 @@ const patchAssetLocationMap = (req, next) => {
     });
 };
 
+const patchAssetReallocate = (req, next) => {
+
+    const request = {
+        headers: req.headers,
+        body: {
+            rules: { roles: ['superuser', 'administrator'] },
+            values: req.body
+        }
+    };
+
+    repository.patchAssetReallocate(request, (err, res) => {
+        if(err) {
+            log.error(`status: ${ err.status } PATCH asset assetRef v${ version } result: ${ JSON.stringify(err) }`);
+            next(err, null);
+        } else {
+            log.info(`status: ${ res.status } PATCH asset assetRef v${ version }`);
+            next(null, res);
+        }
+    });
+};
+
 module.exports = {
     postAsset: postAsset,
     getAssets: getAssets,
     getContainedAssets: getContainedAssets,
     getAsset: getAsset,
     patchAsset: patchAsset,
-    patchAssetLocationMap: patchAssetLocationMap
+    patchAssetLocationMap: patchAssetLocationMap,
+    patchAssetReallocate: patchAssetReallocate
 }

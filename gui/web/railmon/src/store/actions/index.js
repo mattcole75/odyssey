@@ -29,5 +29,6 @@ export {
     assetCreateAsset,
     assetUpdateAsset,
     assetUpdateAssetLocationMap,
+    assetUpdateAssetAllocation,
     assetReset
 } from './asset';

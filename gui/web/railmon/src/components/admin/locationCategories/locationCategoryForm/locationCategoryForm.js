@@ -55,7 +55,7 @@ const LocationCategoryForm = (props) => {
                 </div>
 
                 <div className='form-floating'>
-                    <textarea className='form-control' id='description' placeholder='Asset Description' rows='3' required minLength={3} maxLength={256}  style={{height:'auto'}}
+                    <textarea className='form-control form-auth-ele-bot' id='description' placeholder='Asset Description' rows='3' required minLength={3} maxLength={256}  style={{height:'auto'}}
                         { ...register('description', {
                             required: 'You must provide a location category description',
                             minLength: {
@@ -106,7 +106,7 @@ const LocationCategoryForm = (props) => {
                         { locationCategory
                             ?   <li className='list-group-item d-flex justify-content-between lh-sm'>
                                     <div className='text-start'>
-                                        <h6 className='my-0'>Date Created</h6>
+                                        <p className='my-0'><small>Date Created</small></p>
                                         <small className='text-muted'>{moment(locationCategory.created).format('MMMM Do YYYY, h:mm:ss a')}</small>
                                     </div>
                                 </li>
@@ -115,7 +115,7 @@ const LocationCategoryForm = (props) => {
                         { locationCategory
                             ?   <li className='list-group-item d-flex justify-content-between lh-sm'>
                                     <div className='text-start'>
-                                        <h6 className='my-0'>Date Last Updated</h6>
+                                        <p className='my-0'><small>Date Last Updated</small></p>
                                         <small className='text-muted'>{moment(locationCategory.updated).format('MMMM Do YYYY, h:mm:ss a')}</small>
                                     </div>
                                 </li>

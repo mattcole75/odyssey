@@ -218,3 +218,25 @@ export const assetUpdateAssetLocationMap = (idToken, id, data, identifier) => {
         });
     };
 }
+
+export const assetUpdateAssetAllocation = (idToken, id, data, identifier) => {
+    return dispatch => {
+        dispatch(start());
+
+        asset.patch('/assetallocation', data, {
+            headers: {
+                idToken: idToken,
+                param: id
+            }
+        })
+        .then(res => {
+            dispatch(updateAssetSuccess(res.data.res, identifier));
+        })
+        .then(() => {
+            dispatch(finish());
+        })
+        .catch(err => {
+            dispatch(fail(whatIsTheErrorMessage(err))); 
+        });
+    };
+}

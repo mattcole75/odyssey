@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useParams, useNavigate } from 'react-router-dom';
 
-import { assetGetAsset, assetGetContainedAssets, assetUpdateAsset, assetCreateAsset, assetUpdateAssetLocationMap } from '../../../store/actions/index';
+import { assetGetAsset, assetGetContainedAssets, assetUpdateAsset, assetCreateAsset, assetUpdateAssetLocationMap, assetUpdateAssetAllocation } from '../../../store/actions/index';
 
 import { useForm } from 'react-hook-form';
 import ContainedAssets from './containedAssetList/containedAssetList';
@@ -16,6 +16,7 @@ import Spinner from '../../ui/spinner/spinner';
 
 import LocationEdit from './location/locationEdit';
 import AddAssetForm from './addAssetForm';
+import Reallocation from './reallocation/reallocation';
 
 import { capitalizeFirstLetter } from '../../../shared/utility';
 
@@ -33,12 +34,14 @@ const EditAssetForm = () => {
     const [ inuseStatus, setInuseStatus ] = useState(asset != null ? asset.inuse : true);
     const [ editingMap, setEditingMap ] = useState(false);
     const [ addingAsset, setAddingAsset ] = useState(false);
+    const [ reallocatingAsset, setReallocatingAsset ] = useState(false);
 
     const onGetAsset = useCallback((idToken, id, identifier) => dispatch(assetGetAsset(idToken, id, identifier)), [dispatch]);
     const onGetContainedAssets = useCallback((idToken, id, identifier) => dispatch(assetGetContainedAssets(idToken, id, identifier)), [dispatch]);
     const onUpdateAsset = useCallback((idToken, data, identifier) => dispatch(assetUpdateAsset(idToken, data, identifier)), [dispatch]);
     const onCreateAsset = useCallback((idToken, data, identifier) => dispatch(assetCreateAsset(idToken, data, identifier)), [dispatch]);
     const onUpdateLocationMap = useCallback((idToken, id, data, identifier) => dispatch(assetUpdateAssetLocationMap(idToken, id, data, identifier)), [dispatch]);
+    const onUpdateAssetAllocation = useCallback((idToken, id, data, identifier) => dispatch(assetUpdateAssetAllocation(idToken, id, data, identifier)), [dispatch]);
 
     const { register, reset, getValues, formState: { errors } } = useForm({ mode: 'onChange' });
 
@@ -52,11 +55,9 @@ const EditAssetForm = () => {
         setAddingAsset(prevState => !prevState);
     };
 
-    // useEffect(() => {
-    //     onGetOrganisations(idToken, 'GET_ORGS');
-    //     onGetLocationCategories(idToken, 'GET_LOCATION_CATEGORIES');
-
-    // }, [ idToken, onGetOrganisations, onGetLocationCategories ]);
+    const toggleAssetReallocation = () => {
+        setReallocatingAsset(prevState => !prevState);
+    };
     
     // load asset details on page refresh given an id
     useEffect(() => {
@@ -114,7 +115,10 @@ const EditAssetForm = () => {
         onUpdateLocationMap(idToken, id, { location: data }, 'PATCH_ASSET_LOCATION_MAP');
     }, [onUpdateLocationMap, id, idToken]);
 
-    
+    const patchAssetAllocation = useCallback((data) => {
+        onUpdateAssetAllocation(idToken, id, data, 'PATCH_ASSET_ALLOCATION');
+    }, [idToken, id, onUpdateAssetAllocation]);
+
     const toggleInuseStatus = () => {
         setInuseStatus(prevState => !prevState);
     }
@@ -152,6 +156,19 @@ const EditAssetForm = () => {
                     } />
     }
 
+    if(reallocatingAsset) {
+        modal = <Modal
+                    show={ reallocatingAsset }
+                    modalClosed={ toggleAssetReallocation }
+                    content={
+                        <Reallocation
+                            save={ patchAssetAllocation }
+                            parent={ asset.parent }
+                            toggle={ toggleAssetReallocation }
+                        />
+                    } />
+    }
+
     return (
         <div className='form-admin container'>
              <Backdrop show={ loading } />
@@ -182,25 +199,38 @@ const EditAssetForm = () => {
                         }
                     </div>
                     <div className='col-sm-6'>
-                        <div className='form-floating'>
-                            <input type='text' className='form-control form-auth-ele-top' id='name' placeholder='Asset name' autoComplete='off' required minLength={3} maxLength={50}
-                            { ...register('name', {
-                                required: 'You must specify an Asset Name',
-                                minLength: {
-                                    value: 3,
-                                    message: 'Asset Name must have at least 3 characters'
-                                },
-                                maxLength: {
-                                    value: 50,
-                                    message: 'Asset Name must have less than 50 characters'
-                                }
-                            }) }
-                            />
-                            <label htmlFor='name'>Asset Name</label>
+                        <div className='input-group'>
+                            <div className='form-floating col-sm-9'>
+                                <input type='text' className='form-control form-auth-ele-top' id='name' placeholder='Asset name' autoComplete='off' required minLength={3} maxLength={50}
+                                { ...register('name', {
+                                    required: 'You must specify an Asset Name',
+                                    minLength: {
+                                        value: 3,
+                                        message: 'Asset Name must have at least 3 characters'
+                                    },
+                                    maxLength: {
+                                        value: 50,
+                                        message: 'Asset Name must have less than 50 characters'
+                                    }
+                                }) }
+                                />
+                                <label htmlFor='name'>Asset Name</label>
+                            </div>
+
+                            <div className='col-sm-3'>
+                                <span className="input-group-text h-100 form-auth-ele-top-right" id="basic-addon1">ID: { id }</span>
+                            </div>
+
                         </div>
-                        <div className='form-floating'>
-                            <input type='text' className='form-control form-auth-ele-bot' id='assetRef' placeholder='Asset Reference' autoComplete='off' readOnly value={ asset && asset.parent ? asset.parent : 'Top Level Asset' } />
-                            <label htmlFor='assetRef'>Parent Asset</label>
+
+                        <div className='input-group mb-3'>  
+                            <div className='form-floating col-sm-9'>
+                                <input type='text' className='form-control form-auth-ele-bot-left mb-0' id='assetRef' placeholder='Asset Reference' autoComplete='off' readOnly value={ asset && asset.parent ? asset.parent : 'Top Level Asset' } />
+                                <label htmlFor='assetRef'>Parent Asset</label>
+                            </div>
+                            <div className='col-sm-3'>
+                                 <button className='form-control btn btn-outline-primary h-100 form-auth-ele-bot-right mb-0' type='button' onClick={ toggleAssetReallocation }>Reallocate</button>
+                            </div>
                         </div>
                     </div>
                     <div className='col-sm-6'>

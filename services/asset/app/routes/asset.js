@@ -68,4 +68,14 @@ module.exports = (app) => {
                 res.status(response.status).send(response);
         });
     });
+
+    app.patch('/' + service + '/api/' + version + '/assetallocation', (req, res) => {
+        res.set('Content-Type', 'application/json');
+        controller.patchAssetReallocate(req, (err, response) => {
+            if(err)
+                res.status(err.status).send(err);
+            else
+                res.status(response.status).send(response);
+        });
+    });
 };

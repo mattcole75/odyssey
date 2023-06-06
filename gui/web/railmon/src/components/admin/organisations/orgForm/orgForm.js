@@ -57,7 +57,7 @@ const OrgForm = (props) => {
                 </div>
 
                 <div className='form-floating'>
-                    <input type='text' className='form-control form-auth-ele-top' id='abbreviation' placeholder='Organisation abbreviation' autoComplete='off' required minLength={3} maxLength={4}
+                    <input type='text' className='form-control form-auth-ele-mid' id='abbreviation' placeholder='Organisation abbreviation' autoComplete='off' required minLength={3} maxLength={4}
                     { ...register('abbreviation', {
                         required: 'You must specify an Organisation Abbreviation',
                         minLength: {
@@ -123,7 +123,7 @@ const OrgForm = (props) => {
                         { organisation
                             ?   <li className='list-group-item d-flex justify-content-between lh-sm'>
                                     <div className='text-start'>
-                                        <h6 className='my-0'>Date Created</h6>
+                                        <p className='my-0'><small>Date Created</small></p>
                                         <small className='text-muted'>{moment(organisation.created).format('MMMM Do YYYY, h:mm:ss a')}</small>
                                     </div>
                                 </li>
@@ -132,7 +132,7 @@ const OrgForm = (props) => {
                         { organisation
                             ?   <li className='list-group-item d-flex justify-content-between lh-sm'>
                                     <div className='text-start'>
-                                        <h6 className='my-0'>Date Last Updated</h6>
+                                        <p className='my-0'><small>Date Last Updated</small></p>
                                         <small className='text-muted'>{moment(organisation.updated).format('MMMM Do YYYY, h:mm:ss a')}</small>
                                     </div>
                                 </li>
