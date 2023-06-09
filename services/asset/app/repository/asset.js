@@ -127,8 +127,23 @@ const patchAssetReallocate = (req, next) => {
     const sproc = " call sp_updateAssetAssetRef(" +
         (param + ", ") +
         (values.assetRef == null ? null +")" : values.assetRef + ")");
-    
-    console.log('sproc', sproc);
+        
+    axios.patch('/patch',
+        { rules: rules, sproc: sproc },
+        { headers: {'Content-Type': 'application/json', idtoken: idtoken } })
+        .then(res => {
+            next(null, res.data);
+        })
+        .catch(err => {
+            next(err.response.data, null);
+        });
+};
+
+const deleteAsset = (req, next) => {
+    const { idtoken, param } = req.headers;
+    const { rules } = req.body;
+
+    const sproc = " call sp_deleteAsset(" + param + ")";
     
     axios.patch('/patch',
         { rules: rules, sproc: sproc },
@@ -141,6 +156,32 @@ const patchAssetReallocate = (req, next) => {
         });
 };
 
+const reinstateAsset = (req, next) => {
+    const { idtoken, param } = req.headers;
+    const { rules } = req.body;
+
+    const sproc = " call sp_reinstateAsset(" + param + ")";
+
+    axios.get('/get',
+        { headers: {'Content-Type': 'application/json', idToken: idtoken, rules: JSON.stringify(rules), sproc: sproc } })
+        .then(res => {
+            next(null, res.data);
+        })
+        .catch(err => {
+            next(err.response.data, null);
+        });
+    
+    // axios.patch('/patch',
+    //     { rules: rules, sproc: sproc },
+    //     { headers: {'Content-Type': 'application/json', idtoken: idtoken } })
+    //     .then(res => {
+    //         next(null, res.data);
+    //     })
+    //     .catch(err => {
+    //         next(err.response.data, null);
+    //     });
+};
+
 module.exports = {
     postAsset: postAsset,
     getAssets: getAssets,
@@ -148,6 +189,8 @@ module.exports = {
     getAsset: getAsset,
     patchAsset: patchAsset,
     patchAssetLocationMap: patchAssetLocationMap,
-    patchAssetReallocate: patchAssetReallocate
+    patchAssetReallocate: patchAssetReallocate,
+    deleteAsset: deleteAsset,
+    reinstateAsset: reinstateAsset
 }
 

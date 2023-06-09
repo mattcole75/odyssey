@@ -222,8 +222,6 @@ const authorise = (req, authenticated, rules, next) => {
         return next({ status: 403, message: 'Forbidden' }, null);
     }
     
-    console.log('rules.roles', rules);
-    console.log('roles', roles);
     // if(role.every(r => roles.includes(r))) {
     if(rules.roles.every(r => roles.includes(r))) {
         // console.log('role compliance', roles, role);

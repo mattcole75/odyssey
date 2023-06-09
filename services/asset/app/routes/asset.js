@@ -78,4 +78,24 @@ module.exports = (app) => {
                 res.status(response.status).send(response);
         });
     });
+
+    app.patch('/' + service + '/api/' + version + '/assetdelete', (req, res) => {
+        res.set('Content-Type', 'application/json');
+        controller.deleteAsset(req, (err, response) => {
+            if(err)
+                res.status(err.status).send(err);
+            else
+                res.status(response.status).send(response);
+        });
+    });
+
+    app.patch('/' + service + '/api/' + version + '/assetreinstate', (req, res) => {
+        res.set('Content-Type', 'application/json');
+        controller.reinstateAsset(req, (err, response) => {
+            if(err)
+                res.status(err.status).send(err);
+            else
+                res.status(response.status).send(response);
+        });
+    });
 };

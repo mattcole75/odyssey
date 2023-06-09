@@ -133,7 +133,6 @@ describe('Asset Service Tests', () => {
             .expect('Content-Type', /json/)
             .expect(200)
             .then(res => {
-                console.log(res.body.res);
                 expect(res.body.res).toHaveLength(1)
             })
     });
@@ -2438,7 +2437,6 @@ describe('Asset Service Tests', () => {
             .expect('Content-Type', /json/)
             .expect(200)
             .then(res => {
-                console.log(res.body.res);
                 expect(res.body.res).toHaveLength(2)
             })
     });
@@ -2467,9 +2465,37 @@ describe('Asset Service Tests', () => {
             .expect('Content-Type', /json/)
             .expect(200)
             .then(res => {
-                console.log(res.body.res);
                 expect(res.body.res).toHaveLength(1)
             })
+    });
+
+    it('should, delete the asset and their descendants (update inuse to 0)', async () => {
+        await assetEndPoint.patch('/assetdelete')
+        .set({
+            idToken: idToken,
+            param: parentAssetRef
+        })
+        .set('Accept', 'application/json')
+        .expect('Content-Type', /json/)
+        .expect(200)
+        // .then(res => {
+        //     console.log(res.body);
+        //     expect(res.body.res).toHaveLength(0);
+        // })
+    });
+
+    it('should, reinstate the asset and their descendants (update inuse to 1)', async () => {
+        await assetEndPoint.patch('/assetreinstate')
+        .set({
+            idToken: idToken,
+            param: parentAssetRef
+        })
+        .set('Accept', 'application/json')
+        .expect('Content-Type', /json/)
+        .expect(200)
+        .then(res => {
+            expect(res.body.res).toHaveLength(1);
+        })
     });
 
 });

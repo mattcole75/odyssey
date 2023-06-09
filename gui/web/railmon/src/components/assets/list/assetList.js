@@ -5,9 +5,9 @@ import { capitalizeFirstLetter } from '../../../shared/utility';
 
 const Assets = (props) => {
 
-    const { assets } = props;
+    const { assets, toggleAssetDeleting } = props;
     const roles = useSelector(state => state.auth.roles);
-    
+
     return (
         <div className='container'>
             <hr className='mb-3' />
@@ -41,7 +41,7 @@ const Assets = (props) => {
                         <ul className='dropdown-menu fs-7'>
                             <li><Link className='dropdown-item' to={`/asset/${ item.id }`} >Open</Link></li>
                             { roles.includes('administrator')
-                                ?   <li><button type='button' className='dropdown-item' onClick={ () => {} }>Delete</button></li>
+                                ?   <li><button type='button' className='dropdown-item' onClick={ () => { toggleAssetDeleting(item.id) } }>Delete</button></li>
                                 :   null
                             }
                            

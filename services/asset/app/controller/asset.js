@@ -156,6 +156,44 @@ const patchAssetReallocate = (req, next) => {
     });
 };
 
+const deleteAsset = (req, next) => {
+    const request = {
+        headers: req.headers,
+        body: {
+            rules: { roles: ['administrator'] }
+        }
+    };
+
+    repository.deleteAsset(request, (err, res) => {
+        if(err) {
+            log.error(`status: ${ err.status } DELETE asset v${ version } result: ${ JSON.stringify(err) }`);
+            next(err, null);
+        } else {
+            log.info(`status: ${ res.status } DELETE asset v${ version }`);
+            next(null, res);
+        }
+    });
+};
+
+const reinstateAsset = (req, next) => {
+    const request = {
+        headers: req.headers,
+        body: {
+            rules: { roles: ['administrator'] }
+        }
+    };
+
+    repository.reinstateAsset(request, (err, res) => {
+        if(err) {
+            log.error(`status: ${ err.status } REINSTATE asset v${ version } result: ${ JSON.stringify(err) }`);
+            next(err, null);
+        } else {
+            log.info(`status: ${ res.status } REINSTATE asset v${ version }`);
+            next(null, res);
+        }
+    });
+};
+
 module.exports = {
     postAsset: postAsset,
     getAssets: getAssets,
@@ -163,5 +201,7 @@ module.exports = {
     getAsset: getAsset,
     patchAsset: patchAsset,
     patchAssetLocationMap: patchAssetLocationMap,
-    patchAssetReallocate: patchAssetReallocate
+    patchAssetReallocate: patchAssetReallocate,
+    deleteAsset: deleteAsset,
+    reinstateAsset: reinstateAsset
 }

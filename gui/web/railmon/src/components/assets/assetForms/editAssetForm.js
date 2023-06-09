@@ -18,6 +18,7 @@ import LocationEdit from './location/locationEdit';
 import AddAssetForm from './addAssetForm';
 import Reallocation from './reallocation/reallocation';
 
+
 import { capitalizeFirstLetter } from '../../../shared/utility';
 
 const EditAssetForm = () => {
@@ -35,6 +36,7 @@ const EditAssetForm = () => {
     const [ editingMap, setEditingMap ] = useState(false);
     const [ addingAsset, setAddingAsset ] = useState(false);
     const [ reallocatingAsset, setReallocatingAsset ] = useState(false);
+    
 
     const onGetAsset = useCallback((idToken, id, identifier) => dispatch(assetGetAsset(idToken, id, identifier)), [dispatch]);
     const onGetContainedAssets = useCallback((idToken, id, identifier) => dispatch(assetGetContainedAssets(idToken, id, identifier)), [dispatch]);
@@ -229,7 +231,7 @@ const EditAssetForm = () => {
                                 <label htmlFor='assetRef'>Parent Asset</label>
                             </div>
                             <div className='col-sm-3'>
-                                 <button className='form-control btn btn-outline-primary h-100 form-auth-ele-bot-right mb-0' type='button' onClick={ toggleAssetReallocation }>Reallocate</button>
+                                 <button className='form-control btn btn-outline-secondary h-100 form-auth-ele-bot-right mb-0' type='button' onClick={ toggleAssetReallocation }>Reallocate</button>
                             </div>
                         </div>
                     </div>

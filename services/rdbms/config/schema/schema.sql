@@ -399,13 +399,15 @@ create procedure sp_selectAssets (in searchText varchar(64))
             select a.id, b.name as owner, b.abbreviation as ownerAbbr, c.name as maintainer, c.abbreviation as maintainerAbbr, a.name, a.status from asset a
                 left outer join organisation b on a.ownedByRef = b.id
                 left outer join organisation c on a.maintainedByRef = c.id
-            where match(a.name, a.description, a.status) against(searchText in boolean mode)
+            where a.inuse = 1
+            and match(a.name, a.description, a.status) against(searchText in boolean mode)
             order by a.name;
         else
             select  a.id, b.name as owner, b.abbreviation as ownerAbbr, c.name as maintainer, c.abbreviation as maintainerAbbr, a.name, a.status from asset a
                 left outer join organisation b on a.ownedByRef = b.id
                 left outer join organisation c on a.maintainedByRef = c.id
-            where a.assetRef is null
+            where a.inuse = 1
+            and a.assetRef is null
             order by a.name;
         end if;
     end//
@@ -413,7 +415,8 @@ create procedure sp_selectAssets (in searchText varchar(64))
 create procedure sp_selectContainedAssets (in uid int)
     begin
         select id, name, status, locationType  from asset 
-        where assetRef = uid
+        where inuse = 1
+        and assetRef = uid
         order by name;
     end//
 
@@ -572,25 +575,44 @@ create procedure sp_selectAssetDescendant (in uid int)
 
         with descendants as
             (
-                 select  a.id, a.assetRef from asset a where a.id = 1
+                 select  a.id, a.assetRef from asset a where a.id = uid
                     union all
                 select a.id, a.assetRef from asset a inner join asset c on a.assetRef = c.id
             )
 
             select distinct id, assetRef from descendants order by id;
 
-        -- with descendants as
-        --     (
-        --         select null id, uid assetRef, 0 as level
-        --             union
-        --                 select  a.id, a.assetRef , 1 as level from asset a where a.id = uid
-        --             union all
-        --                 select a.id, a.assetRef , c.level + 1 from asset a join asset c on a.id = c.assetRef
-        --     )
-
-        --     select distinct id, assetRef, level from descendants order by level, id;
     end//
 
+create procedure sp_deleteAsset (in uid int)
+    begin
+
+        with descendants as
+            (
+                select  a.id, a.assetRef from asset a where a.id = uid
+                union all
+                select a.id, a.assetRef from asset a inner join asset c on a.assetRef = c.id
+            )
+
+            update asset set inuse = 0 where id in (select distinct id from descendants order by id);
+            
+            call sp_selectAssets('');
+    end//
+
+create procedure sp_reinstateAsset (in uid int)
+    begin
+
+        with descendants as
+            (
+                select  a.id, a.assetRef from asset a where a.id = uid
+                union all
+                select a.id, a.assetRef from asset a inner join asset c on a.assetRef = c.id
+            )
+
+            update asset set inuse = 1 where id in (select distinct id from descendants order by id);
+            
+            call sp_selectAssets('');
+    end//
 -- DECLARE @parent varchar(10) = 'a';
 -- WITH cte AS
 -- (

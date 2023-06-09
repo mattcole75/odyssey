@@ -38,16 +38,15 @@ const createAssetSuccess = (id, asset, identifier) => {
         id: id,
         asset: asset,
         identifier: identifier
-    }
-    
-};
+    };
+}
 
 const updateAssetSuccess = (asset, identifier) => {
     return {
         type: actionType.ASSET_UPDATE_ASSET_SUCCESS,
         asset: asset,
         identifier: identifier
-    }
+    };
 }
 
 const finish = () => {
@@ -231,6 +230,31 @@ export const assetUpdateAssetAllocation = (idToken, id, data, identifier) => {
         })
         .then(res => {
             dispatch(updateAssetSuccess(res.data.res, identifier));
+        })
+        .then(() => {
+            dispatch(finish());
+        })
+        .catch(err => {
+            dispatch(fail(whatIsTheErrorMessage(err))); 
+        });
+    };
+}
+
+export const assetDeleteAsset = (idToken, id, identifier) => {
+    return dispatch => {
+        dispatch(start());
+
+        const config = {
+            headers: {
+                'content-type': 'application/json',
+                idToken: idToken,
+                param: id
+            }
+        };
+
+        asset.patch('/assetdelete', {}, config)
+        .then(res => {
+            dispatch(getAssetsSuccess(res.data.res, identifier));
         })
         .then(() => {
             dispatch(finish());
