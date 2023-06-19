@@ -6,7 +6,7 @@ const service = config.get('service');
 const express = require('./config/express');
 
 
-const PORT = process.env.PORT || 1337;
+const PORT = process.env.HTTP_PORT || 1337;
 
 const app = express();
 
