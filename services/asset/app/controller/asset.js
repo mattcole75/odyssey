@@ -194,6 +194,25 @@ const reinstateAsset = (req, next) => {
     });
 };
 
+const deleteContainedAsset = (req, next) => {
+    const request = {
+        headers: req.headers,
+        body: {
+            rules: { roles: ['administrator'] }
+        }
+    };
+
+    repository.deleteContainedAsset(request, (err, res) => {
+        if(err) {
+            log.error(`status: ${ err.status } DELETE contained asset v${ version } result: ${ JSON.stringify(err) }`);
+            next(err, null);
+        } else {
+            log.info(`status: ${ res.status } DELETE contained asset v${ version }`);
+            next(null, res);
+        }
+    });
+};
+
 module.exports = {
     postAsset: postAsset,
     getAssets: getAssets,
@@ -203,5 +222,6 @@ module.exports = {
     patchAssetLocationMap: patchAssetLocationMap,
     patchAssetReallocate: patchAssetReallocate,
     deleteAsset: deleteAsset,
-    reinstateAsset: reinstateAsset
+    reinstateAsset: reinstateAsset,
+    deleteContainedAsset: deleteContainedAsset
 }

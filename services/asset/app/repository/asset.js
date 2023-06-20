@@ -62,6 +62,7 @@ const getContainedAssets = (req, next) => {
     axios.get('/get',
         { headers: {'Content-Type': 'application/json', idToken: idtoken, rules: JSON.stringify(rules), sproc: sproc } })
         .then(res => {
+            console.log('MCd', res.data);
             next(null, res.data);
         })
         .catch(err => {
@@ -182,6 +183,35 @@ const reinstateAsset = (req, next) => {
     //     });
 };
 
+const deleteContainedAsset = (req, next) => {
+    const { idtoken, param, query } = req.headers;
+    const { rules } = req.body;
+
+    const sproc = " call sp_deleteContainedAsset(" + param + "," + query + ")";
+
+    axios.get('/get',
+        { headers: {'Content-Type': 'application/json', idToken: idtoken, rules: JSON.stringify(rules), sproc: sproc } })
+        .then(res => {
+            next(null, res.data);
+        })
+        .catch(err => {
+            next(err.response.data, null);
+        });
+
+    // console.log('MCb', sproc);
+    
+    // axios.get('/get',
+    //     { rules: rules, sproc: sproc },
+    //     { headers: {'Content-Type': 'application/json', idtoken: idtoken } })
+    //     .then(res => {
+    //         console.log('MCc', res.data);
+    //         next(null, res.data);
+    //     })
+    //     .catch(err => {
+    //         next(err.response.data, null);
+    //     });
+};
+
 module.exports = {
     postAsset: postAsset,
     getAssets: getAssets,
@@ -191,6 +221,7 @@ module.exports = {
     patchAssetLocationMap: patchAssetLocationMap,
     patchAssetReallocate: patchAssetReallocate,
     deleteAsset: deleteAsset,
-    reinstateAsset: reinstateAsset
+    reinstateAsset: reinstateAsset,
+    deleteContainedAsset: deleteContainedAsset
 }
 

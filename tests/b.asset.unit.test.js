@@ -2498,6 +2498,36 @@ describe('Asset Service Tests', () => {
         })
     });
 
+    it('should, delete a contained asset as part of the containing assets functionality', async () => {
+        await assetEndPoint.patch('/containedassetdelete')
+        .set({
+            idToken: idToken,
+            param: parentAssetRef2,
+            query: parentAssetRef
+        })
+        .set('Accept', 'application/json')
+        .expect('Content-Type', /json/)
+        .expect(200)
+        // .then(res => {
+        //     // console.log(res.body);
+        //     // expect(res.body.res).toHaveLength(0);
+        // })
+    });
+
+    it('should, reinstate the asset and their descendants (update inuse to 1)', async () => {
+        await assetEndPoint.patch('/assetreinstate')
+        .set({
+            idToken: idToken,
+            param: parentAssetRef2
+        })
+        .set('Accept', 'application/json')
+        .expect('Content-Type', /json/)
+        .expect(200)
+        .then(res => {
+            expect(res.body.res).toHaveLength(1);
+        })
+    });
+
 });
 
 // auth bug fixes

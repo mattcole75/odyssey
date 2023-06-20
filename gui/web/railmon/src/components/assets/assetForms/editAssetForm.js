@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useParams, useNavigate } from 'react-router-dom';
 
-import { assetGetAsset, assetGetContainedAssets, assetUpdateAsset, assetCreateAsset, assetUpdateAssetLocationMap, assetUpdateAssetAllocation } from '../../../store/actions/index';
+import { assetGetAsset, assetGetContainedAssets, assetUpdateAsset, assetCreateAsset, assetUpdateAssetLocationMap, assetUpdateAssetAllocation, assetDeleteContainedAsset } from '../../../store/actions/index';
 
 import { useForm } from 'react-hook-form';
 import ContainedAssets from './containedAssetList/containedAssetList';
@@ -17,6 +17,7 @@ import Spinner from '../../ui/spinner/spinner';
 import LocationEdit from './location/locationEdit';
 import AddAssetForm from './addAssetForm';
 import Reallocation from './reallocation/reallocation';
+import DeleteAssetForm from './deleteAssetForm';
 
 
 import { capitalizeFirstLetter } from '../../../shared/utility';
@@ -36,6 +37,8 @@ const EditAssetForm = () => {
     const [ editingMap, setEditingMap ] = useState(false);
     const [ addingAsset, setAddingAsset ] = useState(false);
     const [ reallocatingAsset, setReallocatingAsset ] = useState(false);
+    const [ deletingAssetId, setDeletingAssetId ] = useState(null);
+    const [ deletingAsset, setDeletingAsset ] = useState(false);
     
 
     const onGetAsset = useCallback((idToken, id, identifier) => dispatch(assetGetAsset(idToken, id, identifier)), [dispatch]);
@@ -44,6 +47,7 @@ const EditAssetForm = () => {
     const onCreateAsset = useCallback((idToken, data, identifier) => dispatch(assetCreateAsset(idToken, data, identifier)), [dispatch]);
     const onUpdateLocationMap = useCallback((idToken, id, data, identifier) => dispatch(assetUpdateAssetLocationMap(idToken, id, data, identifier)), [dispatch]);
     const onUpdateAssetAllocation = useCallback((idToken, id, data, identifier) => dispatch(assetUpdateAssetAllocation(idToken, id, data, identifier)), [dispatch]);
+    const onDeleteContainedAsset = useCallback((idToken, id, containingID, identifier) => dispatch(assetDeleteContainedAsset(idToken, id, containingID, identifier)), [dispatch]);
 
     const { register, reset, getValues, formState: { errors } } = useForm({ mode: 'onChange' });
 
@@ -60,6 +64,11 @@ const EditAssetForm = () => {
     const toggleAssetReallocation = () => {
         setReallocatingAsset(prevState => !prevState);
     };
+
+    const toggleAssetDeleting = (id) => {
+        setDeletingAssetId(id);
+        setDeletingAsset(prevState => !prevState);
+    };
     
     // load asset details on page refresh given an id
     useEffect(() => {
@@ -75,6 +84,8 @@ const EditAssetForm = () => {
         if(identifier === 'POST_CONTAINED_ASSET') {
             onGetContainedAssets(idToken, id, 'GET_CHILD_ASSETS');
             toggleAssetAdding();
+        } else if (identifier === 'DELETE_ASSET') {
+            toggleAssetDeleting();
         }
             
     }, [id, idToken, identifier, onGetContainedAssets]);
@@ -120,6 +131,10 @@ const EditAssetForm = () => {
     const patchAssetAllocation = useCallback((data) => {
         onUpdateAssetAllocation(idToken, id, data, 'PATCH_ASSET_ALLOCATION');
     }, [idToken, id, onUpdateAssetAllocation]);
+
+    const deleteContainedAsset = useCallback(() => {
+        onDeleteContainedAsset(idToken, deletingAssetId, id,  'DELETE_ASSET');
+    }, [deletingAssetId, idToken, id, onDeleteContainedAsset]);
 
     const toggleInuseStatus = () => {
         setInuseStatus(prevState => !prevState);
@@ -170,6 +185,19 @@ const EditAssetForm = () => {
                         />
                     } />
     }
+
+    if(deletingAsset) {
+        modal = <Modal
+                    show={ deletingAsset }
+                    modalClosed={ toggleAssetDeleting }
+                    content={
+                        <DeleteAssetForm
+                            id={ deletingAssetId }
+                            deleteAsset={ deleteContainedAsset }
+                            toggle={ toggleAssetDeleting }
+                        />
+                    } />
+    }    
 
     return (
         <div className='form-admin container'>
@@ -450,7 +478,7 @@ const EditAssetForm = () => {
                                     onClick={ toggleAssetAdding }>Add Asset</button>
                             </div>
                             <div className='mb-3'>
-                                <ContainedAssets assets={ containedAssets } />
+                                <ContainedAssets assets={ containedAssets } toggle={ toggleAssetDeleting } />
                             </div>
                         </div>
                     

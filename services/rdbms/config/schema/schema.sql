@@ -587,29 +587,46 @@ create procedure sp_selectAssetDescendant (in uid int)
 create procedure sp_deleteAsset (in uid int)
     begin
 
-        with descendants as
-            (
-                select  a.id, a.assetRef from asset a where a.id = uid
-                union all
-                select a.id, a.assetRef from asset a inner join asset c on a.assetRef = c.id
-            )
+        with recursive descendants (id, assetRef) as (
+	        select id, assetRef from asset where id = uid
+	        union
+	        select id, assetRef from asset where assetRef = uid
+	        union all
+	        select a.id, a.assetRef from asset a inner join descendants on a.assetRef = descendants.id
+        )
 
-            update asset set inuse = 0 where id in (select distinct id from descendants order by id);
+        update asset set inuse = 0 where id in (select distinct id from descendants);
             
             call sp_selectAssets('');
+    end//
+
+create procedure sp_deleteContainedAsset (in uid int, containingId int)
+    begin
+        with recursive descendants (id, assetRef) as (
+	        select id, assetRef from asset where id = uid
+	        union
+	        select id, assetRef from asset where assetRef = uid
+	        union all
+	        select a.id, a.assetRef from asset a inner join descendants on a.assetRef = descendants.id
+        )
+
+        update asset set inuse = 0 where id in (select distinct id from descendants);
+            
+        call sp_selectContainedAssets(containingId);
     end//
 
 create procedure sp_reinstateAsset (in uid int)
     begin
 
-        with descendants as
-            (
-                select  a.id, a.assetRef from asset a where a.id = uid
-                union all
-                select a.id, a.assetRef from asset a inner join asset c on a.assetRef = c.id
-            )
+        with recursive descendants (id, assetRef) as (
+	        select id, assetRef from asset where id = uid
+	        union
+	        select id, assetRef from asset where assetRef = uid
+	        union all
+	        select a.id, a.assetRef from asset a inner join descendants on a.assetRef = descendants.id
+        )
 
-            update asset set inuse = 1 where id in (select distinct id from descendants order by id);
+        update asset set inuse = 1 where id in (select distinct id from descendants);
             
             call sp_selectAssets('');
     end//

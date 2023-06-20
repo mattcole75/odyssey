@@ -34,20 +34,20 @@ const Assets = (props) => {
                                 <td className='item-code'>{item.maintainerAbbr}</td>
                                 <td ><div className='col-truncate'>{capitalizeFirstLetter(item.status)}</div></td>
                                 <td className='ps-3 pe-3'>
-                    <div className='dropdown'>
-                        <div className='' role='button' data-bs-toggle='dropdown' aria-expanded='false'>
-                            <span className='bi-three-dots-vertical fs-7' />
-                        </div>
-                        <ul className='dropdown-menu fs-7'>
-                            <li><Link className='dropdown-item' to={`/asset/${ item.id }`} >Open</Link></li>
-                            { roles.includes('administrator')
-                                ?   <li><button type='button' className='dropdown-item' onClick={ () => { toggleAssetDeleting(item.id) } }>Delete</button></li>
-                                :   null
-                            }
-                           
-                        </ul>
-                    </div>
-                </td>
+                                    <div className='dropdown'>
+                                        <div className='' role='button' data-bs-toggle='dropdown' aria-expanded='false'>
+                                            <span className='bi-three-dots-vertical fs-7' />
+                                        </div>
+                                        <ul className='dropdown-menu fs-7'>
+                                            <li><Link className='dropdown-item' to={`/asset/${ item.id }`} >Open</Link></li>
+                                            { roles.includes('administrator')
+                                                ?   <li><button type='button' className='dropdown-item' onClick={ () => { toggleAssetDeleting(item.id) } }>Delete</button></li>
+                                                :   null
+                                            }
+                                        
+                                        </ul>
+                                    </div>
+                                </td>
                             </tr>
                         ))}
                     </tbody>

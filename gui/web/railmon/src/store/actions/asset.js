@@ -264,3 +264,30 @@ export const assetDeleteAsset = (idToken, id, identifier) => {
         });
     };
 }
+
+export const assetDeleteContainedAsset = (idToken, id, containingId, identifier) => {
+    return dispatch => {
+        dispatch(start());
+
+        const config = {
+            headers: {
+                'content-type': 'application/json',
+                idToken: idToken,
+                param: id,
+                query: containingId
+            }
+        };
+
+        asset.patch('/containedassetdelete', {}, config)
+        .then(res => {
+            console.log('MCa', res.data.res);
+            dispatch(getContainedAssetsSuccess(res.data.res, identifier));
+        })
+        .then(() => {
+            dispatch(finish());
+        })
+        .catch(err => {
+            dispatch(fail(whatIsTheErrorMessage(err))); 
+        });
+    };
+}

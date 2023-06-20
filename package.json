@@ -12,7 +12,7 @@
     "sparkDbInit1": "echo \"db.createCollection('sensorData', { 'timeseries': {timeField: 'timestamp', metaField: 'id', granularity: 'minutes'}, expireAfterSeconds: 31536000})\" | mongosh spark",
     "sparkDbInit2": "echo \"db.createCollection('pointData', { 'timeseries': {timeField: 'timestamp', metaField: 'id', granularity: 'minutes'}, expireAfterSeconds: 31536000})\" | mongosh spark",
     "sparkTest": "echo 'db.sensorData.deleteMany({})' | mongosh spark && jest ./tests/c.spark.unit.test.js --runInBand",
-    "adminTest": "echo 'db.organisations.deleteMany({}), db.locationCategories.deleteMany({})' | mongosh administration && jest ./tests/d.admin.unit.test.js --runInBand"
+    "adminTest": "jest ./tests/d.admin.unit.test.js --runInBand"
   },
   "keywords": [
     "asset register"

@@ -98,4 +98,14 @@ module.exports = (app) => {
                 res.status(response.status).send(response);
         });
     });
+
+    app.patch('/' + service + '/api/' + version + '/containedassetdelete', (req, res) => {
+        res.set('Content-Type', 'application/json');
+        controller.deleteContainedAsset(req, (err, response) => {
+            if(err)
+                res.status(err.status).send(err);
+            else
+                res.status(response.status).send(response);
+        });
+    });
 };
