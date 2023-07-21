@@ -41,7 +41,7 @@ const authenticate = (req, next) => {
         }));
 }
 
-const patchToken = (req, next) => {
+const patchToken = (req, next) => { 
 
     const { idToken, lastLoggedIn } = req;
 

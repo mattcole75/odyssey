@@ -191,7 +191,7 @@ const logout = (req, next) => {
         const params = { localId: localid, idToken: idtoken};
         auth.removeToken(params, (err, res) => {
             if(err) {
-                log.error(`POST v${version} - failed - getUser - status: ${err.status} msg: ${err.msg}`);
+                log.error(`POST v${version} - failed - logout - status: ${err.status} msg: ${err.msg}`);
                 next(err, null);
             } else {
                 next(null, res);
