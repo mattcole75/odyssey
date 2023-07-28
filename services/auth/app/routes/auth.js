@@ -1,26 +1,35 @@
 const config = require('../../configuration/config');
 const service = config.get('service');
 const version = config.get('version');
-const auth = require('../controller/auth');
+const con = require('../controller/auth');
 
 module.exports = (app) => {
 
     app.get('/' + service + '/api/' + version, (req, res) => {
-        res.status(200).send({'msg': 'Server is up!'});
+        res.status(200).send({'msg': 'service is up!'});
     });
 
     app.post('/' + service + '/api/' + version + '/user', (req, res) => {
-        auth.postUser(req, (err, user) => {
+        con.userPostUser(req, (err, result) => {
             res.set('Content-Type', 'application/json');
             if(err)
                 res.status(err.status).send(err);
             else
-                res.status(user.status).send(user);
+                res.status(result.status).send(result);
+        });
+    });
+
+    app.patch('/' + service + '/api/' + version + '/verifyemail', (req, res) => {
+        con.userPatchUserEmailVerified(req, (err, result) => {
+            if(err)
+                res.status(err.status).send(err);
+            else
+                res.status(result.status).send(result);
         });
     });
 
     app.post('/' + service + '/api/' + version + '/user/login', (req, res) => {
-        auth.login(req, (err, auth) => {
+        con.userLoginUser(req, (err, auth) => {
             res.set('Content-Type', 'application/json');
             if(err)
                 res.status(err.status).send(err);
@@ -29,62 +38,19 @@ module.exports = (app) => {
         });
     });
 
-    app.get('/' + service + '/api/' + version + '/user', (req, res) => {
-        res.set('Content-Type', 'application/json');
-
-        const rules = {
-            roles: ['user', 'administrator'],
-            allowSameUser: true
-        }
-
-        auth.isAuthenticated(req, rules, (err) => {
-            if(err)
-                res.status(err.status).send(err);
-            else {
-                auth.getUser(req, (err, user) => {
-                    if(err)
-                        res.status(err.status).send(err);
-                    else
-                        res.status(user.status).send(user);
-                });
-            }
-        });
-    });
-
-    app.get('/' + service + '/api/' + version + '/users', (req, res) => {
-        res.set('Content-Type', 'application/json');
-
-        const rules = {
-            roles: ['administrator']
-        }
-
-        auth.isAuthenticated(req, rules, (err) => {
-            if(err)
-                res.status(err.status).send(err);
-            else {
-                auth.getUsers(req, (err, users) => {
-                    if(err)
-                        res.status(err.status).send(err);
-                    else
-                        res.status(users.status).send(users);
-                });
-            }
-        });
-    });
-
     app.post('/' + service + '/api/' + version + '/user/logout', (req, res) => {
         res.set('Content-Type', 'application/json');
 
         const rules = {
-            roles: ['user', 'administrator'],
+            roles: ['user'],
             allowSameUser: true
         }
 
-        auth.isAuthenticated(req, rules, (err) => {
+        con.isAuthenticated(req, rules, (err) => {
             if(err)
                 res.status(err.status).send(err);
             else {
-                auth.logout(req, (err, auth) => {
+                con.userLogoutUser(req, (err, auth) => {
                     if(err)
                         res.status(err.status).send(err);
                     else
@@ -94,19 +60,41 @@ module.exports = (app) => {
         });
     });
 
+    app.get('/' + service + '/api/' + version + '/user', (req, res) => {
+        res.set('Content-Type', 'application/json');
+
+        const rules = {
+            roles: ['user'],
+            allowSameUser: true
+        }
+
+        con.isAuthenticated(req, rules, (err) => {
+            if(err)
+                res.status(err.status).send(err);
+            else {
+                con.userGetUser(req, (err, user) => {
+                    if(err)
+                        res.status(err.status).send(err);
+                    else
+                        res.status(user.status).send(user);
+                });
+            }
+        });
+    });
+
     app.patch('/' + service + '/api/' + version + '/user/displayname', (req, res) => {
         res.set('Content-Type', 'application/json');
 
         const rules = {
-            roles: ['user', 'administrator'],
+            roles: ['user'],
             allowSameUser: true
         }
 
-        auth.isAuthenticated(req, rules, (err) => {
+        con.isAuthenticated(req, rules, (err) => {
             if(err)
                 res.status(err.status).send(err);
             else {
-                auth.patchUserDisplayName(req, (err, user) => {
+                con.userPatchUserDisplayName(req, (err, user) => {
                     if(err)
                         res.status(err.status).send(err);
                     else
@@ -120,15 +108,15 @@ module.exports = (app) => {
         res.set('Content-Type', 'application/json');
 
         const rules = {
-            roles: ['user', 'administrator'],
+            roles: ['user'],
             allowSameUser: true
         }
 
-        auth.isAuthenticated(req, rules, (err) => {
+        con.isAuthenticated(req, rules, (err) => {
             if(err)
                 res.status(err.status).send(err);
             else {
-                auth.patchUserEmail(req, (err, user) => {
+                con.userPatchUserEmail(req, (err, user) => {
                     if(err)
                         res.status(err.status).send(err);
                     else
@@ -142,19 +130,50 @@ module.exports = (app) => {
         res.set('Content-Type', 'application/json');
 
         const rules = {
-            roles: ['user', 'administrator'],
+            roles: ['user'],
             allowSameUser: true
         }
 
-        auth.isAuthenticated(req, rules, (err) => {
+        con.isAuthenticated(req, rules, (err) => {
             if(err)
                 res.status(err.status).send(err);
             else {
-                auth.patchUserPassword(req, (err, user) => {
+                con.userPatchUserPassword(req, (err, user) => {
                     if(err)
                         res.status(err.status).send(err);
                     else
                         res.status(user.status).send(user);
+                });
+            }
+        });
+    });
+
+    app.post('/' + service + '/api/' + version + '/user/forgottenpassword', (req, res) => {
+        con.userPostUserForgottenPassword(req, (err, result) => {
+            res.set('Content-Type', 'application/json');
+            if(err)
+                res.status(err.status).send(err);
+            else
+                res.status(result.status).send(result);
+        });
+    });
+
+    app.get('/' + service + '/api/' + version + '/admin/users', (req, res) => {
+        res.set('Content-Type', 'application/json');
+
+        const rules = {
+            roles: ['administrator']
+        }
+
+        con.isAuthenticated(req, rules, (err) => {
+            if(err)
+                res.status(err.status).send(err);
+            else {
+                con.adminGetUsers(req, (err, users) => {
+                    if(err)
+                        res.status(err.status).send(err);
+                    else
+                        res.status(users.status).send(users);
                 });
             }
         });
@@ -167,11 +186,11 @@ module.exports = (app) => {
             roles: ['administrator']
         }
 
-        auth.isAuthenticated(req, rules, (err) => {
+        con.isAuthenticated(req, rules, (err) => {
             if(err)
                 res.status(err.status).send(err);
             else {
-                auth.patchAdminUser(req, (err, user) => {
+                con.adminPatchUser(req, (err, user) => {
                     if(err)
                         res.status(err.status).send(err);
                     else
@@ -181,31 +200,10 @@ module.exports = (app) => {
         });
     });
 
-    // app.patch('/' + service + '/api/' + version + '/user/role', (req, res) => {
-    //     res.set('Content-Type', 'application/json');
-
-    //     const rules = {
-    //         roles: ['administrator']
-    //     }
-
-    //     auth.isAuthenticated(req, rules, (err) => {
-    //         if(err)
-    //             res.status(err.status).send(err);
-    //         else {
-    //             auth.patchUserRole(req, (err, user) => {
-    //                 if(err)
-    //                     res.status(err.status).send(err);
-    //                 else
-    //                     res.status(user.status).send(user);
-    //             });
-    //         }
-    //     });
-    // });
-
     app.post('/' + service + '/api/' + version + '/approvetransaction', (req, res) => {
         // will not authenticate user as the function is only checking the token
         // must check the rules of the requesting API endpoint
-        auth.approveTransaction(req, (err, token) => {
+        con.approveTransaction(req, (err, token) => {
             res.set('Content-Type', 'application/json');
             if(err)
                 res.status(err.status).send(err);

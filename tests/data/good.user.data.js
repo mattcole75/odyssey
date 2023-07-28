@@ -33,7 +33,7 @@ const users = [
             displayName: 'Fitz Farseer',
             email: 'fitz.farseer@system.com',
             password: '1234abcd!',
-            roles: ['user', 'super user'],
+            roles: ['user'],
             localId: '',
             idToken: ''
         },
@@ -42,7 +42,7 @@ const users = [
             displayName: 'Tony Ezekiel',
             email: 'tony.ezekiel@system.com',
             password: '1234abcd!',
-            roles: ['user', 'super user'],
+            roles: ['user'],
             localId: '',
             idToken: ''
         },
@@ -85,7 +85,7 @@ const users = [
         {
             desription: 'create user, sysadmin',
             displayName: 'sysadmin',
-            email: 'mcole.uk@gmail.com',
+            email: 'admin@system.com',
             password: '1234abcd!',
             roles: ['user', 'administrator'],
             localId: '',

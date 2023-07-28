@@ -1,204 +1,14 @@
-const auth = require('../repository/auth');
+const repo = require('../repository/auth');
 const log = require('../../utility/logger')();
 const crypto = require('crypto');
 const config = require('../../configuration/config');
 const version = config.get('version');
 const validate = require('../../validation/validate');
-const { postUserRules, postLoginRules, getUserRules, postLogoutRules, getTokenRules, patchUserDisplayNameRules, patchUserEmailRules, patchUserPasswordRules, patchUserRoleRules, testTokenRules, patchAdminUserRules } = require('../../validation/rules');
+const validationRules = require('../../validation/rules');
 const moment = require('moment');
 const { genHash, genToken } = require('../../utility/auth');
 const { ObjectId } = require('mongodb');
 const adminEmail = config.get('adminEmail');
-
-
-const postUser = (req, next) => {
-
-    const errors = validate(req.body, postUserRules);
-
-    if(errors.length > 0) {
-        log.error(`POST v${version} - validation failure - postUser - status: 400, msg: ${errors}`);
-        next({status: 400, msg: 'Bad request - validation failure'}, null);
-    } else {
-
-        const salt = crypto.randomBytes(256);
-        const hash = genHash(req.body.password, salt);
-
-        auth.postUser(
-            {   ...req.body,
-                password: hash,
-                salt: salt.toString('hex'),
-                inuse: true,
-                lastLoggedIn: null,
-                logInCount: 0,
-                roles: ['user'],
-                updated: moment().format(),
-                created: moment().format()
-            },
-            (err, user) => {
-            if(err) {
-                log.error(`POST v${version} - failed - postUser - status: ${err.status} msg: ${err.msg}`);
-                next(err, null);
-            }
-            else {
-                auth.authenticate(req.body, (err, result) => {
-                    if(err) {
-                        log.error(`POST v${version} - failed - login - status: 400, msg: ${err.msg}`);
-                        next(err, null);
-                    } else {
-                        const params = { localId: result.data._id, idToken: genToken(), lastLoggedIn: moment().format()};
-                        auth.patchToken(params, (err, idToken) => {
-                            if(err) {
-                                log.error(`POST v${version} - failed - login - status: ${err.status} msg: ${err.msg}`);
-                                next(err, null);
-                            } else {
-                                next(null, {
-                                    status: user.status,
-                                    user: {
-                                        localId: result.data._id,
-                                        displayName: result.data.displayName,
-                                        email: result.data.email,
-                                        idToken: idToken.idToken,
-                                        roles: result.data.roles,
-                                        expiresIn: 3600
-                                    }
-                                });
-                            }
-                        });
-        
-                    }
-                });
-
-                // log.info(`POST v${version} - success - postuser - status: ${user.status}`);
-                //next(null, user);
-            }
-        });
-    }
-}
-
-const login = (req, next) => {
-
-    const errors = validate(req.body, postLoginRules);
-
-    if(errors.length > 0) {
-        log.error(`POST v${version} - validation failure - login - status: 400 msg: ${errors}`);
-        next({status: 400, msg: 'Bad request - validation failure'}, null);
-    } else {
-        auth.authenticate(req.body, (err, result) => {
-            if(err) {
-                log.error(`POST v${version} - failed - login - status: 400, msg: ${err.msg}`);
-                next(err, null);
-            } else {
-                const params = { localId: result.data._id, idToken: genToken(), lastLoggedIn: moment().format()};
-                auth.patchToken(params, (err, idToken) => {
-                    if(err) {
-                        log.error(`POST v${version} - failed - login - status: ${err.status} msg: ${err.msg}`);
-                        next(err, null);
-                    } else {
-                        next(null, {
-                            status: result.status,
-                            user: {
-                                idToken: idToken.idToken,
-                                localId: result.data._id,
-                                displayName: result.data.displayName,
-                                email: result.data.email,
-                                roles: result.data.roles,
-                                expiresIn: 3600
-                            }
-                        });
-                    }
-                });
-
-            }
-        });
-    }
-}
-
-const getUser = (req, next) => {
-
-    const { localid, idtoken } = req.headers;
-
-    let errors = [];
-
-    if(localid && localid != null && idtoken && idtoken != null) {
-        errors = validate(req.headers, getUserRules);
-    } else {
-        log.error(`POST v${version} - validation failure - getUser - status: 400, msg: request header parameters missing`);
-        return next({status: 400, msg: 'Bad request - validation failure'}, null);
-    }
-    
-    if(errors.length > 0) {
-        log.error(`POST v${version} - validation failure - getUser - status: 400, msg: ${errors}`);
-        next({status: 400, msg: 'Bad request - validation failure'}, null);
-    } else {
-        auth.getUser(req.headers, (err, result) => {
-            if(err) {
-                log.error(`POST v${version} - failed - getUser - status: ${err.status} msg: ${err.msg}`);
-                next(err, null);
-            } else {
-                next(null, {
-                    status: result.status,
-                    user: {
-                        localId: result.data._id,
-                        displayName: result.data.displayName,
-                        email: result.data.email,
-                        roles: result.data.roles
-                    }
-                });
-            }
-        });
-    }
-}
-
-const getUsers = (req, next) => {
-
-    const { localid, idtoken, query } = req.headers;
-
-    let errors = [];
-
-    if(localid && localid != null && idtoken && idtoken != null) {
-        errors = validate(req.headers, getUserRules);
-    } else {
-        log.error(`POST v${version} - validation failure - getUsers - status: 400, msg: request header parameters missing`);
-        return next({status: 400, msg: 'Bad request - validation failure'}, null);
-    }
-    
-    if(errors.length > 0) {
-        log.error(`POST v${version} - validation failure - getUsers - status: 400, msg: ${errors}`);
-        next({status: 400, msg: 'Bad request - validation failure'}, null);
-    } else {
-        auth.getUsers(query, (err, res) => {
-            if(err) {
-                log.error(`POST v${version} - failed - getUsers - status: ${err.status} msg: ${err.msg}`);
-                next(err, null);
-            } else {
-                // console.log(res);
-                next(null, res);
-            }
-        });
-    }
-}
-
-const logout = (req, next) => {
-
-    const { localid, idtoken } = req.headers;
-
-    const errors = validate(req.headers, postLogoutRules);
-
-    if(errors.length > 0) {
-        log.error(`POST v${version} - validation failure - logout - status: 400, msg: ${errors}`);
-        next({status: 400, msg: 'Bad request - validation failure'}, null);
-    } else {
-        const params = { localId: localid, idToken: idtoken};
-        auth.removeToken(params, (err, res) => {
-            if(err) {
-                log.error(`POST v${version} - failed - logout - status: ${err.status} msg: ${err.msg}`);
-                next(err, null);
-            } else {
-                next(null, res);
-            }
-        });
-    }
-}
 
 const authorise = (req, authenticated, rules, next) => {
 
@@ -219,7 +29,7 @@ const authorise = (req, authenticated, rules, next) => {
          
     if (!roles) {
         // console.log('no role', role);
-        return next({ status: 403, message: 'Forbidden' }, null);
+        return next({ status: 403, message: 'forbidden' }, null);
     }
     
     // if(role.every(r => roles.includes(r))) {
@@ -249,7 +59,7 @@ const authorise = (req, authenticated, rules, next) => {
     // console.log('email', email);
     // console.log('_id', _id);
     // console.log('id', id);
-    return next( { status: 403, message: 'Forbidden' }, null);
+    return next( { status: 403, message: 'forbidden' }, null);
 }
 
 const isAuthenticated = (req, rules, next) => {
@@ -260,18 +70,18 @@ const isAuthenticated = (req, rules, next) => {
 
     if (localid && localid != null && localid !== null && localid !== '' && localid !== 'null' &&
         idtoken && idtoken != null && idtoken !== null && idtoken !== '' && idtoken !== 'null') {
-        errors = validate(req.headers, getTokenRules);
+        errors = validate(req.headers, validationRules.isAuthenticatedRules);
     } else {
         log.error(`POST v${version} - validation failure - isAuthenticated - status: 401, msg: request header parameters missing`);
-        return next({ status: 401, msg: 'Unauthorised' }, null);
+        return next({ status: 401, msg: 'unauthorised' }, null);
     }
 
     if (errors.length > 0) {
         log.error(`POST v${version} - validation failure - isAuthenticated - status: 400, msg: ${errors}`);
-        return next({ status: 400, msg: 'Bad request - validation failure' }, null);
+        return next({ status: 400, msg: 'bad request' }, null);
     } else {
         const params = { idToken: idtoken, localId: localid };
-        auth.isAuthenticated(params, (err, auth) => {
+        repo.isAuthenticated(params, (err, auth) => {
             if(err) {
                 log.error(`POST v${version} - failed - isAuthenticated - status: ${err.status} msg: ${err.msg}`);
                 return next(err, null);
@@ -287,21 +97,183 @@ const isAuthenticated = (req, rules, next) => {
     }
 }
 
-const patchUserDisplayName = (req, next) => {
+const userPostUser = (req, next) => {
+    // check the user input is valid
+    const errors = validate(req.body, validationRules.userPostUserRules);
+    // return and log any errors found through the validation process
+    if(errors.length > 0) {
+        log.error(`POST v${version} - validation failure - userPostUser - status: 400, msg: ${errors}`);
+        next({status: 400, msg: 'bad request'}, null);
+    } else {
+        // generate a salt value
+        const salt = crypto.randomBytes(256);
+        // hash the password with the salt
+        const hash = genHash(req.body.password, salt);
+        //generate email verification token
+        const verificationToken = genToken();
+        // insert new user into the database
+        repo.createUser(
+            {   ...req.body,
+                emailVerified: false,
+                password: hash,
+                salt: salt.toString('hex'),
+                inuse: false,
+                lastLoggedIn: null,
+                logInCount: 0,
+                roles: ['user'],
+                updated: moment().format(),
+                created: moment().format(),
+                idToken: verificationToken
+            },
+            (err, res) => {
+            if(err) {
+                // log and return error
+                log.error(`POST v${version} - failed - userPostUser - status: ${err.status} msg: ${err.msg}`);
+                next(err, null);
+            }
+            else {
+                // log and return success
+                // log.info(`POST v${version} - success - userPostuser - status: ${JSON.stringify(req.body)}`);
+                next(null, res);
+            }
+        });
+    }
+}
+
+const userPatchUserEmailVerified = (req, next) => {
+
+    const { idtoken } = req.headers;
+    const { verified } = req.body;
+
+    const errors = validate(req.headers, validationRules.userPatchUserEmailVerifiedRules);
+
+    if(errors.length > 0) {
+        log.error(`POST v${version} - validation failure - userPatchUserEmailVerified - status: 400, msg: ${errors}`);
+        next({status: 400, msg: 'bad request'}, null);
+    } else {
+        const params = { idToken: idtoken, verified: verified };
+        repo.updateEmailVerification(params, (err, res) => {
+            if(err) {
+                log.error(`POST v${version} - failed - userPatchUserEmailVerified - status: ${err.status} msg: ${err.msg}`);
+                next(err, null);
+            } else {
+                next(null, res);
+            }
+        });
+    }
+}
+
+const userLoginUser = (req, next) => {
+
+    const errors = validate(req.body, validationRules.userLoginUserRules);
+
+    if(errors.length > 0) {
+        log.error(`POST v${version} - validation failure - userLoginUser - status: 400 msg: ${errors}`);
+        next({status: 400, msg: 'bad request'}, null);
+    } else {
+        repo.authenticate(req.body, (err, result) => {
+            if(err) {
+                log.error(`POST v${version} - failed - userLoginUser - status: ${err.status}, msg: ${err.msg}`);
+                next(err, null);
+            } else {
+                const params = { localId: result.data._id, idToken: genToken(), lastLoggedIn: moment().format() };
+                repo.updateToken(params, (err, idToken) => {
+                    if(err) {
+                        log.error(`POST v${version} - failed - userLoginUser - status: ${err.status} msg: ${err.msg}`);
+                        next(err, null);
+                    } else {
+                        next(null, {
+                            status: result.status,
+                            user: {
+                                idToken: idToken.idToken,
+                                localId: result.data._id,
+                                displayName: result.data.displayName,
+                                email: result.data.email,
+                                roles: result.data.roles,
+                                expiresIn: 3600
+                            }
+                        });
+                    }
+                });
+
+            }
+        });
+    }
+}
+
+const userLogoutUser = (req, next) => {
+
+    const { localid, idtoken } = req.headers;
+
+    const errors = validate(req.headers, validationRules.userLogoutUserRules);
+
+    if(errors.length > 0) {
+        log.error(`POST v${version} - validation failure - userLogoutUser - status: 400, msg: ${errors}`);
+        next({status: 400, msg: 'bad request'}, null);
+    } else {
+        const params = { localId: localid, idToken: idtoken};
+        repo.deleteToken(params, (err, res) => {
+            if(err) {
+                log.error(`POST v${version} - failed - userLogoutUser - status: ${err.status} msg: ${err.msg}`);
+                next(err, null);
+            } else {
+                next(null, res);
+            }
+        });
+    }
+}
+
+const userGetUser = (req, next) => {
+
+    const { localid, idtoken } = req.headers;
+
+    let errors = [];
+
+    if(localid && localid != null && idtoken && idtoken != null) {
+        errors = validate(req.headers, validationRules.userGetUserRules);
+    } else {
+        log.error(`POST v${version} - validation failure - userGetUser - status: 400, msg: request header parameters missing`);
+        return next({status: 400, msg: 'bad request'}, null);
+    }
+    
+    if(errors.length > 0) {
+        log.error(`POST v${version} - validation failure - userGetUser - status: 400, msg: ${errors}`);
+        next({status: 400, msg: 'bad request'}, null);
+    } else {
+        repo.selectUser(req.headers, (err, result) => {
+            if(err) {
+                log.error(`POST v${version} - failed - userGetUser - status: ${err.status} msg: ${err.msg}`);
+                next(err, null);
+            } else {
+                next(null, {
+                    status: result.status,
+                    user: {
+                        localId: result.data._id,
+                        displayName: result.data.displayName,
+                        email: result.data.email,
+                        roles: result.data.roles
+                    }
+                });
+            }
+        });
+    }
+}
+
+const userPatchUserDisplayName = (req, next) => {
 
     const { localid, idtoken } = req.headers;
     const { displayName } = req.body;
 
-    const errors = validate(req.body, patchUserDisplayNameRules);
+    const errors = validate(req.body, validationRules.userPatchUserDisplayNameRules);
 
     if(errors.length > 0) {
-        log.error(`POST v${version} - validation failure - patch display name - status: 400, msg: ${errors}`);
-        next({status: 400, msg: 'Bad request - validation failure'}, null);
+        log.error(`POST v${version} - validation failure - userPatchUserDisplayName - status: 400, msg: ${errors}`);
+        next({status: 400, msg: 'bad request'}, null);
     } else {
         const params = { localId: localid, idToken: idtoken, data: { displayName: displayName, updated: moment().format() } };
-        auth.patchUser(params, (err, res) => {
+        repo.updateUser(params, (err, res) => {
             if(err) {
-                log.error(`POST v${version} - failed - patchUser - status: ${err.status} msg: ${err.msg}`);
+                log.error(`POST v${version} - failed - userPatchUserDisplayName - status: ${err.status} msg: ${err.msg}`);
                 next(err, null);
             } else {
                 next(null, res);
@@ -310,21 +282,21 @@ const patchUserDisplayName = (req, next) => {
     }
 }
 
-const patchUserEmail = (req, next) => {
+const userPatchUserEmail = (req, next) => {
 
     const { localid, idtoken } = req.headers;
     const { email } = req.body;
 
-    const errors = validate(req.body, patchUserEmailRules);
+    const errors = validate(req.body, validationRules.userPatchUserEmailRules);
 
     if(errors.length > 0) {
-        log.error(`POST v${version} - validation failure - patch user email - status: 400, msg: ${errors}`);
-        next({status: 400, msg: 'Bad request - validation failure'}, null);
+        log.error(`POST v${version} - validation failure - userPatchUserEmail - status: 400, msg: ${errors}`);
+        next({status: 400, msg: 'bad request'}, null);
     } else {
         const params = { localId: localid, idToken: idtoken, data: { email: email, updated: moment().format() } };
-        auth.patchUser(params, (err, res) => {
+        repo.updateUser(params, (err, res) => {
             if(err) {
-                log.error(`POST v${version} - failed - patchUser - status: ${err.status} msg: ${err.msg}`);
+                log.error(`POST v${version} - failed - userPatchUserEmail - status: ${err.status} msg: ${err.msg}`);
                 next(err, null);
             } else {
                 next(null, res);
@@ -333,24 +305,24 @@ const patchUserEmail = (req, next) => {
     }
 }
 
-const patchUserPassword = (req, next) => {
+const userPatchUserPassword = (req, next) => {
 
     const { localid, idtoken } = req.headers;
     const { password } = req.body;
 
-    const errors = validate(req.body, patchUserPasswordRules);
+    const errors = validate(req.body, validationRules.userPatchUserPasswordRules);
 
     const salt = crypto.randomBytes(256);
     const hash = genHash(password, salt);
 
     if(errors.length > 0) {
-        log.error(`POST v${version} - validation failure - patch user password - status: 400, msg: ${errors}`);
-        next({status: 400, msg: 'Bad request - validation failure'}, null);
+        log.error(`POST v${version} - validation failure - userPatchUserPassword - status: 400, msg: ${errors}`);
+        next({status: 400, msg: 'bad request'}, null);
     } else {
         const params = { localId: localid, idToken: idtoken, data: { salt: salt.toString('hex'), password: hash, updated: moment().format() } };
-        auth.patchUser(params, (err, res) => {
+        repo.updateUser(params, (err, res) => {
             if(err) {
-                log.error(`POST v${version} - failed - patchUser - status: ${err.status} msg: ${err.msg}`);
+                log.error(`POST v${version} - failed - userPatchUserPassword - status: ${err.status} msg: ${err.msg}`);
                 next(err, null);
             } else {
                 next(null, res);
@@ -359,20 +331,102 @@ const patchUserPassword = (req, next) => {
     }
 }
 
-const patchAdminUser = (req, next) => {
+const userPostUserForgottenPassword = (req, next) => {
+
+    const { email } = req.body;
+    // check the user input is valid
+    const errors = validate(req.body, validationRules.userPostUserForgottenPasswordRules);
+    // return and log any errors found through the validation process
+    if(errors.length > 0) {
+        log.error(`POST v${version} - validation failure - userPostUserForgottenPassword - status: 400, msg: ${errors}`);
+        next({status: 400, msg: 'bad request'}, null);
+    } else {
+        const params = { email: email };
+        repo.selectUserByEmail(params, (err, res) => {
+            if(err) {
+                log.error(`POST v${version} - failed - userPostUserForgottenPassword - status: ${err.status} msg: ${err.msg}`);
+                next(null, { status: 200, msg: 'ok' });
+            } else {
+                const params = { localId: res.data._id, idToken: genToken(), lastLoggedIn: moment().format() };
+                repo.updateToken(params, (err, idToken) => {
+                    if(err) {
+                        log.error(`POST v${version} - failed - userPostUserForgottenPassword - status: ${err.status} msg: ${err.msg}`);
+                        next(null, { status: 200, msg: 'ok' });
+                    } else {
+                        //todo start email process with following info
+                        console.log({
+                            idToken: idToken.idToken,
+                            localId: res.data._id
+                        });
+                        next(null, { status: 200, msg: 'ok' });
+                    }
+                });
+            }
+        });
+    }
+}
+
+const adminGetUsers = (req, next) => {
+
+    const { localid, idtoken, query } = req.headers;
+
+    let errors = [];
+
+    if(localid && localid != null && idtoken && idtoken != null) {
+        errors = validate(req.headers, validationRules.adminGetUsersRules);
+    } else {
+        log.error(`POST v${version} - validation failure - adminGetUsers - status: 400, msg: request header parameters missing`);
+        return next({status: 400, msg: 'bad request'}, null);
+    }
+    
+    if(errors.length > 0) {
+        log.error(`POST v${version} - validation failure - adminGetUsers - status: 400, msg: ${errors}`);
+        next({status: 400, msg: 'bad request'}, null);
+    } else {
+        repo.selectUsers(query, (err, res) => {
+            if(err) {
+                log.error(`POST v${version} - failed - adminGetUsers - status: ${err.status} msg: ${err.msg}`);
+                next(err, null);
+            } else {
+                const users = new Array();
+                res.res.forEach(user => {
+                    let usr = {
+                        localId: user._id,
+                        displayName: user.displayName,
+                        email: user.email,
+                        roles: user.roles,
+                        inuse: user.inuse,
+                        lastLoggedInDate: user.lastLoggedInDate,
+                        logInCount: user.logInCount,
+                        updated: user.updated,
+                        created: user.created
+                    }
+                    users.push(usr);
+                });
+
+                next(null, {
+                    status: res.status,
+                    users: users
+                })
+            }
+        });
+    }
+}
+
+const adminPatchUser = (req, next) => {
 
     const { uid, roles, inuse } = req.body;
 
-    const errors = validate(req.body, patchAdminUserRules);
+    const errors = validate(req.body, validationRules.adminPatchUserRules);
 
     if(errors.length > 0) {
-        log.error(`POST v${version} - validation failure - patch user status - status: 400, msg: ${errors}`);
-        next({status: 400, msg: 'Bad request - validation failure'}, null);
+        log.error(`POST v${version} - validation failure - adminPatchUser - status: 400, msg: ${ errors }`);
+        next({status: 400, msg: 'bad request'}, null);
     } else {
         const params = { uid: uid, data: { roles: roles, inuse: inuse, updated: moment().format() } };
-        auth.patchAdminUser(params, (err, res) => {
+        repo.adminUpdateUser(params, (err, res) => {
             if(err) {
-                log.error(`POST v${version} - failed - patchUser - status: ${err.status} msg: ${err.msg}`);
+                log.error(`POST v${version} - failed - adminPatchUser - status: ${err.status} msg: ${ err.msg }`);
                 next(err, null);
             } else {
                 next(null, res);
@@ -388,19 +442,19 @@ const approveTransaction = (req, next) => {
 
     let errors = [];
     if(idtoken != null) {
-        errors = validate(req.headers, testTokenRules);
+        errors = validate(req.headers, validationRules.approveTransactionRules);
     } else {
-        log.error(`POST v${version} - validation failure - testToken - status: 400, msg: request header parameters missing`);
-        return next({status: 400, msg: 'Bad request - validation failure'}, null);
+        log.error(`POST v${version} - validation failure - approveTransaction - status: 400, msg: request header parameters missing`);
+        return next({status: 400, msg: 'bad request'}, null);
     }
     
     if(errors.length > 0) {
-        log.error(`POST v${version} - validation failure - testToken - status: 400, msg: ${errors}`);
-        next({status: 400, msg: 'Bad request - validation failure'}, null);
+        log.error(`POST v${version} - validation failure - approveTransaction - status: 400, msg: ${errors}`);
+        next({status: 400, msg: 'bad request'}, null);
     } else {
-        auth.approveTransaction(idtoken, (err, res) => {
+        repo.approveTransaction(idtoken, (err, res) => {
             if(err) {
-                log.error(`POST v${version} - failed - testToken - status: ${err.status} msg: ${err.msg}`);
+                log.error(`POST v${version} - failed - approveTransaction - status: ${err.status} msg: ${err.msg}`);
                 next(err, null);
             } else {
                 authorise(req, res.data, rules, (err, res) => {
@@ -415,16 +469,17 @@ const approveTransaction = (req, next) => {
 }
 
 module.exports = {
-    postUser: postUser,
-    login: login,
-    getUser: getUser,
-    getUsers:  getUsers,
-    logout: logout,
     isAuthenticated: isAuthenticated,
-    patchUserDisplayName: patchUserDisplayName,
-    patchUserEmail: patchUserEmail,
-    patchUserPassword: patchUserPassword,
-    patchAdminUser: patchAdminUser,
-    // patchUserRole: patchUserRole,
+    userPostUser: userPostUser,
+    userPatchUserEmailVerified: userPatchUserEmailVerified,
+    userLoginUser: userLoginUser,
+    userLogoutUser: userLogoutUser,
+    userGetUser: userGetUser,
+    userPatchUserDisplayName: userPatchUserDisplayName,
+    userPatchUserEmail: userPatchUserEmail,
+    userPatchUserPassword: userPatchUserPassword,
+    userPostUserForgottenPassword: userPostUserForgottenPassword,
+    adminGetUsers:  adminGetUsers,
+    adminPatchUser: adminPatchUser,
     approveTransaction: approveTransaction
 }
