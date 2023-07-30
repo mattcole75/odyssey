@@ -1,7 +1,7 @@
 const config = require('../../configuration/config');
 const service = config.get('service');
 const version = config.get('version');
-const con = require('../controller/auth');
+const con = require('../controller/guardian');
 
 module.exports = (app) => {
 

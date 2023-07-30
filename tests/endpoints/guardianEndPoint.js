@@ -1,4 +1,4 @@
-const config = require('../../services/auth/configuration/config');
+const config = require('../../services/guardian/configuration/config');
 const service = config.get('service');
 const version = config.get('version');
 

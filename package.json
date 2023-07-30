@@ -4,7 +4,7 @@
   "description": "Asset Management CRUD API",
   "main": "index.js",
   "scripts": {
-    "auth_service_test": "echo 'db.user.deleteMany({})' | mongosh auth && jest ./tests/a.auth.unit.test.js --runInBand",
+    "guardian_service_test": "echo 'db.user.deleteMany({})' | mongosh auth && jest ./tests/a.guardian.unit.test.js --runInBand",
     "assetTest": "jest ./tests/b.asset.unit.test.js --runInBand",
     "locationTest": "echo 'db.locations.deleteMany({}) ' | mongosh location && jest ./tests/e.location.unit.test.js --runInBand",
     "populate": "jest -t 'Test the location microservice POST methods'",

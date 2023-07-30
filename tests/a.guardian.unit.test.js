@@ -1,6 +1,6 @@
 'use strict'
 
-const authEndPoint = require('./endpoints/authEndPoint');
+const endPoint = require('./endpoints/guardianEndPoint');
 const crypto = require('crypto');
 const goodUsers = require('./data/good.user.data');
 const badUsers = require('./data/bad.user.data');
@@ -11,7 +11,7 @@ let wrongToken = '7c58e9e7cd20ae44f354d59f7a73ebb7e346d5e5a61517e33e0e97c4c79d25
 describe('Test 1 - prospective user registration - Validate user input', () => {
 
     it('should return 400 bad request if the display name is not between 3 and 64 chars', async () => {
-        await authEndPoint.post('/user')
+        await endPoint.post('/user')
             .send({
                 displayName: 'ab',
                 email: 'test@test.com',
@@ -28,7 +28,7 @@ describe('Test 1 - prospective user registration - Validate user input', () => {
     });
 
     it('should return 400 bad request if the display name is not between 3 and 64 chars', async () => {
-        await authEndPoint.post('/user')
+        await endPoint.post('/user')
             .send({
                 displayName: 'abcdefghijabcdefghijabcdefghijabcdefghijabcdefghijabcdefghij12345',
                 email: 'test@test.com',
@@ -45,7 +45,7 @@ describe('Test 1 - prospective user registration - Validate user input', () => {
     });
 
     it('should return 400 bad request if the email address is not well formed', async () => {
-        await authEndPoint.post('/user')
+        await endPoint.post('/user')
             .send({
                 displayName: 'test user',
                 email: '',
@@ -62,7 +62,7 @@ describe('Test 1 - prospective user registration - Validate user input', () => {
     });
 
     it('should return 400 bad request if the email address is not well formed', async () => {
-        await authEndPoint.post('/user')
+        await endPoint.post('/user')
             .send({
                 displayName: 'test user',
                 email: 'test@test.',
@@ -79,7 +79,7 @@ describe('Test 1 - prospective user registration - Validate user input', () => {
     });
 
     it('should return 400 bad request if the email address is not well formed', async () => {
-        await authEndPoint.post('/user')
+        await endPoint.post('/user')
             .send({
                 displayName: 'test user',
                 email: 'test.test.com',
@@ -96,7 +96,7 @@ describe('Test 1 - prospective user registration - Validate user input', () => {
     });
 
     it('should return 400 bad request if the password is not well formed', async () => {
-        await authEndPoint.post('/user')
+        await endPoint.post('/user')
             .send({
                 displayName: 'test user',
                 email: 'test@test.com',
@@ -113,7 +113,7 @@ describe('Test 1 - prospective user registration - Validate user input', () => {
     });
 
     it('should return 400 bad request if the password is not well formed', async () => {
-        await authEndPoint.post('/user')
+        await endPoint.post('/user')
             .send({
                 displayName: 'test user',
                 email: 'test@test.com',
@@ -135,7 +135,7 @@ describe('Test 2 - Prospective user registration - Register users', () => {
     goodUsers.forEach(user => {
 
         it('should, create a user account for: ' + user.displayName, async () => {
-            await authEndPoint.post('/user')
+            await endPoint.post('/user')
                 .send({
                     displayName: user.displayName,
                     email: user.email,
@@ -159,7 +159,7 @@ describe('Test 3 - Prospective user registration - attempt to register duplicate
     goodUsers.forEach(user => {
 
         it('should, fail to create a user account for: ' + user.displayName, async () => {
-            await authEndPoint.post('/user')
+            await endPoint.post('/user')
                 .send({
                     displayName: user.displayName,
                     email: user.email,
@@ -182,7 +182,7 @@ describe('Test 4 - Prospective user email verification - Verify user email addre
     goodUsers.forEach(user => {
 
         it('should, verify the email address for: ' + user.displayName, async () => {
-            await authEndPoint.patch('/verifyemail')
+            await endPoint.patch('/verifyemail')
                 .send({ verified: true })
                 .set({ 
                     'Content-Type': 'application/json',
@@ -202,7 +202,7 @@ describe('Test 4 - Prospective user email verification - Verify user email addre
 describe('Test 5 - User login - Validate user input', () => {
 
     it('should return 400 bad request if the email address is not well formed', async () => {
-        await authEndPoint.post('/user/login')
+        await endPoint.post('/user/login')
             .send({
                 email: '',
                 password: '4266f573bc905042c47467963c33ad598715c5f10e6dac2717d30efc1e7fa984'
@@ -218,7 +218,7 @@ describe('Test 5 - User login - Validate user input', () => {
     });
 
     it('should return 400 bad request if the email address is not well formed', async () => {
-        await authEndPoint.post('/user/login')
+        await endPoint.post('/user/login')
             .send({
                 email: 'test@test.',
                 password: '4266f573bc905042c47467963c33ad598715c5f10e6dac2717d30efc1e7fa984'
@@ -234,7 +234,7 @@ describe('Test 5 - User login - Validate user input', () => {
     });
 
     it('should return 400 bad request if the email address is not well formed', async () => {
-        await authEndPoint.post('/user/login')
+        await endPoint.post('/user/login')
             .send({
                 email: 'test.test.com',
                 password: '4266f573bc905042c47467963c33ad598715c5f10e6dac2717d30efc1e7fa984'
@@ -250,7 +250,7 @@ describe('Test 5 - User login - Validate user input', () => {
     });
 
     it('should return 400 bad request if the password is not well formed', async () => {
-        await authEndPoint.post('/user/login')
+        await endPoint.post('/user/login')
             .send({
                 email: 'test@test.com',
                 password: '123456789012345678901234567890123456789012345678901234567890123' // 63 chars
@@ -266,7 +266,7 @@ describe('Test 5 - User login - Validate user input', () => {
     });
 
     it('should return 400 bad request if the password is not well formed', async () => {
-        await authEndPoint.post('/user/login')
+        await endPoint.post('/user/login')
             .send({
                 email: 'test@test.com',
                 password: '12345678901234567890123456789012345678901234567890123456789012345' // 65 chars
@@ -288,7 +288,7 @@ describe('Test 6 - User login - fail to login a disabled account unless its the 
         it(user.email !== 'admin@system.com'
             ? 'should, fail to login a disabled account: ' + user.displayName
             : 'should, login the primary account: ' + user.displayName, async () => {
-            await authEndPoint.post('/user/login')
+            await endPoint.post('/user/login')
                 .send({
                     email: user.email,
                     password: crypto.createHash('sha256').update(user.password).digest('hex')
@@ -317,7 +317,7 @@ describe('Test 6 - User login - fail to login a disabled account unless its the 
 describe('Test 7 - Administrator get a list of system users and enable their accounts', () => {
 
     it('should get a list of all users using the priviledged account', async () => {
-        await authEndPoint.get('/admin/users')
+        await endPoint.get('/admin/users')
             .set({
                 'Content-Type': 'application/json',
                 idToken: goodUsers.find(usr => usr.displayName === 'sysadmin').idToken,
@@ -338,7 +338,7 @@ describe('Test 7 - Administrator get a list of system users and enable their acc
     goodUsers.forEach(user => {
 
         it('should, using the priviledged user, enable each account: ' + user.displayName, async () => {
-            await authEndPoint.patch('/admin/user')
+            await endPoint.patch('/admin/user')
                 .set({
                     'Content-Type': 'application/json',
                     idToken: goodUsers.find(usr => usr.displayName === 'sysadmin').idToken,
@@ -364,7 +364,7 @@ describe('Test 8 - Login each user, get their own data, attemp to get another us
     //login all users
     goodUsers.forEach(user => {
         it('should, login and return the user details and token for: ' + user.displayName, async () => {
-            await authEndPoint.post('/user/login')
+            await endPoint.post('/user/login')
                 .send({
                     email: user.email,
                     password: crypto.createHash('sha256').update(user.password).digest('hex')
@@ -387,7 +387,7 @@ describe('Test 8 - Login each user, get their own data, attemp to get another us
     goodUsers.forEach(user => {
 
         it('should, successfully return the users details for: ' + user.displayName, async () => {
-            await authEndPoint.get('/user')
+            await endPoint.get('/user')
                 .set({
                     'Content-Type': 'application/json',
                     idToken: user.idToken,
@@ -405,7 +405,7 @@ describe('Test 8 - Login each user, get their own data, attemp to get another us
     });
     // attemp to get other users details
     it('should, fail to retieve a different users details with valid token', async () => {
-        await authEndPoint.get('/user')
+        await endPoint.get('/user')
             .set({
                 idToken: goodUsers.find(usr => usr.displayName === 'Rand Althor').idToken,
                 localId: goodUsers.find(usr => usr.displayName === 'Chade Fallstar').localId
@@ -422,7 +422,7 @@ describe('Test 8 - Login each user, get their own data, attemp to get another us
     goodUsers.forEach(user => {
 
         it('should, return all registered users but only for an administrator role', async () => {
-            await authEndPoint.get('/admin/users')
+            await endPoint.get('/admin/users')
                 .set({
                     idToken: user.idToken,
                     localId: user.localId,
@@ -444,7 +444,7 @@ describe('Test 8 - Login each user, get their own data, attemp to get another us
     goodUsers.forEach(user => {
 
         it('should, logout: ' + user.displayName, async() => {
-            await authEndPoint.post('/user/logout')
+            await endPoint.post('/user/logout')
                 .set({
                     idToken: user.idToken,
                     localId: user.localId
@@ -459,7 +459,7 @@ describe('Test 8 - Login each user, get their own data, attemp to get another us
 describe('Test 9 - update user details', () => {
 
     it('should, login and update the users details the user details and token for: ' + goodUsers.find(usr => usr.displayName === 'Tony Ezekiel').displayName, async () => {
-        await authEndPoint.post('/user/login')
+        await endPoint.post('/user/login')
             .send({
                 email: goodUsers.find(usr => usr.displayName === 'Tony Ezekiel').email,
                 password: crypto.createHash('sha256').update(goodUsers.find(usr => usr.displayName === 'Tony Ezekiel').password).digest('hex')
@@ -479,7 +479,7 @@ describe('Test 9 - update user details', () => {
     });
 
     it('should return 400 bad request if the display name is not between 3 and 64 chars', async () => {
-        await authEndPoint.patch('/user/displayname')
+        await endPoint.patch('/user/displayname')
             .send({
                 displayName: 'ab'
             })
@@ -498,7 +498,7 @@ describe('Test 9 - update user details', () => {
     });
 
     it('should return 400 bad request if the display name is not between 3 and 64 chars', async () => {
-        await authEndPoint.patch('/user/displayname')
+        await endPoint.patch('/user/displayname')
             .send({
                 displayName: 'abcdefghijabcdefghijabcdefghijabcdefghijabcdefghijabcdefghij12345'
             })
@@ -517,7 +517,7 @@ describe('Test 9 - update user details', () => {
     });
 
     it('should return 400 bad request if the email address is not well formed', async () => {
-        await authEndPoint.patch('/user/email')
+        await endPoint.patch('/user/email')
             .send({
                 email: ''
             })
@@ -536,7 +536,7 @@ describe('Test 9 - update user details', () => {
     });
 
     it('should return 400 bad request if the email address is not well formed', async () => {
-        await authEndPoint.patch('/user/email')
+        await endPoint.patch('/user/email')
             .send({
                 email: 'test@test.'
             })
@@ -556,7 +556,7 @@ describe('Test 9 - update user details', () => {
     });
 
     it('should return 400 bad request if the email address is not well formed', async () => {
-        await authEndPoint.patch('/user/email')
+        await endPoint.patch('/user/email')
             .send({
                 email: 'test.test.com'
             })
@@ -576,7 +576,7 @@ describe('Test 9 - update user details', () => {
     });
 
     it('should return 400 bad request if the password is not well formed', async () => {
-        await authEndPoint.patch('/user/password')
+        await endPoint.patch('/user/password')
             .send({
                 password: '123456789012345678901234567890123456789012345678901234567890123' // 63 chars
             })
@@ -596,7 +596,7 @@ describe('Test 9 - update user details', () => {
     });
 
     it('should return 400 bad request if the password is not well formed', async () => {
-        await authEndPoint.patch('/user/password')
+        await endPoint.patch('/user/password')
             .send({
                 password: '12345678901234567890123456789012345678901234567890123456789012345' // 65 chars
             })
@@ -616,7 +616,7 @@ describe('Test 9 - update user details', () => {
     });
 
     it('should return 200 for a successful update of the display name', async () => {
-        await authEndPoint.patch('/user/displayname')
+        await endPoint.patch('/user/displayname')
             .send({
                 displayName: 'Ezekiel Tony'
             })
@@ -635,7 +635,7 @@ describe('Test 9 - update user details', () => {
     });
 
     it('should return 200 for a succeessful update of the email address', async () => {
-        await authEndPoint.patch('/user/email')
+        await endPoint.patch('/user/email')
             .send({
                 email: 'Ezekiel.Tony@system.com'
             })
@@ -654,7 +654,7 @@ describe('Test 9 - update user details', () => {
     });
 
     it('should return 400 bad request if the password is not well formed', async () => {
-        await authEndPoint.patch('/user/password')
+        await endPoint.patch('/user/password')
             .send({
                 password: crypto.createHash('sha256').update(goodUsers.find(usr => usr.displayName === 'Tony Ezekiel').password).digest('hex')
             })
@@ -674,7 +674,7 @@ describe('Test 9 - update user details', () => {
     });
 
     it('should, logout: ' + goodUsers.find(usr => usr.displayName === 'Tony Ezekiel').displayName, async() => {
-        await authEndPoint.post('/user/logout')
+        await endPoint.post('/user/logout')
             .set({
                 'Content-Type': 'application/json',
                 idToken: goodUsers.find(usr => usr.displayName === 'Tony Ezekiel').idToken,
@@ -688,7 +688,7 @@ describe('Test 9 - update user details', () => {
 describe('Test 10 - forgotten password request', () => {
 
     it('should return 400 bad request if the email address is not well formed', async () => {
-        await authEndPoint.post('/user/forgottenpassword')
+        await endPoint.post('/user/forgottenpassword')
             .send({
                 email: ''
             })
@@ -703,7 +703,7 @@ describe('Test 10 - forgotten password request', () => {
     });
 
     it('should return 400 bad request if the email address is not well formed', async () => {
-        await authEndPoint.post('/user/forgottenpassword')
+        await endPoint.post('/user/forgottenpassword')
             .send({
                 email: 'test@test.'
             })
@@ -718,7 +718,7 @@ describe('Test 10 - forgotten password request', () => {
     });
 
     it('should return 400 bad request if the email address is not well formed', async () => {
-        await authEndPoint.post('/user/forgottenpassword')
+        await endPoint.post('/user/forgottenpassword')
             .send({
                 email: 'test.test.com'
             })
@@ -733,7 +733,7 @@ describe('Test 10 - forgotten password request', () => {
     });
 
     it('should, return 200 for an invalid email', async () => {
-        await authEndPoint.post('/user/forgottenpassword')
+        await endPoint.post('/user/forgottenpassword')
             .send({
                 email: 'not.exist@system.com'
             })
@@ -748,7 +748,7 @@ describe('Test 10 - forgotten password request', () => {
     });
 
     it('should, return 200 for a valid email', async () => {
-        await authEndPoint.post('/user/forgottenpassword')
+        await endPoint.post('/user/forgottenpassword')
             .send({
                 email: goodUsers.find(usr => usr.displayName === 'Kyle Haven').email
             })
@@ -766,7 +766,7 @@ describe('Test 10 - forgotten password request', () => {
 describe('Test 11 - Deny access tests:', () => {
 
     it('should, deny access for incorrect email address', async () => {
-        await authEndPoint.post('/user/login')
+        await endPoint.post('/user/login')
             .send({
                 email: badUsers[0].email,
                 password: crypto.createHash('sha256').update(badUsers[0].password).digest('hex')
@@ -782,7 +782,7 @@ describe('Test 11 - Deny access tests:', () => {
     });
 
     it('should, deny access for incorrect password', async () => {
-        await authEndPoint.post('/user/login')
+        await endPoint.post('/user/login')
             .send({
                 email: badUsers[1].email,
                 password: crypto.createHash('sha256').update(badUsers[1].password).digest('hex')
@@ -798,7 +798,7 @@ describe('Test 11 - Deny access tests:', () => {
     });
 
     it('should, deny access for incorrect email and password', async () => {
-        await authEndPoint.post('/user/login')
+        await endPoint.post('/user/login')
             .send({
                 'Content-Type': 'application/json',
                 email: badUsers[2].email,
@@ -814,7 +814,7 @@ describe('Test 11 - Deny access tests:', () => {
     });
 
     it('should, login a valid user for further testing', async () => {
-        await authEndPoint.post('/user/login')
+        await endPoint.post('/user/login')
             .send({
                 email: badUsers[3].email,
                 password: crypto.createHash('sha256').update(badUsers[3].password).digest('hex')
@@ -834,7 +834,7 @@ describe('Test 11 - Deny access tests:', () => {
     });
 
     it('should, fail to return user data, given a logged in user but with invalid token', async () => {
-        await authEndPoint.get('/user')
+        await endPoint.get('/user')
             .set({
                 'Content-Type': 'application/json',
                 idToken: wrongToken,
@@ -850,7 +850,7 @@ describe('Test 11 - Deny access tests:', () => {
     });
 
     it('should, fail to return user data, given a logged in user but with invadid localId', async () => {
-        await authEndPoint.get('/user')
+        await endPoint.get('/user')
             .set({
                 'Content-Type': 'application/json',
                 idToken: badUsers[3].idToken,
@@ -866,14 +866,14 @@ describe('Test 11 - Deny access tests:', () => {
     });
 
     it('should, fail to return the users details given no headers', async() => {
-        await authEndPoint.get('/user')
+        await endPoint.get('/user')
             .set({ 'Content-Type': 'application/json' })
             .expect('Content-Type', /json/)
             .expect(401)
     });
 
     it('should, fail to return the users details given null token', async () => {
-        await authEndPoint.get('/user')
+        await endPoint.get('/user')
             .set({
                 'Content-Type': 'application/json',
                 idToken: null,
@@ -884,7 +884,7 @@ describe('Test 11 - Deny access tests:', () => {
     });
 
     it('should, fail to return the users details given an empty token', async () => {
-        await authEndPoint.get('/user')
+        await endPoint.get('/user')
             .set({
                 'Content-Type': 'application/json',
                 idToken: '',
@@ -895,7 +895,7 @@ describe('Test 11 - Deny access tests:', () => {
     });
 
     it('should, fail to create a user with an already registered email address', async () => {
-        await authEndPoint.post('/user')
+        await endPoint.post('/user')
             .send({
                 displayName: goodUsers[0].displayName,
                 email: goodUsers[0].email,
@@ -909,7 +909,7 @@ describe('Test 11 - Deny access tests:', () => {
     });
 
     it('should, logout the user given the user id', async () => {
-        await authEndPoint.post('/user/logout')
+        await endPoint.post('/user/logout')
             .set({
                 'Content-Type': 'application/json',
                 idToken: badUsers[3].idToken,
@@ -924,7 +924,7 @@ describe('Test 11 - Deny access tests:', () => {
 describe('Test 12 - approve transaction tests', () => {
 
     it('should, return 403 for a non recognised token', async () => {
-        await authEndPoint.post('/approvetransaction')
+        await endPoint.post('/approvetransaction')
             .set({
                 idToken: wrongToken
             })
@@ -940,7 +940,7 @@ describe('Test 12 - approve transaction tests', () => {
     });
 
     it('should, return 400 for an empty string token', async () => {
-        await authEndPoint.post('/approvetransaction')
+        await endPoint.post('/approvetransaction')
             .set({
                 idToken: ''
             })
@@ -956,7 +956,7 @@ describe('Test 12 - approve transaction tests', () => {
     });
 
     it('should, return 400 for no token', async () => {
-        await authEndPoint.post('/approvetransaction')
+        await endPoint.post('/approvetransaction')
             .set({
             
             })
@@ -972,7 +972,7 @@ describe('Test 12 - approve transaction tests', () => {
     });
 
     it('should, login a valid user for further testing', async () => {
-        await authEndPoint.post('/user/login')
+        await endPoint.post('/user/login')
             .send({
                 email: goodUsers[1].email,
                 password: crypto.createHash('sha256').update(goodUsers[1].password).digest('hex')
@@ -992,7 +992,7 @@ describe('Test 12 - approve transaction tests', () => {
     });
 
     it('should, return 200 for a valid token', async () => {
-        await authEndPoint.post('/approvetransaction')
+        await endPoint.post('/approvetransaction')
             .set({
                 idToken: goodUsers[1].idToken
             })
@@ -1008,7 +1008,7 @@ describe('Test 12 - approve transaction tests', () => {
     });
 
     it('should, return 403 for a valid token but no role permission', async () => {
-        await authEndPoint.post('/approvetransaction')
+        await endPoint.post('/approvetransaction')
             .set({
                 idToken: goodUsers[1].idToken
             })
@@ -1023,7 +1023,7 @@ describe('Test 12 - approve transaction tests', () => {
     });
 
     it('should, logout the user given the user id', async () => {
-        await authEndPoint.post('/user/logout')
+        await endPoint.post('/user/logout')
             .set({
                 idToken: goodUsers[1].idToken,
                 localId: goodUsers[1].localId
@@ -1034,7 +1034,7 @@ describe('Test 12 - approve transaction tests', () => {
     });
 
     it('should, return 403 for a logged out user', async () => {
-        await authEndPoint.post('/approvetransaction')
+        await endPoint.post('/approvetransaction')
             .set({
                 idToken: goodUsers[1].idToken
             })
@@ -1053,7 +1053,7 @@ describe('Test 12 - approve transaction tests', () => {
 describe('Bug replication and fixes', () => {
 
     it('should return 200 server is up', async () => {
-        await authEndPoint.get('/')
+        await endPoint.get('/')
         .set({ 'Content-Type': 'application/json' })
         .expect(200)
         .then(res => {
@@ -1063,7 +1063,7 @@ describe('Bug replication and fixes', () => {
 
     // monitoring the logs on the live server and clocked this request... someone trying to hack the system? 
     it('should return 404 Not Found', async () => {
-        await authEndPoint.get('/.env')
+        await endPoint.get('/.env')
         .expect(404)
         .then(res => {
             expect(res.res.statusMessage).toBe('Not Found');
@@ -1071,7 +1071,7 @@ describe('Bug replication and fixes', () => {
     });
 
     it('should return 404 Not Found', async () => {
-        await authEndPoint.get('/index.html')
+        await endPoint.get('/index.html')
         .expect(404)
         .then(res => {
             expect(res.res.statusMessage).toBe('Not Found');

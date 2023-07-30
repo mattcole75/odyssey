@@ -17,7 +17,7 @@ module.exports = () => {
 
     app.use(morgan('[:date[clf]] :method :url :status :response-time ms - :res[content-length]'));
 
-    require('../app/routes/auth')(app);
+    require('../app/routes/guardian')(app);
 
     app.use((err, req, res, next) => {
         console.error(err.stack);

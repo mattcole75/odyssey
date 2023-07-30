@@ -1,4 +1,4 @@
-const repo = require('../repository/auth');
+const repo = require('../repository/guardian');
 const log = require('../../utility/logger')();
 const crypto = require('crypto');
 const config = require('../../configuration/config');
