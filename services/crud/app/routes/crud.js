@@ -5,7 +5,7 @@ const version = config.get('version');
 
 module.exports = (app) => {
     app.get('/' + service + '/api/' + version, (req, res) => {
-        res.status(200).send({'msg': 'Server is up!'});
+        res.status(200).send({'msg': 'Service is up!'});
     });
 
     app.post('/' + service + '/api/' + version + '/post', (req, res) => {

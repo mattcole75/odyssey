@@ -920,7 +920,7 @@ describe('Test 11 - Deny access tests:', () => {
     });
 
 });
-// // auth token tests
+// token tests
 describe('Test 12 - approve transaction tests', () => {
 
     it('should, return 403 for a non recognised token', async () => {
@@ -1049,7 +1049,7 @@ describe('Test 12 - approve transaction tests', () => {
             .expect(403)
     });
 });
-// auth bug fixes
+// bug fixes
 describe('Bug replication and fixes', () => {
 
     it('should return 200 server is up', async () => {
